@@ -1,0 +1,2219 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Яндекс.Почта — Входящие</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    background: #E5EAF0;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    font-size: 14px;
+  }
+
+  .mail-app {
+    width: 1000px;
+    max-width: 100%;
+    height: 800px;
+    max-height: 96vh;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.04);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ===== HEADER ===== */
+  .header {
+    height: 52px;
+    background: #FC3F1D;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    flex-shrink: 0;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .header-left { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+
+  .ya-logo {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #fff;
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: -0.4px;
+    cursor: default;
+    user-select: none;
+  }
+
+  .ya-logo svg { flex-shrink: 0; }
+
+  .header-search-wrap {
+    position: relative;
+    flex: 1;
+    max-width: 340px;
+  }
+
+  .header-search {
+    width: 100%;
+    background: rgba(255,255,255,0.18);
+    border: none;
+    border-radius: 20px;
+    padding: 6px 14px 6px 34px;
+    color: #fff;
+    font-size: 13px;
+    outline: none;
+    transition: background 0.2s;
+  }
+
+  .header-search:focus { background: rgba(255,255,255,0.30); }
+  .header-search::placeholder { color: rgba(255,255,255,0.55); }
+
+  .header-search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255,255,255,0.55);
+    font-size: 13px;
+    pointer-events: none;
+  }
+
+  .header-right { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+
+  .header-btn {
+    color: #fff;
+    cursor: pointer;
+    opacity: 0.80;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: none;
+    background: none;
+    font-size: 16px;
+    transition: background 0.15s, opacity 0.15s;
+  }
+
+  .header-btn:hover { background: rgba(255,255,255,0.15); opacity: 1; }
+
+  .header-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.20);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-left: 4px;
+    transition: background 0.2s;
+    border: none;
+  }
+
+  .header-avatar:hover { background: rgba(255,255,255,0.35); }
+
+  /* ===== BODY LAYOUT ===== */
+  .body { display: flex; flex: 1; overflow: hidden; }
+
+  /* ===== SIDEBAR ===== */
+  .sidebar {
+    width: 210px;
+    background: #F7F9FC;
+    border-right: 1px solid #E2E8F0;
+    padding: 14px 10px;
+    overflow-y: auto;
+    flex-shrink: 0;
+  }
+
+  .compose-btn {
+    width: 100%;
+    padding: 10px 0;
+    background: #FC3F1D;
+    color: #fff;
+    border: none;
+    border-radius: 24px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .compose-btn:hover { background: #E63518; }
+  .compose-btn:active { transform: scale(0.98); }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    font-weight: 500;
+    transition: background 0.12s;
+    user-select: none;
+  }
+
+  .nav-item:hover { background: #E8EDF4; }
+  .nav-item:active { background: #DDE4ED; }
+
+  .nav-item.active {
+    background: #FEE9E5;
+    color: #FC3F1D;
+    font-weight: 600;
+  }
+
+  .nav-item .icon { font-size: 17px; width: 22px; text-align: center; flex-shrink: 0; }
+
+  .nav-item .badge {
+    margin-left: auto;
+    background: #FC3F1D;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 1px 7px;
+    border-radius: 10px;
+    line-height: 16px;
+  }
+
+  .sidebar-divider { height: 1px; background: #E2E8F0; margin: 10px 0; }
+
+  .folders-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #8E9CAB;
+    font-weight: 600;
+    padding: 4px 12px;
+    letter-spacing: 0.5px;
+  }
+
+  /* ===== INBOX AREA ===== */
+  .inbox-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; position: relative; }
+
+  /* ===== TOOLBAR ===== */
+  .toolbar {
+    height: 46px;
+    border-bottom: 1px solid #E2E8F0;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    gap: 2px;
+    flex-shrink: 0;
+    background: #FBFCFD;
+  }
+
+  .toolbar input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #FC3F1D;
+    cursor: pointer;
+    margin-right: 4px;
+    flex-shrink: 0;
+  }
+
+  .toolbar-btn {
+    background: none;
+    border: none;
+    padding: 5px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #555;
+    font-weight: 500;
+    transition: background 0.12s;
+    white-space: nowrap;
+  }
+
+  .toolbar-btn:hover { background: #E8EDF4; }
+  .toolbar-btn:active { background: #DDE4ED; }
+
+  .toolbar-sep { width: 1px; height: 22px; background: #E2E8F0; margin: 0 4px; flex-shrink: 0; }
+
+  .toolbar-spacer { flex: 1; min-width: 8px; }
+
+  .toolbar .count {
+    font-size: 12px;
+    color: #8E9CAB;
+    margin-right: 6px;
+    white-space: nowrap;
+  }
+
+  .toolbar .pagination { display: flex; align-items: center; gap: 2px; }
+
+  .page-btn {
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #555;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.12s;
+  }
+
+  .page-btn:hover { background: #E8EDF4; }
+  .page-btn:disabled { opacity: 0.3; cursor: default; }
+  .page-btn:disabled:hover { background: none; }
+
+  /* ===== EMAIL LIST ===== */
+  .email-list { flex: 1; overflow-y: auto; }
+
+  .email-row {
+    display: flex;
+    align-items: center;
+    padding: 9px 14px;
+    cursor: pointer;
+    border-bottom: 1px solid #F0F4F8;
+    transition: background 0.08s;
+    min-height: 50px;
+    gap: 10px;
+  }
+
+  .email-row:hover { background: #F4F7FA; }
+
+  .email-row.unread { background: #fff; }
+  .email-row.unread .from { font-weight: 700; color: #111; }
+  .email-row.unread .subject { font-weight: 600; color: #1a1a1a; }
+  .email-row.unread .date-text { font-weight: 600; color: #111; }
+
+  .email-row .cb { flex-shrink: 0; }
+  .email-row .cb input { width: 16px; height: 16px; accent-color: #FC3F1D; cursor: pointer; }
+
+  .email-row .avatar-wrap { flex-shrink: 0; }
+
+  .email-row .avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 700;
+    font-size: 13px;
+    flex-shrink: 0;
+    user-select: none;
+  }
+
+  .avatar.orange { background: linear-gradient(135deg, #FF8C00, #FF4500); }
+  .avatar.green  { background: linear-gradient(135deg, #00B09B, #96C93D); }
+  .avatar.blue   { background: linear-gradient(135deg, #4FACFE, #00F2FE); }
+  .avatar.purple { background: linear-gradient(135deg, #A18CD1, #FBC2EB); }
+  .avatar.gray   { background: linear-gradient(135deg, #B0BEC5, #90A4AE); }
+  .avatar.red    { background: linear-gradient(135deg, #E53935, #EF5350); }
+
+  .email-row .from-wrap { min-width: 0; flex-shrink: 0; width: 190px; }
+
+  .email-row .from {
+    font-size: 14px;
+    color: #333;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .email-row .subject-wrap {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .email-row .subject {
+    font-size: 14px;
+    color: #444;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .email-row .subject .label {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 0 5px;
+    border-radius: 3px;
+    margin-right: 4px;
+    vertical-align: middle;
+    line-height: 16px;
+  }
+
+  .label.work { background: #E3F2FD; color: #1565C0; }
+
+  .email-row .date-wrap {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 8px;
+  }
+
+  .email-row .date-text {
+    font-size: 12px;
+    color: #8E9CAB;
+    white-space: nowrap;
+  }
+
+  .email-row .pin-icon {
+    color: #FC3F1D;
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+
+  /* ===== EMAIL READER ===== */
+  .email-reader {
+    display: none;
+    flex: 1;
+    flex-direction: column;
+    overflow: hidden;
+    background: #fff;
+  }
+
+  .email-reader.open { display: flex; }
+
+  .reader-scroll { padding: 24px 32px; flex: 1; overflow-y: auto; }
+
+  .reader-back {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    font-size: 13px;
+    color: #FC3F1D;
+    cursor: pointer;
+    font-weight: 500;
+    padding: 4px 0;
+    margin-bottom: 12px;
+  }
+
+  .reader-back:hover { text-decoration: underline; }
+
+  .reader-header { border-bottom: 1px solid #E8EDF4; padding-bottom: 18px; margin-bottom: 18px; }
+
+  .reader-subject {
+    font-size: 22px;
+    font-weight: 700;
+    color: #111;
+    margin-bottom: 14px;
+    line-height: 1.3;
+    word-break: break-word;
+  }
+
+  .reader-from {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    position: relative;
+  }
+
+  .reader-from .avatar { width: 48px; height: 48px; font-size: 18px; flex-shrink: 0; }
+
+  .reader-from .info-wrap { flex: 1; min-width: 0; }
+
+  .reader-from .name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #111;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .reader-from .email {
+    font-size: 13px;
+    color: #8E9CAB;
+  }
+
+  .reader-from .to-me {
+    font-size: 13px;
+    color: #8E9CAB;
+    margin-top: 1px;
+  }
+
+  .reader-from .to-me span { color: #1565C0; cursor: pointer; }
+  .reader-from .to-me span:hover { text-decoration: underline; }
+
+  .reader-from .date-right {
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 12px;
+    color: #8E9CAB;
+    text-align: right;
+  }
+
+  .reader-body {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #222;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    word-wrap: break-word;
+  }
+
+  .reader-body strong { color: #111; }
+
+  .reader-body .vacancy-block {
+    background: #F7F9FC;
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin: 16px 0;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+
+  .reader-body .vacancy-block:hover { background: #F0F4FA; border-color: #C8D0DC; }
+
+  .reader-body .vacancy-block .v-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1565C0;
+    margin-bottom: 6px;
+  }
+
+  .reader-body .vacancy-block .v-company {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .reader-body .vacancy-block .v-salary {
+    font-size: 15px;
+    font-weight: 700;
+    color: #2E7D32;
+    margin: 6px 0;
+  }
+
+  .reader-body .vacancy-block .v-desc {
+    font-size: 13px;
+    color: #555;
+    line-height: 1.5;
+    margin-top: 4px;
+  }
+
+  .reader-body .vacancy-block .v-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .reader-body .vacancy-block .v-tag {
+    background: #E3F2FD;
+    color: #1565C0;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: 500;
+  }
+
+  .reader-body .vacancy-block .v-sub {
+    font-size: 13px;
+    color: #555;
+    margin-top: 2px;
+  }
+
+  .reader-body .vacancy-sep {
+    border: none;
+    border-top: 1px dashed #D0D8E0;
+    margin: 18px 0;
+  }
+
+  .reader-actions {
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px solid #E8EDF4;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding-bottom: 8px;
+  }
+
+  .reader-actions button {
+    padding: 8px 18px;
+    border-radius: 20px;
+    border: 1px solid #D0D8E0;
+    background: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.12s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .reader-actions button:hover { background: #F4F7FA; border-color: #B0BEC5; }
+  .reader-actions button:active { background: #E8EDF4; }
+
+  .reader-actions button.primary {
+    background: #FC3F1D;
+    color: #fff;
+    border-color: #FC3F1D;
+  }
+
+  .reader-actions button.primary:hover { background: #E63518; border-color: #E63518; }
+
+  /* ===== COMPOSE MODAL ===== */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.35);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal-box {
+    background: #fff;
+    border-radius: 12px;
+    width: 600px;
+    max-width: 100%;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 12px 48px rgba(0,0,0,0.18);
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px solid #E2E8F0;
+  }
+
+  .modal-header h3 { font-size: 16px; font-weight: 600; color: #111; }
+
+  .modal-close {
+    width: 32px; height: 32px;
+    border: none; background: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    color: #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.12s;
+  }
+
+  .modal-close:hover { background: #F0F4F8; }
+
+  .modal-body { padding: 14px 18px; flex: 1; overflow-y: auto; }
+
+  .modal-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px solid #F0F4F8;
+  }
+
+  .modal-row label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #8E9CAB;
+    width: 44px;
+    flex-shrink: 0;
+  }
+
+  .modal-row input, .modal-row textarea {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    padding: 4px 0;
+    font-family: inherit;
+    background: none;
+  }
+
+  .modal-row textarea {
+    min-height: 180px;
+    resize: vertical;
+    line-height: 1.5;
+  }
+
+  .modal-footer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 18px;
+    border-top: 1px solid #E2E8F0;
+  }
+
+  .modal-footer .send-btn {
+    background: #FC3F1D;
+    color: #fff;
+    border: none;
+    padding: 8px 28px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .modal-footer .send-btn:hover { background: #E63518; }
+
+  .modal-footer .cancel-btn {
+    background: none;
+    border: none;
+    font-size: 13px;
+    color: #666;
+    cursor: pointer;
+    padding: 8px 12px;
+  }
+
+  .modal-footer .cancel-btn:hover { color: #111; }
+
+  /* ===== SCROLLBARS ===== */
+  .email-list::-webkit-scrollbar,
+  .reader-scroll::-webkit-scrollbar,
+  .sidebar::-webkit-scrollbar,
+  .modal-body::-webkit-scrollbar { width: 6px; }
+
+  .email-list::-webkit-scrollbar-track,
+  .reader-scroll::-webkit-scrollbar-track,
+  .sidebar::-webkit-scrollbar-track,
+  .modal-body::-webkit-scrollbar-track { background: transparent; }
+
+  .email-list::-webkit-scrollbar-thumb,
+  .reader-scroll::-webkit-scrollbar-thumb,
+  .sidebar::-webkit-scrollbar-thumb,
+  .modal-body::-webkit-scrollbar-thumb { background: #C8D0DC; border-radius: 4px; }
+
+  .email-list::-webkit-scrollbar-thumb:hover,
+  .reader-scroll::-webkit-scrollbar-thumb:hover,
+  .sidebar::-webkit-scrollbar-thumb:hover,
+  .modal-body::-webkit-scrollbar-thumb:hover { background: #A8B4C4; }
+
+  /* ===== TOAST ===== */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: #323232;
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    opacity: 0;
+    transition: opacity 0.3s, transform 0.3s;
+    z-index: 2000;
+    pointer-events: none;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.20);
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* ===== NEW EMAIL ANIMATION ===== */
+  @keyframes emailAppear {
+    0% { background: #FFF8E1; transform: translateX(-10px); opacity: 0.5; }
+    50% { background: #FFF3CD; transform: translateX(3px); }
+    100% { background: #fff; transform: translateX(0); opacity: 1; }
+  }
+
+  .email-row.new-email {
+    animation: emailAppear 1.2s ease-out;
+  }
+
+  /* ===== NOTIFICATION BANNER ===== */
+  .notif-banner {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, #FC3F1D, #E63518);
+    color: #fff;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(252,63,29,0.3);
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+  }
+
+  .notif-banner.show { display: flex; }
+
+  .notif-banner .notif-icon {
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+
+  .notif-banner .notif-text { flex: 1; }
+  .notif-banner .notif-text strong { color: #fff; }
+  .notif-banner .notif-close {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    opacity: 0.7;
+    padding: 0 4px;
+  }
+  .notif-banner .notif-close:hover { opacity: 1; }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 720px) {
+    body { padding: 0; }
+    .mail-app { border-radius: 0; height: 100vh; max-height: 100vh; }
+    .sidebar { width: 50px; padding: 10px 6px; }
+    .sidebar .nav-item span:not(.icon) { display: none; }
+    .sidebar .folders-label { display: none; }
+    .sidebar .compose-btn { padding: 8px; border-radius: 50%; width: 36px; height: 36px; margin: 0 auto 10px; }
+    .sidebar .compose-btn span:not(.icon-span) { display: none; }
+    .sidebar .nav-item { justify-content: center; padding: 8px; }
+    .email-row .from-wrap { width: 100px; }
+    .reader-scroll { padding: 16px; }
+    .reader-from .date-right { position: static; margin-top: 6px; text-align: left; }
+  }
+</style>
+</head>
+<body>
+
+<div class="mail-app">
+
+  <!-- ===== HEADER ===== -->
+  <div class="header">
+    <div class="header-left">
+      <div class="ya-logo">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="11" fill="#fff"/>
+          <text x="12" y="16" text-anchor="middle" font-size="13" font-weight="bold" fill="#FC3F1D">Я</text>
+        </svg>
+        Яндекс.Почта
+      </div>
+    </div>
+
+    <div class="header-search-wrap">
+      <span class="header-search-icon">&#128269;</span>
+      <input class="header-search" type="text" placeholder="Поиск в почте" oninput="filterEmails(this.value)">
+    </div>
+
+    <div class="header-right">
+      <button class="header-btn" title="Настройки">&#9881;</button>
+      <button class="header-btn" title="Помощь">&#63;</button>
+      <button class="header-avatar" title="Аккаунт">ДХ</button>
+    </div>
+  </div>
+
+  <!-- ===== BODY ===== -->
+  <div class="body">
+
+    <!-- ===== SIDEBAR ===== -->
+    <div class="sidebar">
+      <button class="compose-btn" onclick="openCompose()">
+        <span class="icon-span" style="font-size:18px;">&#9998;</span>
+        <span>Написать</span>
+      </button>
+
+      <div class="nav-item active" data-folder="inbox" onclick="switchFolder(this)">
+        <span class="icon">&#9776;</span>
+        <span>Входящие</span>
+        <span class="badge" id="inboxBadge">7</span>
+      </div>
+      <div class="nav-item" data-folder="flagged" onclick="switchFolder(this)">
+        <span class="icon">&#9734;</span>
+        <span>Помеченные</span>
+      </div>
+      <div class="nav-item" data-folder="sent" onclick="switchFolder(this)">
+        <span class="icon">&#9993;</span>
+        <span>Отправленные</span>
+      </div>
+      <div class="nav-item" data-folder="drafts" onclick="switchFolder(this)">
+        <span class="icon">&#128451;</span>
+        <span>Черновики</span>
+      </div>
+      <div class="nav-item" data-folder="trash" onclick="switchFolder(this)">
+        <span class="icon">&#128465;</span>
+        <span>Корзина</span>
+      </div>
+      <div class="nav-item" data-folder="spam" onclick="switchFolder(this)">
+        <span class="icon">&#128483;</span>
+        <span>Спам</span>
+        <span class="badge" style="background:#666;">2</span>
+      </div>
+
+      <div class="sidebar-divider"></div>
+      <div class="folders-label">Папки</div>
+      <div class="nav-item" data-folder="work" onclick="switchFolder(this)">
+        <span class="icon">&#128188;</span>
+        <span>Работа</span>
+      </div>
+      <div class="nav-item" data-folder="study" onclick="switchFolder(this)">
+        <span class="icon">&#127891;</span>
+        <span>Учёба</span>
+      </div>
+    </div>
+
+    <!-- ===== INBOX ===== -->
+    <div class="inbox-area" id="inboxArea">
+
+      <div class="toolbar">
+        <input type="checkbox" id="selectAllCb" onchange="toggleSelectAll()">
+        <button class="toolbar-btn" onclick="showToast('Почта обновлена')" title="Обновить">&#8635;</button>
+        <button class="toolbar-btn" onclick="deleteSelected()" title="Удалить">&#128465;</button>
+        <button class="toolbar-btn" onclick="showToast('Помечено как спам')" title="Это спам">&#128483;</button>
+        <div class="toolbar-sep"></div>
+        <button class="toolbar-btn" onclick="markRead()" title="Прочитано">&#128065;</button>
+        <button class="toolbar-btn" onclick="markUnread()" title="Не прочитано">&#128064;</button>
+        <div class="toolbar-spacer"></div>
+        <span class="count" id="mailCount">1\u20137 \u0438\u0437 7</span>
+        <div class="pagination">
+          <button class="page-btn" disabled>&#9664;</button>
+          <button class="page-btn" disabled>&#9654;</button>
+        </div>
+      </div>
+
+      <div class="email-list" id="emailList"></div>
+
+      <div class="email-reader" id="emailReader">
+        <div class="reader-scroll" id="readerScroll">
+          <button class="reader-back" id="readerBack" onclick="closeEmail()">&#9664; Назад</button>
+          <div class="reader-header">
+            <div class="reader-subject" id="readerSubject"></div>
+            <div class="reader-from">
+              <div class="avatar" id="readerAvatar"></div>
+              <div class="info-wrap">
+                <div class="name" id="readerName"></div>
+                <div class="email" id="readerEmail"></div>
+                <div class="to-me">Кому: <span id="readerTo">hlebnikovdanya2006@gmail.com</span></div>
+              </div>
+              <div class="date-right" id="readerDate"></div>
+            </div>
+          </div>
+          <div class="reader-body" id="readerBody"></div>
+          <div class="reader-actions">
+            <button class="primary" onclick="replyToCurrent()">&#9993; Ответить</button>
+            <button onclick="showToast('Письмо переслано')">&#128231; Переслать</button>
+            <button onclick="showToast('Добавлено в избранное')">&#9734; В избранное</button>
+            <button onclick="showToast('Удалено')">&#128465; Удалить</button>
+            <button onclick="showToast('Меню')">&#8942; Ещё</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ===== COMPOSE MODAL ===== -->
+<div class="modal-overlay" id="composeModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>Новое сообщение</h3>
+      <button class="modal-close" onclick="closeCompose()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-row">
+        <label>Кому</label>
+        <input type="text" id="composeTo" value="kubanova.on@yandex.ru" style="color:#1565C0;">
+      </div>
+      <div class="modal-row">
+        <label>Тема</label>
+        <input type="text" id="composeSubject" placeholder="Тема письма">
+      </div>
+      <div class="modal-row" style="border-bottom:none;">
+        <label></label>
+        <textarea id="composeBody" placeholder="Напишите что-нибудь..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="send-btn" onclick="sendMail()">&#9993; Отправить</button>
+      <button class="cancel-btn" onclick="closeCompose()">Отмена</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== NOTIFICATION BANNER ===== -->
+<div class="notif-banner" id="notifBanner" onclick="this.classList.remove('show')">
+  <span class="notif-icon">&#128232;</span>
+  <span class="notif-text"><strong>Новое письмо</strong> от Кубановой Ольги Николаевны — РЕЗУЛЬТАТЫ ТЕСТИРОВАНИЯ</span>
+  <button class="notif-close" onclick="event.stopPropagation();this.parentElement.classList.remove('show')">&times;</button>
+</div>
+
+<!-- ===== TOAST ===== -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // ===== EMAIL DATA =====
+  var EMAILS = [
+    // === НОВОЕ ПИСЬМО ОТ КОШКАРОВОЙ ДИНЫ АЛЕКСАНДРОВНЫ ===
+    {
+      id: 'job-quality',
+      folder: 'inbox',
+      unread: true,
+      flagged: false,
+      avatar: '\u041A\u0414',
+      avatarClass: 'red',
+      from: '\u041A\u043E\u0448\u043A\u0430\u0440\u043E\u0432\u0430 \u0414\u0438\u043D\u0430 \u0410\u043B\u0435\u043A\u0441\u0430\u043D\u0434\u0440\u043E\u0432\u043D\u0430',
+      emailFrom: 'koshkarova.da@kachestvo-zhizni.ru',
+      subject: '\u041F\u0440\u0435\u0434\u043B\u043E\u0436\u0435\u043D\u0438\u0435 \u043E \u0440\u0430\u0431\u043E\u0442\u0435 \u0432 \u0411\u043B\u0430\u0433\u043E\u0442\u0432\u043E\u0440\u0438\u0442\u0435\u043B\u044C\u043D\u043E\u043C \u0424\u043E\u043D\u0434\u0435 \u00AB\u041A\u0430\u0447\u0435\u0441\u0442\u0432\u043E \u0436\u0438\u0437\u043D\u0438\u00BB',
+      dateLabel: '9:15',
+      dateFull: '06 \u0438\u044E\u043B\u044F 2026 \u0432 9:15',
+      to: 'hlebnikovdanya2006@gmail.com',
+      bodyHtml: true,
+      body: '<div style="max-width:640px;margin:0 auto;font-family:\'Segoe UI\',Arial,sans-serif;background:#fff;border-radius:14px;border:1px solid #E0E6ED;overflow:hidden;">' +
+
+        // ========== ХЕДЕР С ЛОГОТИПОМ ==========
+        '<div style="background:linear-gradient(135deg, #0D47A1, #1565C0);padding:30px 32px 24px;text-align:center;">' +
+
+          '<svg width="64" height="64" viewBox="0 0 100 100" style="margin-bottom:10px;">' +
+            '<circle cx="50" cy="50" r="46" fill="rgba(255,255,255,0.12)" stroke="#fff" stroke-width="2.5"/>' +
+            '<path d="M50 22 C50 22 28 40 28 58 C28 72 38 80 50 80 C62 80 72 72 72 58 C72 40 50 22 50 22Z" fill="none" stroke="#fff" stroke-width="2.5"/>' +
+            '<path d="M50 30 C50 30 34 44 34 58 C34 69 42 75 50 75 C58 75 66 69 66 58 C66 44 50 30 50 30Z" fill="rgba(255,255,255,0.9)"/>' +
+            '<text x="50" y="56" text-anchor="middle" font-size="22" font-weight="bold" fill="#0D47A1">\u041A\u0416</text>' +
+          '</svg>' +
+
+          '<div style="font-size:28px;font-weight:800;color:#fff;letter-spacing:1px;">\u041A\u0430\u0447\u0435\u0441\u0442\u0432\u043E \u0436\u0438\u0437\u043D\u0438</div>' +
+          '<div style="font-size:13px;color:rgba(255,255,255,0.75);font-weight:500;letter-spacing:3px;margin-top:2px;text-transform:uppercase;">\u0411\u043B\u0430\u0433\u043E\u0442\u0432\u043E\u0440\u0438\u0442\u0435\u043B\u044C\u043D\u044B\u0439 \u0444\u043E\u043D\u0434</div>' +
+          '<div style="width:50px;height:2px;background:rgba(255,255,255,0.3);margin:12px auto 0;"></div>' +
+          '<div style="font-size:10px;color:rgba(255,255,255,0.45);margin-top:8px;letter-spacing:1px;">\u041E\u0413\u0420\u041D 1234567890123 \u2022 \u0418\u041D\u041D 7712345678</div>' +
+        '</div>' +
+
+        // ========== ОСНОВНОЙ БЛОК ==========
+        '<div style="background:#fff;padding:28px 30px 22px;color:#333;font-size:15px;line-height:1.7;">' +
+
+          '<p style="margin:0 0 16px 0;"><strong>\u0423\u0432\u0430\u0436\u0430\u0435\u043C\u044B\u0439 \u0425\u043B\u0435\u0431\u043D\u0438\u043A\u043E\u0432 \u0414\u0430\u043D\u0438\u0438\u043B!</strong></p>' +
+
+          '<p style="margin:0 0 14px 0;">\u0414\u043E\u0431\u0440\u044B\u0439 \u0432\u0435\u0447\u0435\u0440! \u041C\u0435\u043D\u044F \u0437\u043E\u0432\u0443\u0442 \u041A\u043E\u0448\u043A\u0430\u0440\u043E\u0432\u0430 \u0414\u0438\u043D\u0430 \u0410\u043B\u0435\u043A\u0441\u0430\u043D\u0434\u0440\u043E\u0432\u043D\u0430, \u044F \u044F\u0432\u043B\u044F\u044E\u0441\u044C \u0440\u0443\u043A\u043E\u0432\u043E\u0434\u0438\u0442\u0435\u043B\u0435\u043C \u043E\u0442\u0434\u0435\u043B\u0430 \u0440\u0430\u0437\u0432\u0438\u0442\u0438\u044F \u0431\u043B\u0430\u0433\u043E\u0442\u0432\u043E\u0440\u0438\u0442\u0435\u043B\u044C\u043D\u043E\u0433\u043E \u0444\u043E\u043D\u0434\u0430 <strong>\u00AB\u041A\u0430\u0447\u0435\u0441\u0442\u0432\u043E \u0436\u0438\u0437\u043D\u0438\u00BB</strong> (\u041E\u041E\u041E).</p>' +
+
+          '<p style="margin:0 0 14px 0;">\u041D\u0430\u043C \u043F\u043E\u0441\u0442\u0443\u043F\u0438\u043B\u0430 \u0438\u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0438\u044F \u043E \u0412\u0430\u0441 \u043A\u0430\u043A \u043E \u043F\u0435\u0440\u0441\u043F\u0435\u043A\u0442\u0438\u0432\u043D\u043E\u043C \u0440\u0430\u0437\u0440\u0430\u0431\u043E\u0442\u0447\u0438\u043A\u0435, \u0438 \u043C\u044B \u0445\u043E\u0442\u0435\u043B\u0438 \u0431\u044B \u043F\u0440\u0435\u0434\u043B\u043E\u0436\u0438\u0442\u044C \u0412\u0430\u043C \u043F\u0440\u0438\u0441\u043E\u0435\u0434\u0438\u043D\u0438\u0442\u044C\u0441\u044F \u043A \u043D\u0430\u0448\u0435\u0439 \u043A\u043E\u043C\u0430\u043D\u0434\u0435 \u043D\u0430 \u043F\u0435\u0440\u0438\u043E\u0434 \u043B\u0435\u0442\u043D\u0435\u0439 \u043F\u0440\u0430\u043A\u0442\u0438\u043A\u0438 \u0441 <strong>20 \u0438\u044E\u043B\u044F \u043F\u043E 14 \u0430\u0432\u0433\u0443\u0441\u0442\u0430 2026 \u0433\u043E\u0434\u0430</strong>.</p>' +
+
+          // ===== ВАКАНСИЯ =====
+          '<div style="background:linear-gradient(135deg,#E3F2FD,#BBDEFB);border:1px solid #90CAF9;border-radius:12px;padding:20px 22px;margin:16px 0;">' +
+            '<div style="font-size:14px;color:#0D47A1;font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px;">\u0412\u0430\u043A\u0430\u043D\u0441\u0438\u044F</div>' +
+            '<div style="font-size:20px;font-weight:800;color:#0D47A1;margin:2px 0 6px;">\u0420\u0430\u0437\u0440\u0430\u0431\u043E\u0442\u0447\u0438\u043A \u0446\u0438\u0444\u0440\u043E\u0432\u044B\u0445 \u043C\u0430\u0442\u0435\u0440\u0438\u0430\u043B\u043E\u0432 \u0438 \u0441\u0435\u0440\u0432\u0438\u0441\u043E\u0432</div>' +
+            '<div style="font-size:14px;color:#1565C0;font-weight:600;margin-bottom:10px;">\u0411\u043B\u0430\u0433\u043E\u0442\u0432\u043E\u0440\u0438\u0442\u0435\u043B\u044C\u043D\u044B\u0439 \u0444\u043E\u043D\u0434 \u00AB\u041A\u0430\u0447\u0435\u0441\u0442\u0432\u043E \u0436\u0438\u0437\u043D\u0438\u00BB \u2014 \u0443\u0434\u0430\u043B\u0451\u043D\u043D\u0430\u044F \u0437\u0430\u043D\u044F\u0442\u043E\u0441\u0442\u044C</div>' +
+
+            '<table style="border-collapse:collapse;width:100%;font-size:13px;margin:8px 0;">' +
+              '<tr><td style="padding:6px 8px;vertical-align:top;color:#555;width:90px;font-weight:600;">\u041E\u0431\u044F\u0437\u0430\u043D\u043D\u043E\u0441\u0442\u0438:</td><td style="padding:6px 8px;color:#333;">' +
+                '\u2022 \u0420\u0430\u0437\u0440\u0430\u0431\u043E\u0442\u043A\u0430 \u0438 \u0432\u0451\u0440\u0441\u0442\u043A\u0430 \u044D\u043B\u0435\u043A\u0442\u0440\u043E\u043D\u043D\u044B\u0445 \u0438 \u043F\u0435\u0447\u0430\u0442\u043D\u044B\u0445 \u0438\u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0438\u043E\u043D\u043D\u044B\u0445 \u043B\u0438\u0441\u0442\u043E\u0432\u043E\u043A \u0438 \u0431\u0443\u043A\u043B\u0435\u0442\u043E\u0432<br>' +
+                '\u2022 \u0421\u043E\u0437\u0434\u0430\u043D\u0438\u0435 \u0446\u0438\u0444\u0440\u043E\u0432\u044B\u0445 \u0448\u0430\u0431\u043B\u043E\u043D\u043E\u0432 \u0431\u0443\u043C\u0430\u0436\u043D\u0438\u043A\u043E\u0432, \u043A\u0430\u0440\u0442\u0445\u043E\u043B\u0434\u0435\u0440\u043E\u0432 \u0438 \u043F\u043E\u043B\u0438\u0433\u0440\u0430\u0444\u0438\u0447\u0435\u0441\u043A\u043E\u0439 \u043F\u0440\u043E\u0434\u0443\u043A\u0446\u0438\u0438<br>' +
+                '\u2022 \u041F\u043E\u0434\u0433\u043E\u0442\u043E\u0432\u043A\u0430 \u043C\u0430\u043A\u0435\u0442\u043E\u0432 \u0434\u043B\u044F \u043F\u0435\u0447\u0430\u0442\u0438 (\u043B\u0438\u0441\u0442\u043E\u0432\u043A\u0438, \u0431\u0443\u043A\u043B\u0435\u0442\u044B, \u043E\u0442\u043A\u0440\u044B\u0442\u043A\u0438)<br>' +
+                '\u2022 \u0412\u0451\u0440\u0441\u0442\u043A\u0430 \u0438 \u043E\u0444\u043E\u0440\u043C\u043B\u0435\u043D\u0438\u0435 \u043F\u0440\u043E\u0435\u043A\u0442\u043D\u043E\u0439 \u0434\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u0430\u0446\u0438\u0438 \u0438 \u043F\u0440\u0435\u0437\u0435\u043D\u0442\u0430\u0446\u0438\u0439<br>' +
+                '\u2022 \u0420\u0430\u0437\u0440\u0430\u0431\u043E\u0442\u043A\u0430 \u043D\u0435\u0431\u043E\u043B\u044C\u0448\u0438\u0445 \u0432\u0435\u0431-\u0441\u0435\u0440\u0432\u0438\u0441\u043E\u0432 \u0434\u043B\u044F \u0432\u043D\u0443\u0442\u0440\u0435\u043D\u043D\u0438\u0445 \u043D\u0443\u0436\u0434 \u0444\u043E\u043D\u0434\u0430' +
+              '</td></tr>' +
+              '<tr><td style="padding:6px 8px;vertical-align:top;color:#555;font-weight:600;">\u0422\u0440\u0435\u0431\u043E\u0432\u0430\u043D\u0438\u044F:</td><td style="padding:6px 8px;color:#333;">HTML/CSS, JavaScript (\u0431\u0430\u0437\u043E\u0432\u044B\u0439), \u0437\u043D\u0430\u043D\u0438\u0435 \u0433\u0440\u0430\u0444\u0438\u0447\u0435\u0441\u043A\u0438\u0445 \u0440\u0435\u0434\u0430\u043A\u0442\u043E\u0440\u043E\u0432 (\u0436\u0435\u043B\u0430\u0442\u0435\u043B\u044C\u043D\u043E)</td></tr>' +
+              '<tr><td style="padding:6px 8px;vertical-align:top;color:#555;font-weight:600;">\u0424\u043E\u0440\u043C\u0430\u0442:</td><td style="padding:6px 8px;color:#333;\u0423\u0434\u0430\u043B\u0451\u043D\u043D\u0430\u044F \u0440\u0430\u0431\u043E\u0442\u0430, \u043D\u0435\u043F\u043E\u043B\u043D\u044B\u0439 \u0434\u0435\u043D\u044C (4 \u0447\u0430\u0441\u0430)</td></tr>' +
+            '</table>' +
+
+            '<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(13,71,161,0.15);">' +
+              '<a href="https://hh.ru/vacancy/117894561" style="display:inline-block;background:#0D47A1;color:#fff;text-decoration:none;padding:10px 28px;border-radius:20px;font-weight:600;font-size:14px;" target="_blank">\u041F\u043E\u0434\u0440\u043E\u0431\u043D\u0435\u0435 \u043D\u0430 hh.ru \u2192</a>' +
+              '<span style="display:inline-block;font-size:12px;color:#888;margin-left:12px;">\u0412\u0430\u043A\u0430\u043D\u0441\u0438\u044F \u2116117894561</span>' +
+            '</div>' +
+          '</div>' +
+
+          // ===== ГРАФИК РАБОТЫ =====
+          '<h3 style="font-size:17px;font-weight:700;color:#0D47A1;margin:24px 0 12px 0;">\u0420\u0435\u0436\u0438\u043C \u0440\u0430\u0431\u043E\u0442\u044B</h3>' +
+
+          '<table style="border-collapse:collapse;width:100%;margin:10px 0;font-size:14px;border:1px solid #E0E6ED;border-radius:8px;overflow:hidden;">' +
+            '<tr style="background:#F5F8FC;"><td style="padding:10px 14px;border-bottom:1px solid #E0E6ED;font-weight:600;color:#333;width:140px;">\u0420\u0430\u0431\u043E\u0447\u0438\u0435 \u0434\u043D\u0438</td><td style="padding:10px 14px;border-bottom:1px solid #E0E6ED;color:#555;">\u041F\u043E\u043D\u0435\u0434\u0435\u043B\u044C\u043D\u0438\u043A \u2014 \u043F\u044F\u0442\u043D\u0438\u0446\u0430</td></tr>' +
+            '<tr><td style="padding:10px 14px;border-bottom:1px solid #E0E6ED;font-weight:600;color:#333;">\u0420\u0430\u0431\u043E\u0447\u0435\u0435 \u0432\u0440\u0435\u043C\u044F</td><td style="padding:10px 14px;border-bottom:1px solid #E0E6ED;color:#555;"><strong>09:00 \u2014 14:00</strong> (\u0435\u0436\u0435\u0434\u043D\u0435\u0432\u043D\u043E)</td></tr>' +
+            '<tr style="background:#F5F8FC;"><td style="padding:10px 14px;border-bottom:1px solid #E0E6ED;font-weight:600;color:#333;">\u041E\u0431\u0435\u0434\u0435\u043D\u043D\u044B\u0439 \u043F\u0435\u0440\u0435\u0440\u044B\u0432</td><td style="padding:10px 14px;border-bottom:1px solid #E0E6ED;color:#555;"><strong>12:00 \u2014 13:00</strong> (1 \u0447\u0430\u0441)</td></tr>' +
+            '<tr><td style="padding:10px 14px;font-weight:600;color:#333;">\u0412\u0441\u0442\u0440\u0435\u0447\u0438</td><td style="padding:10px 14px;color:#555;">\u041A\u0430\u0436\u0434\u044B\u0439 \u0434\u0435\u043D\u044C \u0432 <strong>09:00</strong> \u2014 \u043F\u043B\u0430\u043D\u0435\u0440\u043A\u0430 \u0432 Zoom (\u0434\u0430\u0451\u043C \u0437\u0430\u0434\u0430\u043D\u0438\u0435 \u043D\u0430 \u0434\u0435\u043D\u044C)</td></tr>' +
+          '</table>' +
+
+          '<p style="margin:12px 0 16px 0;font-size:14px;color:#555;background:#FFF8E1;border-left:4px solid #FFA000;padding:12px 16px;border-radius:4px;">' +
+            '<strong>\u041A\u0430\u043A \u043F\u0440\u043E\u0445\u043E\u0434\u044F\u0442 \u0440\u0430\u0431\u043E\u0447\u0438\u0435 \u0434\u043D\u0438:</strong> \u0415\u0436\u0435\u0434\u043D\u0435\u0432\u043D\u043E \u0432 09:00 \u043C\u044B \u0441\u043E\u0431\u0438\u0440\u0430\u0435\u043C\u0441\u044F \u043D\u0430 \u043A\u0440\u0430\u0442\u043A\u0443\u044E \u043F\u043B\u0430\u043D\u0435\u0440\u043A\u0443 \u0432 Zoom, \u0433\u0434\u0435 \u0432\u044B\u0434\u0430\u0451\u043C \u0437\u0430\u0434\u0430\u043D\u0438\u0435 \u043D\u0430 \u0434\u0435\u043D\u044C. \u0412\u044B \u0432\u044B\u043F\u043E\u043B\u043D\u044F\u0435\u0442\u0435 \u0435\u0433\u043E \u0432 \u0442\u0435\u0447\u0435\u043D\u0438\u0435 \u0440\u0430\u0431\u043E\u0447\u0435\u0433\u043E \u0432\u0440\u0435\u043C\u0435\u043D\u0438 (\u0434\u043E 14:00). \u041D\u0430 \u0441\u043B\u0435\u0434\u0443\u044E\u0449\u0435\u0439 \u0432\u0441\u0442\u0440\u0435\u0447\u0435 \u0432 09:00 \u043F\u0440\u0438\u043D\u0438\u043C\u0430\u0435\u043C \u043E\u0442\u0447\u0451\u0442 \u0438 \u0432\u044B\u0434\u0430\u0451\u043C \u043D\u043E\u0432\u043E\u0435 \u0437\u0430\u0434\u0430\u043D\u0438\u0435.' +
+          '</p>' +
+
+          // ===== СРОКИ =====
+          '<h3 style="font-size:17px;font-weight:700;color:#0D47A1;margin:24px 0 12px 0;">\u0421\u0440\u043E\u043A\u0438 \u0438 \u043F\u0440\u0438\u043D\u044F\u0442\u0438\u0435 \u0440\u0435\u0448\u0435\u043D\u0438\u044F</h3>' +
+
+          '<table style="border-collapse:collapse;width:100%;font-size:14px;border:1px solid #E0E6ED;border-radius:8px;overflow:hidden;">' +
+            '<tr style="background:#F5F8FC;"><td style="padding:10px 14px;border-bottom:1px solid #E0E6ED;font-weight:600;color:#333;width:140px;">\u0421\u0440\u043E\u043A \u0440\u0435\u0448\u0435\u043D\u0438\u044F</td><td style="padding:10px 14px;border-bottom:1px solid #E0E6ED;color:#E53935;font-weight:700;">\u0434\u043E 20 \u0438\u044E\u043B\u044F 2026 \u0433\u043E\u0434\u0430 (\u0432\u043A\u043B\u044E\u0447\u0438\u0442\u0435\u043B\u044C\u043D\u043E)</td></tr>' +
+            '<tr><td style="padding:10px 14px;border-bottom:1px solid #E0E6ED;font-weight:600;color:#333;">\u0414\u0430\u0442\u0430 \u043D\u0430\u0447\u0430\u043B\u0430</td><td style="padding:10px 14px;border-bottom:1px solid #E0E6ED;color:#555;"><strong>20 \u0438\u044E\u043B\u044F 2026 \u0433\u043E\u0434\u0430</strong> (\u043F\u043E\u043D\u0435\u0434\u0435\u043B\u044C\u043D\u0438\u043A)</td></tr>' +
+            '<tr style="background:#F5F8FC;"><td style="padding:10px 14px;font-weight:600;color:#333;">\u0414\u0430\u0442\u0430 \u043E\u043A\u043E\u043D\u0447\u0430\u043D\u0438\u044F</td><td style="padding:10px 14px;color:#555;"><strong>14 \u0430\u0432\u0433\u0443\u0441\u0442\u0430 2026 \u0433\u043E\u0434\u0430</strong> (\u043F\u044F\u0442\u043D\u0438\u0446\u0430)</td></tr>' +
+          '</table>' +
+
+          // ===== ЗАРПЛАТА =====
+          '<h3 style="font-size:17px;font-weight:700;color:#0D47A1;margin:24px 0 12px 0;">\u0424\u0438\u043D\u0430\u043D\u0441\u043E\u0432\u044B\u0435 \u0443\u0441\u043B\u043E\u0432\u0438\u044F</h3>' +
+
+          '<div style="background:linear-gradient(135deg,#E8F5E9,#C8E6C9);border:1px solid #A5D6A7;border-radius:12px;padding:18px 20px;margin:10px 0;">' +
+
+            '<table style="border-collapse:collapse;width:100%;font-size:14px;">' +
+              '<tr><td style="padding:6px 0;color:#2E7D32;font-weight:600;width:130px;">\u0411\u0430\u0437\u043E\u0432\u0430\u044F \u0441\u0442\u0430\u0432\u043A\u0430:</td><td style="padding:6px 0;color:#333;"><strong style="font-size:18px;color:#2E7D32;">30 000 \u20BD</strong> / \u043F\u0435\u0440\u0438\u043E\u0434</td></tr>' +
+              '<tr><td style="padding:6px 0;color:#2E7D32;font-weight:600;">\u0414\u043E\u043F\u043B\u0430\u0442\u044B:</td><td style="padding:6px 0;color:#333;"><strong>5%</strong> \u043E\u0442 \u0432\u044B\u043F\u043E\u043B\u043D\u0435\u043D\u043D\u044B\u0445 \u0437\u0430\u0434\u0430\u043D\u0438\u0439 \u0441\u0432\u0435\u0440\u0445 \u043F\u043B\u0430\u043D\u0430</td></tr>' +
+              '<tr><td style="padding:6px 0;color:#2E7D32;font-weight:600;vertical-align:top;">\u0410\u0432\u0430\u043D\u0441:</td><td style="padding:6px 0;color:#333;"><strong>\u041A\u0430\u0436\u0434\u044B\u0435 5 \u0440\u0430\u0431\u043E\u0447\u0438\u0445 \u0434\u043D\u0435\u0439</strong> (\u0432\u044B\u043F\u043B\u0430\u0447\u0438\u0432\u0430\u0435\u0442\u0441\u044F \u0430\u0432\u0430\u043D\u0441 \u0432 \u0440\u0430\u0437\u043C\u0435\u0440\u0435 50% \u043E\u0442 \u0432\u044B\u043F\u043E\u043B\u043D\u0435\u043D\u043D\u043E\u0433\u043E \u043E\u0431\u044A\u0451\u043C\u0430)</td></tr>' +
+              '<tr><td style="padding:6px 0;color:#2E7D32;font-weight:600;">\u0424\u043E\u0440\u043C\u0430 \u043E\u043F\u043B\u0430\u0442\u044B:</td><td style="padding:6px 0;color:#333;">\u041E\u0444\u0438\u0446\u0438\u0430\u043B\u044C\u043D\u0430\u044F (\u0434\u043E\u0433\u043E\u0432\u043E\u0440 \u0413\u041F\u0425 / \u0441\u0430\u043C\u043E\u0437\u0430\u043D\u044F\u0442\u043E\u0441\u0442\u044C)</td></tr>' +
+            '</table>' +
+
+            '<div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(46,125,50,0.2);font-size:13px;color:#555;">' +
+              '\u041F\u0440\u0438\u043C\u0435\u0440: \u043F\u0440\u0438 \u0431\u0430\u0437\u043E\u0432\u043E\u0439 \u0441\u0442\u0430\u0432\u043A\u0435 30 000 \u20BD \u0438 \u0432\u044B\u043F\u043E\u043B\u043D\u0435\u043D\u0438\u0438 \u0434\u043E\u043F\u043E\u043B\u043D\u0438\u0442\u0435\u043B\u044C\u043D\u044B\u0445 \u0437\u0430\u0434\u0430\u043D\u0438\u0439 \u043D\u0430 5 000 \u20BD, \u0432\u0430\u0448 \u0434\u043E\u0445\u043E\u0434 \u0441\u043E\u0441\u0442\u0430\u0432\u0438\u0442: 30 000 + (5 000 \u00D7 5%) = 30 250 \u20BD \u0437\u0430 \u043F\u0435\u0440\u0438\u043E\u0434.' +
+            '</div>' +
+          '</div>' +
+
+          // ===== ИНСТРУКЦИЯ =====
+          '<h3 style="font-size:17px;font-weight:700;color:#0D47A1;margin:24px 0 12px 0;">\u041F\u043E\u0434\u0440\u043E\u0431\u043D\u0430\u044F \u0438\u043D\u0441\u0442\u0440\u0443\u043A\u0446\u0438\u044F \u043F\u043E \u0440\u0430\u0431\u043E\u0442\u0435</h3>' +
+
+          '<ol style="margin:10px 0 16px 0;padding-left:20px;font-size:14px;color:#444;line-height:1.8;">' +
+            '<li><strong>\u0415\u0436\u0435\u0434\u043D\u0435\u0432\u043D\u0430\u044F \u043F\u043B\u0430\u043D\u0435\u0440\u043A\u0430:</strong> \u0432 09:00 \u043F\u043E\u0434\u043A\u043B\u044E\u0447\u0430\u0439\u0442\u0435\u0441\u044C \u043A Zoom-\u043A\u043E\u043D\u0444\u0435\u0440\u0435\u043D\u0446\u0438\u0438 (\u0441\u0441\u044B\u043B\u043A\u0430 \u0431\u0443\u0434\u0435\u0442 \u043D\u0430\u043F\u0440\u0430\u0432\u043B\u0435\u043D\u0430 \u0432 \u043E\u0442\u0434\u0435\u043B\u044C\u043D\u043E\u043C \u043F\u0438\u0441\u044C\u043C\u0435). \u041D\u0430 \u0432\u0441\u0442\u0440\u0435\u0447\u0435 \u0432\u044B \u043F\u043E\u043B\u0443\u0447\u0430\u0435\u0442\u0435 \u0437\u0430\u0434\u0430\u043D\u0438\u0435 \u043D\u0430 \u0434\u0435\u043D\u044C.</li>' +
+            '<li><strong>\u0412\u044B\u043F\u043E\u043B\u043D\u0435\u043D\u0438\u0435 \u0437\u0430\u0434\u0430\u043D\u0438\u044F:</strong> \u0420\u0430\u0431\u043E\u0442\u0430\u0439\u0442\u0435 \u043D\u0430\u0434 \u0437\u0430\u0434\u0430\u0447\u0435\u0439 \u0441 09:15 \u0434\u043E 12:00, \u0437\u0430\u0442\u0435\u043C \u043E\u0431\u0435\u0434\u0435\u043D\u043D\u044B\u0439 \u043F\u0435\u0440\u0435\u0440\u044B\u0432, \u0438 \u043F\u0440\u043E\u0434\u043E\u043B\u0436\u0435\u043D\u0438\u0435 \u0441 13:00 \u0434\u043E 14:00. \u0412\u0441\u0435 \u043C\u0430\u0442\u0435\u0440\u0438\u0430\u043B\u044B \u0441\u0434\u0430\u0451\u0442\u0435 \u0432 \u0442\u0435\u0447\u0435\u043D\u0438\u0438 \u0434\u043D\u044F.</li>' +
+            '<li><strong>\u041E\u0442\u0447\u0451\u0442\u043D\u043E\u0441\u0442\u044C:</strong> \u041D\u0430 \u0441\u043B\u0435\u0434\u0443\u044E\u0449\u0435\u0439 \u043F\u043B\u0430\u043D\u0435\u0440\u043A\u0435 \u0432 09:00 \u0432\u044B \u0434\u043E\u043A\u043B\u0430\u0434\u044B\u0432\u0430\u0435\u0442\u0435 \u043E \u0440\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442\u0430\u0445. \u041F\u0440\u0438\u043D\u0438\u043C\u0430\u0435\u043C \u043E\u0431\u0440\u0430\u0442\u043D\u0443\u044E \u0441\u0432\u044F\u0437\u044C, \u043A\u043E\u0440\u0440\u0435\u043A\u0442\u0438\u0440\u0443\u0435\u043C \u0438 \u0432\u044B\u0434\u0430\u0451\u043C \u043D\u043E\u0432\u043E\u0435 \u0437\u0430\u0434\u0430\u043D\u0438\u0435.</li>' +
+            '<li><strong>\u041A\u0430\u043D\u0430\u043B\u044B \u0441\u0432\u044F\u0437\u0438:</strong> \u041E\u0441\u043D\u043E\u0432\u043D\u043E\u0439 \u043A\u0430\u043D\u0430\u043B \u2014 \u044D\u043B\u0435\u043A\u0442\u0440\u043E\u043D\u043D\u0430\u044F \u043F\u043E\u0447\u0442\u0430 \u0438 Telegram (\u0440\u0430\u0431\u043E\u0447\u0430\u044F \u0433\u0440\u0443\u043F\u043F\u0430). \u0412 \u044D\u043A\u0441\u0442\u0440\u0435\u043D\u043D\u044B\u0445 \u0441\u043B\u0443\u0447\u0430\u044F\u0445 \u2014 \u0437\u0432\u043E\u043D\u043E\u043A \u043F\u043E \u0442\u0435\u043B\u0435\u0444\u043E\u043D\u0443.</li>' +
+            '<li><strong>\u041C\u0430\u0442\u0435\u0440\u0438\u0430\u043B\u044B:</strong> \u0412\u0441\u0435 \u0448\u0430\u0431\u043B\u043E\u043D\u044B, \u0438\u0441\u0445\u043E\u0434\u043D\u0438\u043A\u0438 \u0438 \u043C\u0430\u043A\u0435\u0442\u044B \u0445\u0440\u0430\u043D\u044F\u0442\u0441\u044F \u0432 \u043E\u0431\u0449\u0435\u043C \u043E\u0431\u043B\u0430\u0447\u043D\u043E\u043C \u0434\u0438\u0441\u043A\u0435 (\u042F\u043D\u0434\u0435\u043A\u0441.\u0414\u0438\u0441\u043A). \u0414\u043E\u0441\u0442\u0443\u043F \u0431\u0443\u0434\u0435\u0442 \u043F\u0440\u0435\u0434\u043E\u0441\u0442\u0430\u0432\u043B\u0435\u043D \u0432 \u043F\u0435\u0440\u0432\u044B\u0439 \u0440\u0430\u0431\u043E\u0447\u0438\u0439 \u0434\u0435\u043D\u044C.</li>' +
+            '<li><strong>\u0410\u0432\u0430\u043D\u0441:</strong> \u041A\u0430\u0436\u0434\u044B\u0435 5 \u0440\u0430\u0431\u043E\u0447\u0438\u0445 \u0434\u043D\u0435\u0439 \u043C\u044B \u043F\u043E\u0434\u0432\u043E\u0434\u0438\u043C \u043F\u0440\u043E\u043C\u0435\u0436\u0443\u0442\u043E\u0447\u043D\u044B\u0435 \u0438\u0442\u043E\u0433\u0438 \u0438 \u0432\u044B\u043F\u043B\u0430\u0447\u0438\u0432\u0430\u0435\u043C \u0430\u0432\u0430\u043D\u0441 \u043D\u0430 \u043A\u0430\u0440\u0442\u0443 \u0438\u043B\u0438 \u043D\u0430\u043B\u0438\u0447\u043D\u044B\u043C\u0438 \u043F\u043E \u0434\u043E\u0433\u043E\u0432\u043E\u0440\u0451\u043D\u043D\u043E\u0441\u0442\u0438.</li>' +
+          '</ol>' +
+
+          '<p style="margin:16px 0 20px 0;font-size:14px;color:#555;background:#E8EAF6;border-left:4px solid #3F51B5;padding:12px 16px;border-radius:4px;">' +
+            '<strong>\u041F\u043E\u0440\u044F\u0434\u043E\u043A \u0440\u0430\u0431\u043E\u0442\u044B \u043F\u043E \u043F\u043E\u0440\u0443\u0447\u0435\u043D\u0438\u044E:</strong> \u0412\u044B \u043F\u043E\u043B\u0443\u0447\u0430\u0435\u0442\u0435 \u043F\u043E\u0440\u0443\u0447\u0435\u043D\u0438\u0435 \u043D\u0430 \u043F\u043B\u0430\u043D\u0435\u0440\u043A\u0435 \u0432 09:00. \u041F\u043E\u0440\u0443\u0447\u0435\u043D\u0438\u0435 \u043C\u043E\u0436\u0435\u0442 \u0431\u044B\u0442\u044C: '\u0440\u0430\u0437\u0440\u0430\u0431\u043E\u0442\u0430\u0442\u044C \u043C\u0430\u043A\u0435\u0442 \u043B\u0438\u0441\u0442\u043E\u0432\u043A\u0438 \u043F\u043E \u043F\u0440\u043E\u0433\u0440\u0430\u043C\u043C\u0435 \u043F\u043E\u043C\u043E\u0449\u0438\u00AB, '\u0441\u0432\u0435\u0440\u0441\u0442\u0430\u0442\u044C \u0448\u0430\u0431\u043B\u043E\u043D \u0431\u0443\u043C\u0430\u0436\u043D\u0438\u043A\u0430 \u0434\u043B\u044F \u0432\u043E\u043B\u043E\u043D\u0442\u0451\u0440\u043E\u0432' \u0438\u043B\u0438 '\u043F\u043E\u0434\u0433\u043E\u0442\u043E\u0432\u0438\u0442\u044C \u043F\u0440\u0435\u0437\u0435\u043D\u0442\u0430\u0446\u0438\u044E \u0434\u043B\u044F \u043F\u0430\u0440\u0442\u043D\u0451\u0440\u043E\u0432'. \u041E\u0431\u0440\u0430\u0437\u0435\u0446 \u0438 \u0442\u0435\u0445\u043D\u0438\u0447\u0435\u0441\u043A\u043E\u0435 \u0437\u0430\u0434\u0430\u043D\u0438\u0435 \u043F\u0440\u0438\u043B\u0430\u0433\u0430\u0435\u0442\u0441\u044F.' +
+          '</p>' +
+
+          // ===== ПОДПИСЬ =====
+          '<hr style="border:none;border-top:1px solid #E8EDF4;margin:24px 0 18px;">' +
+
+          '<p style="margin:0 0 4px 0;">\u041C\u044B \u0431\u0443\u0434\u0435\u043C \u0440\u0430\u0434\u044B \u0432\u0438\u0434\u0435\u0442\u044C \u0412\u0430\u0441 \u0432 \u043D\u0430\u0448\u0435\u0439 \u043A\u043E\u043C\u0430\u043D\u0434\u0435! \u0415\u0441\u043B\u0438 \u0443 \u0412\u0430\u0441 \u043E\u0441\u0442\u0430\u043B\u0438\u0441\u044C \u0432\u043E\u043F\u0440\u043E\u0441\u044B, \u043F\u0438\u0448\u0438\u0442\u0435 \u2014 \u0441 \u0443\u0434\u043E\u0432\u043E\u043B\u044C\u0441\u0442\u0432\u0438\u0435\u043C \u043E\u0442\u0432\u0435\u0447\u0443.</p>' +
+
+          '<p style="margin:0 0 2px 0;">\u0421 \u0443\u0432\u0430\u0436\u0435\u043D\u0438\u0435\u043C \u0438 \u043D\u0430\u0434\u0435\u0436\u0434\u043E\u0439 \u043D\u0430 \u0441\u043E\u0442\u0440\u0443\u0434\u043D\u0438\u0447\u0435\u0441\u0442\u0432\u043E,</p>' +
+          '<p style="margin:0 0 2px 0;"><strong style="color:#0D47A1;">\u041A\u043E\u0448\u043A\u0430\u0440\u043E\u0432\u0430 \u0414\u0438\u043D\u0430 \u0410\u043B\u0435\u043A\u0441\u0430\u043D\u0434\u0440\u043E\u0432\u043D\u0430</strong></p>' +
+          '<p style="margin:0 0 2px 0;font-size:14px;color:#555;">\u0420\u0443\u043A\u043E\u0432\u043E\u0434\u0438\u0442\u0435\u043B\u044C \u043E\u0442\u0434\u0435\u043B\u0430 \u0440\u0430\u0437\u0432\u0438\u0442\u0438\u044F</p>' +
+          '<p style="margin:0 0 2px 0;font-size:14px;color:#555;">\u0411\u043B\u0430\u0433\u043E\u0442\u0432\u043E\u0440\u0438\u0442\u0435\u043B\u044C\u043D\u044B\u0439 \u0444\u043E\u043D\u0434 \u00AB\u041A\u0430\u0447\u0435\u0441\u0442\u0432\u043E \u0436\u0438\u0437\u043D\u0438\u00BB</p>' +
+          '<p style="margin:0 0 2px 0;font-size:13px;color:#888;">E-mail: koshkarova.da@kachestvo-zhizni.ru</p>' +
+          '<p style="margin:0;font-size:13px;color:#888;">\u0422\u0435\u043B.: 8 (495) 777-88-99</p>' +
+
+        '</div>' +
+
+        // ========== ФУТЕР ==========
+        '<div style="background:#FAFBFC;border-top:1px solid #E8EDF4;border-radius:0 0 14px 14px;padding:16px 28px;text-align:center;">' +
+          '<p style="margin:0 0 4px 0;font-size:10px;color:#bbb;line-height:1.5;">' +
+            '\u0414\u0430\u043D\u043D\u043E\u0435 \u043F\u0438\u0441\u044C\u043C\u043E \u044F\u0432\u043B\u044F\u0435\u0442\u0441\u044F \u043E\u0444\u0438\u0446\u0438\u0430\u043B\u044C\u043D\u044B\u043C \u043F\u0440\u0435\u0434\u043B\u043E\u0436\u0435\u043D\u0438\u0435\u043C \u043E \u0442\u0440\u0443\u0434\u043E\u0443\u0441\u0442\u0440\u043E\u0439\u0441\u0442\u0432\u0435 \u0438 \u043D\u0435 \u044F\u0432\u043B\u044F\u0435\u0442\u0441\u044F \u043F\u0443\u0431\u043B\u0438\u0447\u043D\u043E\u0439 \u043E\u0444\u0435\u0440\u0442\u043E\u0439.' +
+          '</p>' +
+          '<p style="margin:0;font-size:10px;color:#ccc;">' +
+            '\u00A9 2026 \u0411\u043B\u0430\u0433\u043E\u0442\u0432\u043E\u0440\u0438\u0442\u0435\u043B\u044C\u043D\u044B\u0439 \u0444\u043E\u043D\u0434 \u00AB\u041A\u0430\u0447\u0435\u0441\u0442\u0432\u043E \u0436\u0438\u0437\u043D\u0438\u00BB. \u0412\u0441\u0435 \u043F\u0440\u0430\u0432\u0430 \u0437\u0430\u0449\u0438\u0449\u0435\u043D\u044B.' +
+          '</p>' +
+        '</div>' +
+
+      '</div>'
+    },
+    // === НОВОЕ ПИСЬМО ОТ КОМПАС КАИТ20 ===
+    {
+      id: 'kompas',
+      folder: 'inbox',
+      unread: true,
+      flagged: false,
+      avatar: 'КК',
+      avatarClass: 'red',
+      from: 'КОМПАС КАИТ20',
+      emailFrom: 'kompas@kait20.ru',
+      subject: '\u0412\u044B\u0434\u0430\u0447\u0430 \u0441\u043F\u0440\u0430\u0432\u043A\u0438 \u043E \u0441\u0442\u0438\u043F\u0435\u043D\u0434\u0438\u0438 \u0437\u0430 \u043F\u0435\u0440\u0438\u043E\u0434 \u043C\u0430\u0439 2025 \u2014 \u0438\u044E\u043D\u044C 2026',
+      dateLabel: '7:00',
+      dateFull: '6 \u0438\u044E\u043B\u044F 2026 \u0432 7:00',
+      to: 'hlebnikovdanya2006@gmail.com',
+      bodyHtml: true,
+      body: '<div style="max-width:620px;margin:0 auto;font-family:\'Segoe UI\',Arial,sans-serif;background:#fff;border-radius:14px;border:1px solid #E0E6ED;">' +
+
+        // ========== ХЕДЕР С ЛОГОТИПОМ ==========
+        '<div style="background:#fff;border-bottom:2px solid #8B0000;padding:28px 30px 22px;text-align:center;">' +
+
+          '<svg width="56" height="56" viewBox="0 0 100 100" style="margin-bottom:8px;">' +
+            '<circle cx="50" cy="50" r="46" fill="none" stroke="#8B0000" stroke-width="3"/>' +
+            '<circle cx="50" cy="50" r="38" fill="none" stroke="#8B0000" stroke-width="1.5" opacity="0.4"/>' +
+            '<polygon points="50,16 55,38 80,50 55,62 50,84 45,62 20,50 45,38" fill="#8B0000"/>' +
+            '<circle cx="50" cy="50" r="9" fill="#fff"/>' +
+            '<text x="50" y="55" text-anchor="middle" font-size="13" font-weight="bold" fill="#8B0000">\u041A</text>' +
+          '</svg>' +
+
+          '<div style="font-size:26px;font-weight:800;color:#8B0000;letter-spacing:2px;">\u041A\u041E\u041C\u041F\u0410\u0421</div>' +
+          '<div style="font-size:13px;color:#8B0000;font-weight:600;letter-spacing:4px;margin-top:0px;">\u041A\u0410\u0418\u0422 \u211620</div>' +
+          '<div style="width:60px;height:2px;background:#8B0000;margin:10px auto 0;opacity:0.3;"></div>' +
+          '<div style="font-size:10px;color:#999;margin-top:8px;letter-spacing:1px;">\u0421\u0418\u0421\u0422\u0415\u041C\u0410 \u042D\u041B\u0415\u041A\u0422\u0420\u041E\u041D\u041D\u041E\u0413\u041E \u0414\u041E\u041A\u0423\u041C\u0415\u041D\u0422\u041E\u041E\u0411\u041E\u0420\u041E\u0422\u0410</div>' +
+        '</div>' +
+
+        // ========== ОСНОВНОЙ БЛОК ==========
+        '<div style="background:#fff;padding:28px 30px 24px;color:#333;font-size:15px;line-height:1.7;">' +
+
+          '<p style="margin:0 0 18px 0;">\u0423\u0432\u0430\u0436\u0430\u0435\u043C\u044B\u0439 \u0425\u043B\u0435\u0431\u043D\u0438\u043A\u043E\u0432 \u0414\u0430\u043D\u0438\u0438\u043B!</p>' +
+
+          '<p style="margin:0 0 18px 0;">\u041A\u043E\u043B\u043B\u0435\u0434\u0436 \u0430\u0432\u0442\u043E\u043C\u0430\u0442\u0438\u0437\u0430\u0446\u0438\u0438 \u0438 \u0438\u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0438\u043E\u043D\u043D\u044B\u0445 \u0442\u0435\u0445\u043D\u043E\u043B\u043E\u0433\u0438\u0439 \u211620, \u0441\u043E\u043A\u0440\u0430\u0449\u0451\u043D\u043D\u043E \u041A\u0410\u0418\u042220, \u043D\u0430\u043F\u0440\u0430\u0432\u043B\u044F\u0435\u0442 \u0412\u0430\u043C \u0434\u0430\u043D\u043D\u043E\u0435 \u0443\u0432\u0435\u0434\u043E\u043C\u043B\u0435\u043D\u0438\u0435 \u0432 \u0440\u0430\u043C\u043A\u0430\u0445 \u0441\u0438\u0441\u0442\u0435\u043C\u044B \u044D\u043B\u0435\u043A\u0442\u0440\u043E\u043D\u043D\u043E\u0433\u043E \u0434\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u043E\u043E\u0431\u043E\u0440\u043E\u0442\u0430 \u00AB\u041A\u041E\u041C\u041F\u0410\u0421\u00BB.</p>' +
+
+          '<p style="margin:0 0 18px 0;">\u0414\u0430\u043D\u043D\u043E\u0435 \u043F\u0438\u0441\u044C\u043C\u043E \u044F\u0432\u043B\u044F\u0435\u0442\u0441\u044F \u043E\u0444\u0438\u0446\u0438\u0430\u043B\u044C\u043D\u044B\u043C \u0443\u0432\u0435\u0434\u043E\u043C\u043B\u0435\u043D\u0438\u0435\u043C \u0438 \u0438\u043C\u0435\u0435\u0442 \u044E\u0440\u0438\u0434\u0438\u0447\u0435\u0441\u043A\u0443\u044E \u0441\u0438\u043B\u0443, \u043F\u043E\u0441\u043A\u043E\u043B\u044C\u043A\u0443 \u043F\u043E\u0434\u043F\u0438\u0441\u0430\u043D\u043E \u044D\u043B\u0435\u043A\u0442\u0440\u043E\u043D\u043D\u043E\u0439 \u043F\u043E\u0434\u043F\u0438\u0441\u044C\u044E \u0432 \u0441\u0438\u0441\u0442\u0435\u043C\u0435 \u00AB\u041A\u041E\u041C\u041F\u0410\u0421\u00BB. \u041D\u043E\u043C\u0435\u0440 \u0438\u0441\u0445\u043E\u0434\u044F\u0449\u0435\u0433\u043E \u0434\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u0430 \u041A20-07/176 \u043E\u0442 06 \u0438\u044E\u043B\u044F 2026 \u0433\u043E\u0434\u0430.</p>' +
+
+          '<hr style="border:none;border-top:1px solid #E8EDF4;margin:20px 0;">' +
+
+          '<p style="margin:0 0 18px 0;">\u0421\u043E\u043E\u0431\u0449\u0430\u0435\u043C \u0412\u0430\u043C, \u0447\u0442\u043E \u0437\u0430\u043A\u0430\u0437\u0430\u043D\u043D\u0430\u044F \u0412\u0430\u043C\u0438 \u0441\u043F\u0440\u0430\u0432\u043A\u0430 \u043E \u043F\u043E\u043B\u0443\u0447\u0435\u043D\u0438\u0438 \u0441\u0442\u0438\u043F\u0435\u043D\u0434\u0438\u0438 \u0437\u0430 \u043F\u0435\u0440\u0438\u043E\u0434 \u0441 \u043C\u0430\u044F 2025 \u0433\u043E\u0434\u0430 \u043F\u043E \u0438\u044E\u043D\u044C 2026 \u0433\u043E\u0434\u0430 \u043F\u043E\u0434\u0433\u043E\u0442\u043E\u0432\u043B\u0435\u043D\u0430 \u0438 \u0433\u043E\u0442\u043E\u0432\u0430 \u043A \u0432\u044B\u0434\u0430\u0447\u0435. \u0414\u043E\u043A\u0443\u043C\u0435\u043D\u0442 \u043E\u0444\u043E\u0440\u043C\u043B\u0435\u043D \u043D\u0430 \u0431\u043B\u0430\u043D\u043A\u0435 \u0443\u0441\u0442\u0430\u043D\u043E\u0432\u043B\u0435\u043D\u043D\u043E\u0433\u043E \u043E\u0431\u0440\u0430\u0437\u0446\u0430 \u0438 \u0437\u0430\u0432\u0435\u0440\u0435\u043D \u043F\u043E\u0434\u043F\u0438\u0441\u044C\u044E \u043E\u0442\u0432\u0435\u0442\u0441\u0442\u0432\u0435\u043D\u043D\u043E\u0433\u043E \u043B\u0438\u0446\u0430 \u0438 \u043F\u0435\u0447\u0430\u0442\u044C\u044E \u043A\u043E\u043B\u043B\u0435\u0434\u0436\u0430. \u0412\u0441\u0435 \u0434\u0430\u043D\u043D\u044B\u0435, \u0443\u043A\u0430\u0437\u0430\u043D\u043D\u044B\u0435 \u0432 \u0441\u043F\u0440\u0430\u0432\u043A\u0435, \u043F\u0440\u043E\u0432\u0435\u0440\u0435\u043D\u044B \u0438 \u0441\u043E\u043E\u0442\u0432\u0435\u0442\u0441\u0442\u0432\u0443\u044E\u0442 \u0434\u0430\u043D\u043D\u044B\u043C \u0431\u0443\u0445\u0433\u0430\u043B\u0442\u0435\u0440\u0441\u043A\u043E\u0433\u043E \u0443\u0447\u0451\u0442\u0430 \u043A\u043E\u043B\u043B\u0435\u0434\u0436\u0430.</p>' +
+
+          '<p style="margin:0 0 18px 0;">\u0427\u0442\u043E\u0431\u044B \u043F\u043E\u043B\u0443\u0447\u0438\u0442\u044C \u0441\u043F\u0440\u0430\u0432\u043A\u0443, \u0412\u0430\u043C \u043D\u0435\u043E\u0431\u0445\u043E\u0434\u0438\u043C\u043E \u043B\u0438\u0447\u043D\u043E \u043F\u043E\u0434\u043E\u0439\u0442\u0438 \u0432 \u0443\u0447\u0435\u0431\u043D\u044B\u0439 \u043E\u0442\u0434\u0435\u043B \u043A\u043E\u043B\u043B\u0435\u0434\u0436\u0430, \u043A\u043E\u0442\u043E\u0440\u044B\u0439 \u0440\u0430\u0441\u043F\u043E\u043B\u0430\u0433\u0430\u0435\u0442\u0441\u044F \u0432 \u0430\u0434\u043C\u0438\u043D\u0438\u0441\u0442\u0440\u0430\u0442\u0438\u0432\u043D\u043E\u043C \u043A\u043E\u0440\u043F\u0443\u0441\u0435 \u043D\u0430 \u0432\u0442\u043E\u0440\u043E\u043C \u044D\u0442\u0430\u0436\u0435 \u0432 \u043A\u0430\u0431\u0438\u043D\u0435\u0442\u0435 \u2116204. \u0410\u0434\u0440\u0435\u0441 \u043A\u043E\u043B\u043B\u0435\u0434\u0436\u0430: \u0433\u043E\u0440\u043E\u0434 \u041C\u043E\u0441\u043A\u0432\u0430, \u0443\u043B\u0438\u0446\u0430 1-\u044F \u041F\u0430\u0440\u043A\u043E\u0432\u0430\u044F, \u0434\u043E\u043C 12. \u041F\u0440\u0438\u0445\u043E\u0434\u0438\u0442\u044C \u043C\u043E\u0436\u043D\u043E \u0432 \u043B\u044E\u0431\u043E\u0439 \u0440\u0430\u0431\u043E\u0447\u0438\u0439 \u0434\u0435\u043D\u044C, \u043D\u0438\u043A\u0430\u043A\u0438\u0445 \u0434\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u043E\u0432 \u043F\u0440\u0438 \u0441\u0435\u0431\u0435 \u0438\u043C\u0435\u0442\u044C \u043D\u0435 \u043D\u0443\u0436\u043D\u043E, \u0434\u043E\u0441\u0442\u0430\u0442\u043E\u0447\u043D\u043E \u043F\u0440\u043E\u0441\u0442\u043E \u043D\u0430\u0437\u0432\u0430\u0442\u044C \u0441\u0432\u043E\u0451 \u0438\u043C\u044F \u0438 \u0441\u043A\u0430\u0437\u0430\u0442\u044C, \u0447\u0442\u043E \u0412\u044B \u0437\u0430 \u0441\u043F\u0440\u0430\u0432\u043A\u043E\u0439 \u043E \u0441\u0442\u0438\u043F\u0435\u043D\u0434\u0438\u0438 \u043E\u0442 \u0441\u0438\u0441\u0442\u0435\u043C\u044B \u00AB\u041A\u041E\u041C\u041F\u0410\u0421\u00BB.</p>' +
+
+          '<p style="margin:0 0 18px 0;">\u0423\u0447\u0435\u0431\u043D\u044B\u0439 \u043E\u0442\u0434\u0435\u043B \u0440\u0430\u0431\u043E\u0442\u0430\u0435\u0442 \u0432 \u0441\u043B\u0435\u0434\u0443\u044E\u0449\u0435\u043C \u0440\u0435\u0436\u0438\u043C\u0435: \u043F\u043E\u043D\u0435\u0434\u0435\u043B\u044C\u043D\u0438\u043A \u0441 09:00 \u0434\u043E 18:00, \u0432\u0442\u043E\u0440\u043D\u0438\u043A \u0441 09:00 \u0434\u043E 18:00, \u0441\u0440\u0435\u0434\u0430 \u0441 09:00 \u0434\u043E 18:00, \u0447\u0435\u0442\u0432\u0435\u0440\u0433 \u0441 09:00 \u0434\u043E 18:00, \u043F\u044F\u0442\u043D\u0438\u0446\u0430 \u0441 09:00 \u0434\u043E 18:00, \u0430 \u0442\u0430\u043A\u0436\u0435 \u0432 \u0441\u0443\u0431\u0431\u043E\u0442\u0443 \u0441 10:00 \u0434\u043E 15:00. \u0412\u043E\u0441\u043A\u0440\u0435\u0441\u0435\u043D\u044C\u0435 \u2014 \u0432\u044B\u0445\u043E\u0434\u043D\u043E\u0439 \u0434\u0435\u043D\u044C. \u041E\u0431\u0435\u0434\u0435\u043D\u043D\u044B\u0439 \u043F\u0435\u0440\u0435\u0440\u044B\u0432 \u0434\u043B\u0438\u0442\u0441\u044F \u0441 13:00 \u0434\u043E 14:00.</p>' +
+
+          '<p style="margin:0 0 18px 0;">\u0421\u0430\u043C\u0430 \u0441\u0438\u0441\u0442\u0435\u043C\u0430 \u044D\u043B\u0435\u043A\u0442\u0440\u043E\u043D\u043D\u043E\u0433\u043E \u0434\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u043E\u043E\u0431\u043E\u0440\u043E\u0442\u0430 \u00AB\u041A\u041E\u041C\u041F\u0410\u0421\u00BB \u0440\u0430\u0431\u043E\u0442\u0430\u0435\u0442 \u043A\u0440\u0443\u0433\u043B\u043E\u0441\u0443\u0442\u043E\u0447\u043D\u043E \u0438 \u0434\u043E\u0441\u0442\u0443\u043F\u043D\u0430 \u0447\u0435\u0440\u0435\u0437 \u043B\u0438\u0447\u043D\u044B\u0439 \u043A\u0430\u0431\u0438\u043D\u0435\u0442 \u043D\u0430 \u0441\u0430\u0439\u0442\u0435 \u043A\u043E\u043B\u043B\u0435\u0434\u0436\u0430. \u0412 \u0441\u0438\u0441\u0442\u0435\u043C\u0435 \u0412\u044B \u043C\u043E\u0436\u0435\u0442\u0435 \u043E\u0442\u0441\u043B\u0435\u0436\u0438\u0432\u0430\u0442\u044C \u0441\u0442\u0430\u0442\u0443\u0441 \u0441\u0432\u043E\u0438\u0445 \u0437\u0430\u044F\u0432\u043E\u043A, \u043F\u043E\u043B\u0443\u0447\u0430\u0442\u044C \u0443\u0432\u0435\u0434\u043E\u043C\u043B\u0435\u043D\u0438\u044F \u0438 \u0437\u0430\u043A\u0430\u0437\u044B\u0432\u0430\u0442\u044C \u043D\u043E\u0432\u044B\u0435 \u0434\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u044B. \u0412\u0445\u043E\u0434 \u0432 \u0441\u0438\u0441\u0442\u0435\u043C\u0443 \u043E\u0441\u0443\u0449\u0435\u0441\u0442\u0432\u043B\u044F\u0435\u0442\u0441\u044F \u043F\u043E \u043B\u043E\u0433\u0438\u043D\u0443 \u0438 \u043F\u0430\u0440\u043E\u043B\u044E, \u043A\u043E\u0442\u043E\u0440\u044B\u0435 \u0431\u044B\u043B\u0438 \u0432\u044B\u0434\u0430\u043D\u044B \u0412\u0430\u043C \u043F\u0440\u0438 \u043F\u043E\u0441\u0442\u0443\u043F\u043B\u0435\u043D\u0438\u0438 \u0432 \u043A\u043E\u043B\u043B\u0435\u0434\u0436.</p>' +
+
+          '<p style="margin:0 0 18px 0;">\u0412\u0430\u043C \u043D\u0435\u043E\u0431\u0445\u043E\u0434\u0438\u043C\u043E \u0437\u0430\u0431\u0440\u0430\u0442\u044C \u0441\u043F\u0440\u0430\u0432\u043A\u0443 \u0432 \u0441\u0440\u043E\u043A \u0434\u043E 15 \u0438\u044E\u043B\u044F 2026 \u0433\u043E\u0434\u0430 \u0432\u043A\u043B\u044E\u0447\u0438\u0442\u0435\u043B\u044C\u043D\u043E. \u041F\u043E\u0441\u043B\u0435 \u044D\u0442\u043E\u0439 \u0434\u0430\u0442\u044B \u0434\u043E\u043A\u0443\u043C\u0435\u043D\u0442 \u0431\u0443\u0434\u0435\u0442 \u0441\u0447\u0438\u0442\u0430\u0442\u044C\u0441\u044F \u043D\u0435\u0434\u0435\u0439\u0441\u0442\u0432\u0438\u0442\u0435\u043B\u044C\u043D\u044B\u043C, \u0438 \u0434\u043B\u044F \u0435\u0433\u043E \u043F\u043E\u0432\u0442\u043E\u0440\u043D\u043E\u0433\u043E \u0437\u0430\u043A\u0430\u0437\u0430 \u0432\u0430\u043C \u043F\u0440\u0438\u0434\u0451\u0442\u0441\u044F \u043E\u0431\u0440\u0430\u0449\u0430\u0442\u044C\u0441\u044F \u0432 \u0443\u0447\u0435\u0431\u043D\u044B\u0439 \u043E\u0442\u0434\u0435\u043B \u0437\u0430\u043D\u043E\u0432\u043E \u0438 \u043F\u0438\u0441\u0430\u0442\u044C \u043D\u043E\u0432\u043E\u0435 \u0437\u0430\u044F\u0432\u043B\u0435\u043D\u0438\u0435, \u0430 \u0441\u0440\u043E\u043A \u0440\u0430\u0441\u0441\u043C\u043E\u0442\u0440\u0435\u043D\u0438\u044F \u0437\u0430\u0439\u043C\u0451\u0442 \u0434\u043E 14 \u0440\u0430\u0431\u043E\u0447\u0438\u0445 \u0434\u043D\u0435\u0439. \u041F\u043E\u044D\u0442\u043E\u043C\u0443 \u043C\u044B \u043D\u0430\u0441\u0442\u043E\u044F\u0442\u0435\u043B\u044C\u043D\u043E \u0440\u0435\u043A\u043E\u043C\u0435\u043D\u0434\u0443\u0435\u043C \u043D\u0435 \u043E\u0442\u043A\u043B\u0430\u0434\u044B\u0432\u0430\u0442\u044C \u0432\u0438\u0437\u0438\u0442 \u0438 \u043F\u043E\u043B\u0443\u0447\u0438\u0442\u044C \u0441\u043F\u0440\u0430\u0432\u043A\u0443 \u043A\u0430\u043A \u043C\u043E\u0436\u043D\u043E \u0440\u0430\u043D\u044C\u0448\u0435.</p>' +
+
+          '<p style="margin:0 0 18px 0;">\u0421\u0440\u043E\u043A \u0434\u0435\u0439\u0441\u0442\u0432\u0438\u044F \u0441\u0430\u043C\u043E\u0439 \u0441\u043F\u0440\u0430\u0432\u043A\u0438 \u0441\u043E\u0441\u0442\u0430\u0432\u043B\u044F\u0435\u0442 30 \u043A\u0430\u043B\u0435\u043D\u0434\u0430\u0440\u043D\u044B\u0445 \u0434\u043D\u0435\u0439 \u0441 \u0434\u0430\u0442\u044B \u0435\u0451 \u0432\u044B\u0434\u0430\u0447\u0438. \u041F\u043E\u0441\u043B\u0435 \u043F\u043E\u043B\u0443\u0447\u0435\u043D\u0438\u044F \u0432\u043D\u0438\u043C\u0430\u0442\u0435\u043B\u044C\u043D\u043E \u043F\u0440\u043E\u0432\u0435\u0440\u044C\u0442\u0435 \u043F\u0440\u0430\u0432\u0438\u043B\u044C\u043D\u043E\u0441\u0442\u044C \u0443\u043A\u0430\u0437\u0430\u043D\u0438\u044F \u0412\u0430\u0448\u0438\u0445 \u0434\u0430\u043D\u043D\u044B\u0445: \u0444\u0430\u043C\u0438\u043B\u0438\u0438, \u0438\u043C\u0435\u043D\u0438, \u043E\u0442\u0447\u0435\u0441\u0442\u0432\u0430, \u043D\u0430\u0438\u043C\u0435\u043D\u043E\u0432\u0430\u043D\u0438\u044F \u043E\u0431\u0440\u0430\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044C\u043D\u043E\u0439 \u043E\u0440\u0433\u0430\u043D\u0438\u0437\u0430\u0446\u0438\u0438, \u043F\u0435\u0440\u0438\u043E\u0434\u0430 \u043E\u0431\u0443\u0447\u0435\u043D\u0438\u044F \u0438 \u0441\u0443\u043C\u043C\u044B \u0441\u0442\u0438\u043F\u0435\u043D\u0434\u0438\u0438. \u0415\u0441\u043B\u0438 \u0412\u044B \u043E\u0431\u043D\u0430\u0440\u0443\u0436\u0438\u0442\u0435 \u043A\u0430\u043A\u0443\u044E-\u043B\u0438\u0431\u043E \u043E\u0448\u0438\u0431\u043A\u0443 \u0438\u043B\u0438 \u043D\u0435\u0442\u043E\u0447\u043D\u043E\u0441\u0442\u044C, \u043F\u043E\u0436\u0430\u043B\u0443\u0439\u0441\u0442\u0430, \u0441\u0440\u0430\u0437\u0443 \u0436\u0435 \u0441\u043E\u043E\u0431\u0449\u0438\u0442\u0435 \u043E\u0431 \u044D\u0442\u043E\u043C \u0441\u043E\u0442\u0440\u0443\u0434\u043D\u0438\u043A\u0443 \u0443\u0447\u0435\u0431\u043D\u043E\u0433\u043E \u043E\u0442\u0434\u0435\u043B\u0430, \u0447\u0442\u043E\u0431\u044B \u043E\u043D \u043C\u043E\u0433 \u043E\u043F\u0435\u0440\u0430\u0442\u0438\u0432\u043D\u043E \u0438\u0441\u043F\u0440\u0430\u0432\u0438\u0442\u044C \u0434\u0430\u043D\u043D\u044B\u0435.</p>' +
+
+          '<p style="margin:0 0 18px 0;">\u041E\u0431\u0440\u0430\u0449\u0430\u0435\u043C \u0412\u0430\u0448\u0435 \u0432\u043D\u0438\u043C\u0430\u043D\u0438\u0435, \u0447\u0442\u043E \u0434\u0430\u043D\u043D\u0430\u044F \u0441\u043F\u0440\u0430\u0432\u043A\u0430 \u043F\u0440\u0435\u0434\u043E\u0441\u0442\u0430\u0432\u043B\u044F\u0435\u0442\u0441\u044F \u0431\u0435\u0441\u043F\u043B\u0430\u0442\u043D\u043E. \u0412 \u0441\u043B\u0443\u0447\u0430\u0435 \u0443\u0442\u0435\u0440\u0438 \u0438\u043B\u0438 \u043F\u043E\u0432\u0440\u0435\u0436\u0434\u0435\u043D\u0438\u044F \u043F\u043E\u043B\u0443\u0447\u0435\u043D\u043D\u043E\u0433\u043E \u0434\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u0430 \u0432\u044B \u043C\u043E\u0436\u0435\u0442\u0435 \u0437\u0430\u043A\u0430\u0437\u0430\u0442\u044C \u0434\u0443\u0431\u043B\u0438\u043A\u0430\u0442, \u043D\u0430\u043F\u0440\u0430\u0432\u0438\u0432 \u043F\u0438\u0441\u044C\u043C\u0435\u043D\u043D\u043E\u0435 \u043E\u0431\u0440\u0430\u0449\u0435\u043D\u0438\u0435 \u0432 \u0443\u0447\u0435\u0431\u043D\u044B\u0439 \u043E\u0442\u0434\u0435\u043B. \u041F\u043E \u043B\u044E\u0431\u044B\u043C \u0432\u043E\u043F\u0440\u043E\u0441\u0430\u043C, \u0441\u0432\u044F\u0437\u0430\u043D\u043D\u044B\u043C \u0441 \u0440\u0430\u0431\u043E\u0442\u043E\u0439 \u0441\u0438\u0441\u0442\u0435\u043C\u044B \u00AB\u041A\u041E\u041C\u041F\u0410\u0421\u00BB, \u0412\u044B \u043C\u043E\u0436\u0435\u0442\u0435 \u043E\u0431\u0440\u0430\u0449\u0430\u0442\u044C\u0441\u044F \u0432 \u0442\u0435\u0445\u043D\u0438\u0447\u0435\u0441\u043A\u0443\u044E \u043F\u043E\u0434\u0434\u0435\u0440\u0436\u043A\u0443 \u043F\u043E \u0442\u0435\u043B\u0435\u0444\u043E\u043D\u0443 8 (495) 111-22-33 \u0438\u043B\u0438 \u043F\u043E \u044D\u043B\u0435\u043A\u0442\u0440\u043E\u043D\u043D\u043E\u0439 \u043F\u043E\u0447\u0442\u0435 kompas@kait20.ru. \u0422\u0435\u0445\u043D\u0438\u0447\u0435\u0441\u043A\u0430\u044F \u043F\u043E\u0434\u0434\u0435\u0440\u0436\u043A\u0430 \u0440\u0430\u0431\u043E\u0442\u0430\u0435\u0442 \u0432 \u0431\u0443\u0434\u043D\u0438\u0435 \u0434\u043D\u0438 \u0441 08:00 \u0434\u043E 20:00.</p>' +
+
+          // Подпись
+          '<hr style="border:none;border-top:1px solid #E8EDF4;margin:24px 0 18px;">' +
+
+          '<p style="margin:0 0 2px 0;">\u0421 \u0443\u0432\u0430\u0436\u0435\u043D\u0438\u0435\u043C,</p>' +
+          '<p style="margin:0 0 2px 0;font-weight:700;color:#8B0000;">\u0410\u0434\u043C\u0438\u043D\u0438\u0441\u0442\u0440\u0430\u0446\u0438\u044F \u0413\u0411\u041F\u041E\u0423 \u041A\u0410\u0418\u0422 \u211620</p>' +
+          '<p style="margin:0 0 2px 0;font-size:13px;color:#999;">\u0421\u0438\u0441\u0442\u0435\u043C\u0430 \u044D\u043B\u0435\u043A\u0442\u0440\u043E\u043D\u043D\u043E\u0433\u043E \u0434\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u043E\u043E\u0431\u043E\u0440\u043E\u0442\u0430 \u00AB\u041A\u041E\u041C\u041F\u0410\u0421\u00BB</p>' +
+          '<p style="margin:0;font-size:12px;color:#bbb;">\u0414\u0430\u043D\u043D\u043E\u0435 \u043F\u0438\u0441\u044C\u043C\u043E \u043F\u043E\u0434\u043F\u0438\u0441\u0430\u043D\u043E \u044D\u043B\u0435\u043A\u0442\u0440\u043E\u043D\u043D\u043E\u0439 \u043F\u043E\u0434\u043F\u0438\u0441\u044C\u044E \u0432 \u0441\u0438\u0441\u0442\u0435\u043C\u0435 \u00AB\u041A\u041E\u041C\u041F\u0410\u0421\u00BB. \u041A\u043E\u0434 \u043F\u043E\u0434\u043F\u0438\u0441\u0438: A7F3-9B21-4C6D</p>' +
+
+        '</div>' +
+
+        // ========== ФУТЕР ==========
+        '<div style="background:#FAFBFC;border-top:1px solid #E8EDF4;border-radius:0 0 14px 14px;padding:16px 28px;text-align:center;">' +
+          '<p style="margin:0 0 4px 0;font-size:10px;color:#bbb;line-height:1.5;">' +
+            '\u0414\u0430\u043D\u043D\u043E\u0435 \u0441\u043E\u043E\u0431\u0449\u0435\u043D\u0438\u0435 \u0441\u0444\u043E\u0440\u043C\u0438\u0440\u043E\u0432\u0430\u043D\u043E \u0430\u0432\u0442\u043E\u043C\u0430\u0442\u0438\u0447\u0435\u0441\u043A\u0438 \u0432 \u0441\u0438\u0441\u0442\u0435\u043C\u0435 \u044D\u043B\u0435\u043A\u0442\u0440\u043E\u043D\u043D\u043E\u0433\u043E \u0434\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u043E\u043E\u0431\u043E\u0440\u043E\u0442\u0430 \u00AB\u041A\u041E\u041C\u041F\u0410\u0421\u00BB. \u041D\u0435 \u0442\u0440\u0435\u0431\u0443\u0435\u0442 \u043E\u0442\u0432\u0435\u0442\u0430.' +
+          '</p>' +
+          '<p style="margin:0;font-size:10px;color:#ccc;">' +
+            '\u00A9 2026 \u0413\u0411\u041F\u041E\u0423 \u041A\u0410\u0418\u0422 \u211620. \u0412\u0441\u0435 \u043F\u0440\u0430\u0432\u0430 \u0437\u0430\u0449\u0438\u0449\u0435\u043D\u044B.' +
+          '</p>' +
+        '</div>' +
+
+      '</div>'
+    },
+    // === ПИСЬМО ОТ ЯРОСЛАВА НИКОЛАЕВА ===
+    {
+      id: 'yaroslav',
+      folder: 'inbox',
+      unread: true,
+      flagged: false,
+      avatar: 'ЯН',
+      avatarClass: 'green',
+      from: 'Ярослав Николаев',
+      emailFrom: 'nikolaev@technogroup.ru',
+      subject: '\uD83D\uDCBC \u041F\u0440\u0435\u0434\u043B\u043E\u0436\u0435\u043D\u0438\u0435 \u0440\u0430\u0431\u043E\u0442\u044B \u2014 \u0421\u043E\u0437\u0434\u0430\u043D\u0438\u0435 \u0431\u0443\u043A\u043B\u0435\u0442\u043E\u0432 \u0438 \u043B\u0438\u0441\u0442\u043E\u0432\u043E\u043A | \u041E\u041E\u041E \u00AB\u0422\u0435\u0445\u043D\u043E \u0413\u0440\u0443\u043F\u00BB',
+      dateLabel: '11:00',
+      dateFull: '10 \u0438\u044E\u043B\u044F 2026 \u0432 11:00',
+      to: 'hlebnikovdanya2006@gmail.com',
+      bodyHtml: true,
+      body: '<div style="max-width:640px;margin:0 auto;font-family:\'Segoe UI\',Arial,sans-serif;background:#fff;border-radius:14px;border:1px solid #E0E6ED;overflow:hidden;">' +
+
+        // ========== ХЕДЕР ==========
+        '<div style="background:linear-gradient(135deg, #1B5E20, #2E7D32);padding:32px 30px 26px;text-align:center;">' +
+          '<svg width="60" height="60" viewBox="0 0 100 100" style="margin-bottom:10px;">' +
+            '<rect x="5" y="5" width="90" height="90" rx="16" fill="rgba(255,255,255,0.12)" stroke="#fff" stroke-width="2.5"/>' +
+            '<rect x="15" y="25" width="70" height="8" rx="4" fill="rgba(255,255,255,0.5)"/>' +
+            '<rect x="15" y="40" width="50" height="6" rx="3" fill="rgba(255,255,255,0.35)"/>' +
+            '<rect x="15" y="52" width="60" height="6" rx="3" fill="rgba(255,255,255,0.35)"/>' +
+            '<rect x="15" y="64" width="40" height="6" rx="3" fill="rgba(255,255,255,0.35)"/>' +
+            '<circle cx="78" cy="78" r="16" fill="#fff"/>' +
+            '<text x="78" y="83" text-anchor="middle" font-size="16" font-weight="bold" fill="#1B5E20">\u2191</text>' +
+          '</svg>' +
+          '<div style="font-size:24px;font-weight:800;color:#fff;letter-spacing:1px;">\u041E\u041E\u041E \u00AB\u0422\u0435\u0445\u043D\u043E \u0413\u0440\u0443\u043F\u00BB</div>' +
+          '<div style="font-size:12px;color:rgba(255,255,255,0.7);font-weight:500;letter-spacing:2px;margin-top:3px;text-transform:uppercase;">\u0426\u0438\u0444\u0440\u043E\u0432\u0430\u044F \u0441\u0435\u0440\u0432\u0438\u0441\u043D\u0430\u044F \u044D\u043A\u043E\u043D\u043E\u043C\u0438\u043A\u0430 \u0432 \u0430\u0432\u0442\u043E\u043C\u043E\u0431\u0438\u043B\u044C\u043D\u043E\u043C \u0442\u0440\u0430\u043D\u0441\u043F\u043E\u0440\u0442\u0435</div>' +
+          '<div style="width:50px;height:2px;background:rgba(255,255,255,0.3);margin:12px auto 0;"></div>' +
+        '</div>' +
+
+        // ========== ОСНОВНОЙ БЛОК ==========
+        '<div style="background:#fff;padding:30px 32px 24px;color:#333;font-size:15px;line-height:1.75;">' +
+
+          '<p style="margin:0 0 18px 0;"><strong>\u0423\u0432\u0430\u0436\u0430\u0435\u043C\u044B\u0439 \u0425\u043B\u0435\u0431\u043D\u0438\u043A\u043E\u0432 \u0414\u0430\u043D\u0438\u0438\u043B!</strong></p>' +
+
+          '<p style="margin:0 0 16px 0;">\u0414\u043E\u0431\u0440\u043E\u0435 \u0443\u0442\u0440\u043E! \u041C\u0435\u043D\u044F \u0437\u043E\u0432\u0443\u0442 <strong>\u042F\u0440\u043E\u0441\u043B\u0430\u0432 \u041D\u0438\u043A\u043E\u043B\u0430\u0435\u0432</strong>, \u044F \u044F\u0432\u043B\u044F\u044E\u0441\u044C \u0440\u0430\u0431\u043E\u0442\u043E\u0434\u0430\u0442\u0435\u043B\u0435\u043C \u0432 \u0441\u0444\u0435\u0440\u0435 \u0438\u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0438\u043E\u043D\u043D\u044B\u0445 \u0442\u0435\u0445\u043D\u043E\u043B\u043E\u0433\u0438\u0439. \u041C\u044B \u043F\u043E\u043B\u0443\u0447\u0438\u043B\u0438 \u0438\u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0438\u044E \u043E \u0422\u0435\u0431\u0435 \u043A\u0430\u043A \u043E \u043E\u043F\u044B\u0442\u043D\u043E\u043C \u043F\u0440\u043E\u0433\u0440\u0430\u043C\u043C\u0438\u0441\u0442\u0435, \u0438 \u0445\u043E\u0442\u0435\u043B\u0438 \u0431\u044B \u043F\u0440\u0435\u0434\u043B\u043E\u0436\u0438\u0442\u044C \u0422\u0435\u0431\u0435 \u0441\u043E\u0442\u0440\u0443\u0434\u043D\u0438\u0447\u0435\u0441\u0442\u0432\u043E \u043F\u043E \u0441\u043E\u0437\u0434\u0430\u043D\u0438\u044E \u0431\u0443\u043A\u043B\u0435\u0442\u043E\u0432 \u0438 \u043B\u0438\u0441\u0442\u043E\u0432\u043E\u043A.</p>' +
+
+          '<p style="margin:0 0 20px 0;">\u0415\u0441\u043B\u0438 \u0412\u044B \u0437\u0430\u0438\u043D\u0442\u0435\u0440\u0435\u0441\u043E\u0432\u0430\u043D\u044B \u0432 \u043F\u0440\u0435\u0434\u043B\u043E\u0436\u0435\u043D\u0438\u0438, \u0442\u043E \u043D\u0430\u043F\u0438\u0448\u0438\u0442\u0435 \u043D\u0430\u043C \u0432 \u043E\u0442\u0432\u0435\u0442\u043D\u043E\u043C \u043F\u0438\u0441\u044C\u043C\u0435, \u0447\u0442\u043E \u044F \u0433\u043E\u0442\u043E\u0432 \u0440\u0430\u0431\u043E\u0442\u0430\u0442\u044C.</p>' +
+
+          '<hr style="border:none;border-top:1px solid #E8EDF4;margin:22px 0;">' +
+
+          // ===== ОПИСАНИЕ РАБОТЫ =====
+          '<h3 style="font-size:17px;font-weight:700;color:#1B5E20;margin:22px 0 12px 0;">\u041E \u0447\u0435\u043C \u0440\u0430\u0431\u043E\u0442\u0430</h3>' +
+
+          '<p style="margin:0 0 14px 0;">\u0424\u0440\u0438\u043B\u0430\u043D\u0441-\u0440\u0430\u0431\u043E\u0442\u0430 \u0434\u043B\u044F \u0441\u043F\u0435\u0446\u0438\u0430\u043B\u0438\u0441\u0442\u043E\u0432 \u043F\u043E \u0441\u043E\u0437\u0434\u0430\u043D\u0438\u044E \u0434\u0438\u0437\u0430\u0439\u043D\u0430 \u0431\u0443\u043A\u043B\u0435\u0442\u043E\u0432 \u043E\u043D\u043B\u0430\u0439\u043D.</p>' +
+          '<p style="margin:0 0 14px 0;"><strong>\u0423\u0434\u0430\u043B\u0451\u043D\u043D\u0430\u044F \u0440\u0430\u0431\u043E\u0442\u0430 \u0434\u043B\u044F \u043A\u0430\u0436\u0434\u043E\u0433\u043E</strong> \u2014 \u043E\u0442 \u0441\u043F\u0435\u0446\u0438\u0430\u043B\u0438\u0441\u0442\u0430 \u0434\u043E \u043D\u043E\u0432\u0438\u0447\u043A\u0430 \u0431\u0435\u0437 \u043E\u043F\u044B\u0442\u0430.</p>' +
+
+          // ===== СТАТИСТИКА =====
+          '<div style="display:flex;gap:10px;margin:20px 0;flex-wrap:wrap;">' +
+            '<div style="flex:1;min-width:120px;background:linear-gradient(135deg,#E8F5E9,#C8E6C9);border-radius:12px;padding:16px 14px;text-align:center;border:1px solid #A5D6A7;">' +
+              '<div style="font-size:26px;font-weight:800;color:#1B5E20;">95 \u0442\u044B\u0441.</div>' +
+              '<div style="font-size:11px;color:#2E7D32;font-weight:600;margin-top:4px;">\u0437\u0430\u0434\u0430\u043D\u0438\u0439 \u043F\u0443\u0431\u043B\u0438\u043A\u0443\u0435\u0442\u0441\u044F \u043A\u0430\u0436\u0434\u044B\u0439 \u043C\u0435\u0441\u044F\u0446</div>' +
+            '</div>' +
+            '<div style="flex:1;min-width:120px;background:linear-gradient(135deg,#E8F5E9,#C8E6C9);border-radius:12px;padding:16px 14px;text-align:center;border:1px solid #A5D6A7;">' +
+              '<div style="font-size:26px;font-weight:800;color:#1B5E20;">27 \u0441\u0435\u043A.</div>' +
+              '<div style="font-size:11px;color:#2E7D32;font-weight:600;margin-top:4px;">\u0441\u0440\u0435\u0434\u043D\u044F\u044F \u0447\u0430\u0441\u0442\u043E\u0442\u0430 \u043F\u043E\u044F\u0432\u043B\u0435\u043D\u0438\u044F \u043D\u043E\u0432\u043E\u0433\u043E \u0437\u0430\u0434\u0430\u043D\u0438\u044F</div>' +
+            '</div>' +
+            '<div style="flex:1;min-width:120px;background:linear-gradient(135deg,#E8F5E9,#C8E6C9);border-radius:12px;padding:16px 14px;text-align:center;border:1px solid #A5D6A7;">' +
+              '<div style="font-size:26px;font-weight:800;color:#1B5E20;">100 \u0442\u044B\u0441. \u20BD</div>' +
+              '<div style="font-size:11px;color:#2E7D32;font-weight:600;margin-top:4px;">\u0432 \u043C\u0435\u0441\u044F\u0446 \u0437\u0430\u0440\u0430\u0431\u0430\u0442\u044B\u0432\u0430\u044E\u0442 \u0430\u043A\u0442\u0438\u0432\u043D\u044B\u0435 \u0438\u0441\u043F\u043E\u043B\u043D\u0438\u0442\u0435\u043B\u0438</div>' +
+            '</div>' +
+          '</div>' +
+
+          // ===== 3 ШАГА =====
+          '<h3 style="font-size:17px;font-weight:700;color:#1B5E20;margin:22px 0 12px 0;">\u041B\u0435\u0433\u043A\u0438\u0439 \u0441\u0442\u0430\u0440\u0442</h3>' +
+
+          '<table style="border-collapse:collapse;width:100%;font-size:14px;margin:10px 0;">' +
+            '<tr>' +
+              '<td style="padding:14px 12px;vertical-align:top;width:36px;text-align:center;">' +
+                '<div style="width:32px;height:32px;border-radius:50%;background:#1B5E20;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;">1</div>' +
+              '</td>' +
+              '<td style="padding:14px 12px;vertical-align:top;">' +
+                '<div style="font-weight:700;color:#111;margin-bottom:2px;">\u0420\u0435\u0433\u0438\u0441\u0442\u0440\u0430\u0446\u0438\u044F</div>' +
+                '<div style="font-size:13px;color:#555;">\u0417\u0430\u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0438\u0440\u0443\u0439\u0442\u0435\u0441\u044C \u0438 \u043F\u0440\u043E\u0439\u0434\u0438\u0442\u0435 \u043D\u0435\u0441\u043A\u043E\u043B\u044C\u043A\u043E \u043E\u0431\u044F\u0437\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u0445 \u0448\u0430\u0433\u043E\u0432</div>' +
+              '</td>' +
+            '</tr>' +
+            '<tr>' +
+              '<td style="padding:14px 12px;vertical-align:top;width:36px;text-align:center;">' +
+                '<div style="width:32px;height:32px;border-radius:50%;background:#1B5E20;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;">2</div>' +
+              '</td>' +
+              '<td style="padding:14px 12px;vertical-align:top;">' +
+                '<div style="font-weight:700;color:#111;margin-bottom:2px;">\u0412\u044B\u0431\u043E\u0440 \u0437\u0430\u0434\u0430\u043D\u0438\u044F</div>' +
+                '<div style="font-size:13px;color:#555;">\u0422\u044B\u0441\u044F\u0447\u0438 \u0437\u0430\u0434\u0430\u043D\u0438\u0439 \u0443\u0436\u0435 \u0437\u0434\u0435\u0441\u044C: \u0432\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u0438 \u043D\u0430\u043F\u0438\u0448\u0438\u0442\u0435 \u0437\u0430\u043A\u0430\u0437\u0447\u0438\u043A\u0443</div>' +
+              '</td>' +
+            '</tr>' +
+            '<tr>' +
+              '<td style="padding:14px 12px;vertical-align:top;width:36px;text-align:center;">' +
+                '<div style="width:32px;height:32px;border-radius:50%;background:#1B5E20;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;">3</div>' +
+              '</td>' +
+              '<td style="padding:14px 12px;vertical-align:top;">' +
+                '<div style="font-weight:700;color:#111;margin-bottom:2px;">\u041F\u043E\u043B\u0443\u0447\u0438\u0442\u0435 \u0434\u0435\u043D\u044C\u0433\u0438</div>' +
+                '<div style="font-size:13px;color:#555;">\u041F\u043E\u0434\u0442\u0432\u0435\u0440\u0434\u0438\u0442\u0435 \u0432\u044B\u043F\u043E\u043B\u043D\u0435\u043D\u0438\u0435 \u0438 \u0437\u0430\u0431\u0435\u0440\u0438\u0442\u0435 \u0432\u043E\u0437\u043D\u0430\u0433\u0440\u0430\u0436\u0434\u0435\u043D\u0438\u0435. \u0421\u0442\u0430\u043D\u044C\u0442\u0435 \u0438\u0441\u043F\u043E\u043B\u043D\u0438\u0442\u0435\u043B\u0435\u043C \u0443\u0436\u0435 \u0441\u0435\u0439\u0447\u0430\u0441. \u0416\u0434\u0451\u043C \u0432\u0430\u0441!</div>' +
+              '</td>' +
+            '</tr>' +
+          '</table>' +
+
+          // ===== ВАКАНСИЯ =====
+          '<div style="background:linear-gradient(135deg,#E8F5E9,#C8E6C9);border:1px solid #A5D6A7;border-radius:12px;padding:20px 22px;margin:20px 0;">' +
+            '<div style="font-size:13px;color:#1B5E20;font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">\u0412\u0430\u043A\u0430\u043D\u0441\u0438\u044F</div>' +
+            '<div style="font-size:20px;font-weight:800;color:#1B5E20;margin:2px 0 6px;">\u0421\u043E\u0437\u0434\u0430\u043D\u0438\u0435 \u0431\u0443\u043A\u043B\u0435\u0442\u043E\u0432 \u0438 \u043B\u0438\u0441\u0442\u043E\u0432\u043E\u043A \u043E\u043D\u043B\u0430\u0439\u043D</div>' +
+            '<div style="font-size:14px;color:#2E7D32;font-weight:600;margin-bottom:10px;">\u0424\u0440\u0438\u043B\u0430\u043D\u0441-\u0440\u0430\u0431\u043E\u0442\u0430 \u2014 \u041E\u041E\u041E \u00AB\u0422\u0435\u0445\u043D\u043E \u0413\u0440\u0443\u043F\u00BB \u2014 \u0443\u0434\u0430\u043B\u0451\u043D\u043D\u0430\u044F \u0437\u0430\u043D\u044F\u0442\u043E\u0441\u0442\u044C</div>' +
+
+            '<table style="border-collapse:collapse;width:100%;font-size:13px;margin:8px 0;">' +
+              '<tr><td style="padding:6px 8px;vertical-align:top;color:#555;width:100px;font-weight:600;">\u041E\u0431\u044F\u0437\u0430\u043D\u043D\u043E\u0441\u0442\u0438:</td><td style="padding:6px 8px;color:#333;">' +
+                '\u2022 \u0421\u043E\u0437\u0434\u0430\u043D\u0438\u0435 \u0434\u0438\u0437\u0430\u0439\u043D\u0430 \u0431\u0443\u043A\u043B\u0435\u0442\u043E\u0432 \u0438 \u043B\u0438\u0441\u0442\u043E\u0432\u043E\u043A \u0434\u043B\u044F \u043A\u043B\u0438\u0435\u043D\u0442\u043E\u0432<br>' +
+                '\u2022 \u0420\u0430\u0437\u0440\u0430\u0431\u043E\u0442\u043A\u0430 \u0446\u0438\u0444\u0440\u043E\u0432\u044B\u0445 \u0448\u0430\u0431\u043B\u043E\u043D\u043E\u0432 \u0431\u0443\u043C\u0430\u0436\u043D\u0438\u043A\u043E\u0432, \u043A\u0430\u0440\u0442\u0445\u043E\u043B\u0434\u0435\u0440\u043E\u0432<br>' +
+                '\u2022 \u041F\u043E\u0434\u0433\u043E\u0442\u043E\u0432\u043A\u0430 \u043C\u0430\u043A\u0435\u0442\u043E\u0432 \u0434\u043B\u044F \u043F\u0435\u0447\u0430\u0442\u0438 \u0438 \u043F\u0440\u0435\u0437\u0435\u043D\u0442\u0430\u0446\u0438\u0439<br>' +
+                '\u2022 \u0412\u0451\u0440\u0441\u0442\u043A\u0430 \u0438 \u043E\u0444\u043E\u0440\u043C\u043B\u0435\u043D\u0438\u0435 \u043F\u0440\u043E\u0435\u043A\u0442\u043D\u043E\u0439 \u0434\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u0430\u0446\u0438\u0438 \u0438 \u043F\u0440\u0435\u0437\u0435\u043D\u0442\u0430\u0446\u0438\u0439' +
+              '</td></tr>' +
+              '<tr><td style="padding:6px 8px;vertical-align:top;color:#555;font-weight:600;">\u0424\u043E\u0440\u043C\u0430\u0442:</td><td style="padding:6px 8px;color:#333;">\u0423\u0434\u0430\u043B\u0451\u043D\u043D\u0430\u044F \u0440\u0430\u0431\u043E\u0442\u0430, \u0433\u0438\u0431\u0440\u0438\u0434\u043D\u044B\u0439 \u0433\u0440\u0430\u0444\u0438\u043A \u043B\u0438\u0431\u043E \u0440\u0430\u0431\u043E\u0442\u0430 \u043D\u0430 \u0442\u0435\u0440\u0440\u0438\u0442\u043E\u0440\u0438\u0438 \u0440\u0430\u0431\u043E\u0442\u043E\u0434\u0430\u0442\u0435\u043B\u044F</td></tr>' +
+            '</table>' +
+
+            '<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(27,94,32,0.15);">' +
+              '<a href="https://work-zilla.com/freelance-jobs/graphics-design/graphic-design/creating-design-brochures-online?ysclid=mreq64utl6511618493" style="display:inline-block;background:#1B5E20;color:#fff;text-decoration:none;padding:10px 28px;border-radius:20px;font-weight:600;font-size:14px;" target="_blank">\u041F\u043E\u0434\u0440\u043E\u0431\u043D\u0435\u0435 \u043D\u0430 work-zilla.com \u2192</a>' +
+            '</div>' +
+          '</div>' +
+
+          // ===== ПРОБНОЕ ЗАДАНИЕ =====
+          '<h3 style="font-size:17px;font-weight:700;color:#1B5E20;margin:22px 0 12px 0;">\u041F\u0440\u043E\u0431\u043D\u043E\u0435 \u0437\u0430\u0434\u0430\u043D\u0438\u0435</h3>' +
+
+          '<div style="background:linear-gradient(135deg,#FFF8E1,#FFF3CD);border:1px solid #FFE082;border-radius:12px;padding:20px 22px;margin:14px 0;">' +
+            '<div style="font-size:14px;color:#E65100;font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">\u0421\u043F\u0435\u0446\u0438\u0430\u043B\u044C\u043D\u044B\u0439 \u043A\u0443\u0440\u0441</div>' +
+            '<div style="font-size:17px;font-weight:700;color:#E65100;margin:4px 0 10px;">\u0421\u0434\u0435\u043B\u0430\u0439\u0442\u0435 \u043F\u0440\u0435\u0437\u0435\u043D\u0442\u0430\u0446\u0438\u044E \u043D\u0430 \u043B\u044E\u0431\u0443\u044E \u0442\u0435\u043C\u0443 \u043F\u043E \u0446\u0438\u0444\u0440\u043E\u0432\u043E\u0439 \u0441\u0435\u0440\u0432\u0438\u0441\u043D\u043E\u0439 \u044D\u043A\u043E\u043D\u043E\u043C\u0438\u043A\u0435 \u043D\u0430 \u0430\u0432\u0442\u043E\u043C\u043E\u0431\u0438\u043B\u044C\u043D\u043E\u043C \u0442\u0440\u0430\u043D\u0441\u043F\u043E\u0440\u0442\u0435</div>' +
+            '<div style="font-size:13px;color:#555;margin-bottom:12px;"><strong>\u0422\u0440\u0435\u0431\u043E\u0432\u0430\u043D\u0438\u044F:</strong> 10\u201315 \u0441\u043B\u0430\u0439\u0434\u043E\u0432. \u041A\u0430\u0440\u0442\u0438\u043D\u043A\u0438, \u0441\u0445\u0435\u043C\u044B, \u0442\u0430\u0431\u043B\u0438\u0446\u044B \u0438 \u043A\u0440\u0430\u0441\u0438\u0432\u043E\u0435 \u043E\u0444\u043E\u0440\u043C\u043B\u0435\u043D\u0438\u0435.</div>' +
+            '<table style="border-collapse:collapse;width:100%;font-size:13px;">' +
+              '<tr><td style="padding:6px 10px;border:1px solid #FFE082;width:24px;font-size:16px;">\u2714</td><td style="padding:6px 10px;border:1px solid #FFE082;">\u0412\u044B\u044F\u0432\u043B\u044F\u0435\u0442 \u043A\u0440\u0435\u0430\u0442\u0438\u0432\u043D\u043E\u0441\u0442\u044C \u0438 \u043F\u0440\u043E\u0444\u0435\u0441\u0441\u0438\u043E\u043D\u0430\u043B\u0438\u0437\u043C</td></tr>' +
+              '<tr><td style="padding:6px 10px;border:1px solid #FFE082;width:24px;font-size:16px;">\u2714</td><td style="padding:6px 10px;border:1px solid #FFE082;">\u041F\u043E\u043A\u0430\u0437\u044B\u0432\u0430\u0435\u0442 \u0443\u043C\u0435\u043D\u0438\u0435 \u0440\u0430\u0431\u043E\u0442\u0430\u0442\u044C \u0441 \u0433\u0440\u0430\u0444\u0438\u0447\u0435\u0441\u043A\u0438\u043C\u0438 \u0440\u0435\u0434\u0430\u043A\u0442\u043E\u0440\u0430\u043C\u0438</td></tr>' +
+              '<tr><td style="padding:6px 10px;border:1px solid #FFE082;width:24px;font-size:16px;">\u2714</td><td style="padding:6px 10px;border:1px solid #FFE082;">\u0417\u043D\u0430\u0435\u0442, \u043A\u0430\u043A \u0441\u043E\u0447\u0435\u0442\u0430\u0442\u044C \u0446\u0432\u0435\u0442\u0430, \u0448\u0440\u0438\u0444\u0442\u044B \u0438 \u043A\u043E\u043C\u043F\u043E\u0437\u0438\u0446\u0438\u0438</td></tr>' +
+            '</table>' +
+          '</div>' +
+
+          // ===== ПОХОЖИЕ ВАКАНСИИ =====
+          '<h3 style="font-size:17px;font-weight:700;color:#1B5E20;margin:22px 0 12px 0;">\u041F\u043E\u0445\u043E\u0436\u0438\u0435 \u0432\u0430\u043A\u0430\u043D\u0441\u0438\u0438</h3>' +
+          '<p style="0 0 10px 0;font-size:14px;color:#555;">\u0422\u0430\u043A\u0436\u0435 \u0441\u043C\u043E\u0442\u0440\u0438\u0442\u0435 \u043F\u043E\u0445\u043E\u0436\u0438\u0435 \u0432\u0430\u043A\u0430\u043D\u0441\u0438\u0438 \u0434\u043B\u044F \u0432\u0430\u0448\u0435\u0439 \u0434\u0435\u044F\u0442\u0435\u043B\u044C\u043D\u043E\u0441\u0442\u0438 \u043D\u0430 \u0441\u0430\u0439\u0442\u0435:</p>' +
+          '<div style="background:#F0F7F0;border:1px solid #C8E6C9;border-radius:10px;padding:14px 18px;margin:10px 0;cursor:pointer;" onclick="window.open(\'https://remote-job.ru/search?search%5Bquery%5D=%D0%94%D0%B8%D0%B7%D0%B0%D0%B9%D0%BD%D0%B5%D1%80+%D0%B1%D1%83%D0%BA%D0%BB%D0%B5\u0442%D0%BE%D0%B2&search%5BsearchType%5D=vacancy&ysclid=mreqcn2i7l360629030\',\'_blank\')">' +
+            '<div style="font-size:15px;font-weight:700;color:#1B5E20;">\uD83D\uDCCD \u041F\u043E\u0445\u043E\u0436\u0438\u0435 \u0432\u0430\u043A\u0430\u043D\u0441\u0438\u0438 \u043D\u0430 remote-job.ru</div>' +
+            '<div style="font-size:13px;color:#555;margin-top:4px;">\u0414\u0438\u0437\u0430\u0439\u043D\u0435\u0440 \u0431\u0443\u043A\u043B\u0435\u0442\u043E\u0432 \u2014 \u043F\u043E\u0445\u043E\u0436\u0438\u0435 \u043F\u043E\u0437\u0438\u0446\u0438\u0438 \u0434\u043B\u044F \u0412\u0430\u0448\u0435\u0439 \u043A\u043E\u043C\u043F\u0430\u043D\u0438\u0438</div>' +
+            '<div style="margin-top:6px;"><a href="https://remote-job.ru/search?search%5Bquery%5D=%D0%94%D0%B8%D0%B7%D0%B0%D0%B9%D0%BD%D0%B5%D1%80+%D0%B1%D1%83%D0%BA%D0%BB%D0%B5\u0442%D0%BE%D0%B2&search%5BsearchType%5D=vacancy&ysclid=mreqcn2i7l360629030" style="color:#1B5E20;font-weight:600;font-size:13px;" target="_blank">\u041E\u0442\u043A\u0440\u044B\u0442\u044C \u043D\u0430 remote-job.ru \u2192</a></div>' +
+          '</div>' +
+
+          // ===== СРОКИ =====
+          '<h3 style="font-size:17px;font-weight:700;color:#1B5E20;margin:22px 0 12px 0;">\u0421\u0440\u043E\u043A\u0438 \u0438 \u043F\u0440\u0438\u043D\u044F\u0442\u0438\u0435 \u0440\u0435\u0448\u0435\u043D\u0438\u044F</h3>' +
+
+          '<table style="border-collapse:collapse;width:100%;font-size:14px;border:1px solid #E0E6ED;border-radius:8px;overflow:hidden;">' +
+            '<tr style="background:#F0F7F0;"><td style="padding:10px 14px;border-bottom:1px solid #E0E6ED;font-weight:600;color:#333;width:160px;">\u041E\u043F\u0440\u0435\u0434\u0435\u043B\u0438\u0442\u044C\u0441\u044F \u0434\u043E</td><td style="padding:10px 14px;border-bottom:1px solid #E0E6ED;color:#E53935;font-weight:700;">01.08.2026</td></tr>' +
+            '<tr><td style="padding:10px 14px;border-bottom:1px solid #E0E6ED;font-weight:600;color:#333;">\u041D\u0430\u0447\u0430\u043B\u043E \u043D\u0430\u0431\u043E\u0440\u0430</td><td style="padding:10px 14px;border-bottom:1px solid #E0E6ED;color:#555;">\u041F\u043E\u0441\u043B\u0435 01.08.2026 \u043C\u044B \u043D\u0430\u0447\u043D\u0451\u043C \u043D\u0430\u0431\u043E\u0440 \u043B\u044E\u0434\u0435\u0439</td></tr>' +
+            '<tr style="background:#F0F7F0;"><td style="padding:10px 14px;font-weight:600;color:#333;">\u0424\u043E\u0440\u043C\u0430\u0442 \u0440\u0430\u0431\u043E\u0442\u044B</td><td style="padding:10px 14px;color:#555;">\u0423\u0434\u0430\u043B\u0451\u043D\u043D\u0430\u044F, \u0433\u0438\u0431\u0440\u0438\u0434\u043D\u044B\u0439 \u0433\u0440\u0430\u0444\u0438\u043A \u043B\u0438\u0431\u043E \u0442\u0435\u0440\u0440\u0438\u0442\u043E\u0440\u0438\u044F \u0440\u0430\u0431\u043E\u0442\u043E\u0434\u0430\u0442\u0435\u043B\u044F</td></tr>' +
+          '</table>' +
+
+          // ===== КОНТАКТЫ =====
+          '<div style="background:#F0F7F0;border:1px solid #C8E6C9;border-radius:12px;padding:16px 20px;margin:20px 0;">' +
+            '<div style="font-size:15px;font-weight:700;color:#1B5E20;margin-bottom:8px;">\u041A\u043E\u043D\u0442\u0430\u043A\u0442\u044B</div>' +
+            '<div style="font-size:13px;color:#555;line-height:1.8;">' +
+              '\u041A\u043E\u043C\u043F\u0430\u043D\u0438\u044F: <strong>\u041E\u041E\u041E \u00AB\u0422\u0435\u0445\u043D\u043E \u0413\u0440\u0443\u043F\u00BB</strong><br>' +
+              '\u042D\u043B. \u043F\u043E\u0447\u0442\u0430: nikolaev@technogroup.ru<br>' +
+              '\u0422\u0435\u043B.: +7 (495) 123-45-67<br>' +
+              '\u0421\u0430\u0439\u0442: <a href="https://technogroup.ru" style="color:#1B5E20;font-weight:600;" target="_blank">technogroup.ru</a>' +
+            '</div>' +
+          '</div>' +
+
+          '<hr style="border:none;border-top:1px solid #E8EDF4;margin:22px 0 18px;">' +
+
+          '<p style="margin:0 0 6px 0;">\u0416\u0434\u0451\u043C \u0412\u0430\u0448\u0435\u0433\u043E \u0440\u0435\u0448\u0435\u043D\u0438\u044F. \u0415\u0441\u043B\u0438 \u0443 \u0412\u0430\u0441 \u043E\u0441\u0442\u0430\u043B\u0438\u0441\u044C \u0432\u043E\u043F\u0440\u043E\u0441\u044B \u2014 \u043D\u0430\u043F\u0438\u0448\u0438\u0442\u0435 \u043D\u0430\u043C \u0432 \u043E\u0442\u0432\u0435\u0442\u043D\u043E\u043C \u043F\u0438\u0441\u044C\u043C\u0435.</p>' +
+          '<p style="margin:0 0 12px 0;">\u0423\u0434\u0430\u0447\u043D\u043E\u0433\u043E \u0434\u043D\u044F!</p>' +
+          '<p style="margin:0 0 2px 0;"><strong style="color:#1B5E20;">\u042F\u0440\u043E\u0441\u043B\u0430\u0432 \u041D\u0438\u043A\u043E\u043B\u0430\u0435\u0432</strong></p>' +
+          '<p style="margin:0 0 2px 0;font-size:14px;color:#555;">\u0420\u0430\u0431\u043E\u0442\u043E\u0434\u0430\u0442\u0435\u043B\u044C \u043F\u043E \u0441\u0444\u0435\u0440\u0435 \u0418\u0422</p>' +
+          '<p style="margin:0 0 2px 0;font-size:14px;color:#555;">\u041E\u041E\u041E \u00AB\u0422\u0435\u0445\u043D\u043E \u0413\u0440\u0443\u043F\u00BB</p>' +
+          '<p style="margin:0;font-size:13px;color:#888;">E-mail: nikolaev@technogroup.ru | \u0422\u0435\u043B.: +7 (495) 123-45-67</p>' +
+
+        '</div>' +
+
+        // ========== ФУТЕР ==========
+        '<div style="background:#FAFBFC;border-top:1px solid #E8EDF4;border-radius:0 0 14px 14px;padding:16px 28px;text-align:center;">' +
+          '<p style="margin:0 0 4px 0;font-size:10px;color:#bbb;line-height:1.5;">' +
+            '\u0414\u0430\u043D\u043D\u043E\u0435 \u043F\u0438\u0441\u044C\u043C\u043E \u044F\u0432\u043B\u044F\u0435\u0442\u0441\u044F \u043E\u0444\u0438\u0446\u0438\u0430\u043B\u044C\u043D\u044B\u043C \u043F\u0440\u0435\u0434\u043B\u043E\u0436\u0435\u043D\u0438\u0435\u043C \u043E \u0442\u0440\u0443\u0434\u043E\u0443\u0441\u0442\u0440\u043E\u0439\u0441\u0442\u0432\u0435 \u0438 \u043D\u0435 \u044F\u0432\u043B\u044F\u0435\u0442\u0441\u044F \u043F\u0443\u0431\u043B\u0438\u0447\u043D\u043E\u0439 \u043E\u0444\u0435\u0440\u0442\u043E\u0439.' +
+          '</p>' +
+          '<p style="margin:0;font-size:10px;color:#ccc;">' +
+            '\u00A9 2026 \u041E\u041E\u041E \u00AB\u0422\u0435\u0445\u043D\u043E \u0413\u0440\u0443\u043F\u00BB. \u0412\u0441\u0435 \u043F\u0440\u0430\u0432\u0430 \u0437\u0430\u0449\u0438\u0449\u0435\u043D\u044B.' +
+          '</p>' +
+        '</div>' +
+
+      '</div>'
+    },
+    {
+      id: 'e1',
+      folder: 'inbox',
+      unread: true,
+      flagged: false,
+      avatar: 'OK',
+      avatarClass: 'orange',
+      from: 'Кубанова Ольга Николаевна',
+      emailFrom: 'kubanova.on@yandex.ru',
+      subject: 'РЕЗУЛЬТАТЫ ТЕСТИРОВАНИЯ',
+      dateLabel: '15:40',
+      dateFull: '5 июля 2026 в 15:40',
+      to: 'hlebnikovdanya2006@gmail.com',
+      bodyHtml: true,
+      body: '<p style="margin:0 0 16px 0;font-size:16px;"><strong>Добрый день, Даниил!</strong></p>' +
+        '<p style="margin:0 0 16px 0;">Спасибо, что прошли комплексное тестирование. Ваши результаты готовы. Вы набрали <strong>97 баллов</strong> — это отличный результат!</p>' +
+
+        '<div style="background:linear-gradient(135deg, #1A237E, #283593);border-radius:16px;padding:28px 20px;text-align:center;margin:20px 0;color:#fff;box-shadow:0 4px 20px rgba(26,35,126,0.3);">' +
+          '<div style="font-size:14px;opacity:0.85;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;">Общий результат тестирования</div>' +
+          '<div style="font-size:80px;font-weight:800;line-height:1;margin:8px 0;letter-spacing:-2px;">97</div>' +
+          '<div style="font-size:22px;font-weight:600;opacity:0.9;">баллов</div>' +
+          '<div style="margin-top:16px;display:inline-block;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);padding:8px 28px;border-radius:24px;font-size:15px;font-weight:500;">\u2713 Вы успешно допущены</div>' +
+        '</div>' +
+
+        '<h3 style="margin:24px 0 14px 0;font-size:16px;color:#1A237E;">Шкала допуска</h3>' +
+
+        '<div style="margin:16px 0;background:#fff;border:1px solid #E0E6ED;border-radius:12px;padding:20px;">' +
+          '<div style="position:relative;height:36px;background:#F0F4F8;border-radius:18px;overflow:hidden;">' +
+            '<div style="position:absolute;left:0;top:0;width:30%;height:100%;background:#EF5350;border-radius:18px 0 0 18px;"></div>' +
+            '<div style="position:absolute;left:30%;top:0;width:20%;height:100%;background:#FFA726;"></div>' +
+            '<div style="position:absolute;left:50%;top:0;width:45%;height:100%;background:#42A5F5;"></div>' +
+            '<div style="position:absolute;left:95%;top:0;width:5%;height:100%;background:#66BB6A;border-radius:0 18px 18px 0;"></div>' +
+            '<div style="position:absolute;left:97%;top:-8px;width:3px;height:52px;background:#1A237E;border-radius:2px;z-index:2;"></div>' +
+            '<div style="position:absolute;left:94%;top:-18px;font-size:12px;font-weight:700;color:#1A237E;background:#fff;padding:2px 6px;border-radius:4px;border:1px solid #1A237E;line-height:1;">\u25B2 97</div>' +
+          '</div>' +
+          '<div style="display:flex;justify-content:space-between;margin-top:10px;font-size:12px;color:#777;">' +
+            '<span>0</span><span>30</span><span>50</span><span>95</span><span>100</span>' +
+          '</div>' +
+          '<table style="border-collapse:collapse;width:100%;margin:14px 0 0;font-size:13px;">' +
+            '<tr><td style="padding:7px 10px;border:1px solid #E0E6ED;"><span style="display:inline-block;width:10px;height:10px;background:#EF5350;border-radius:2px;margin-right:8px;vertical-align:middle;"></span>\u0414\u043E\u043F\u0443\u0449\u0435\u043D\u0438\u0435</td><td style="padding:7px 10px;border:1px solid #E0E6ED;color:#555;">0\u201330 \u0431\u0430\u043B\u043B\u043E\u0432</td></tr>' +
+            '<tr style="background:#FAFCFF;"><td style="padding:7px 10px;border:1px solid #E0E6ED;"><span style="display:inline-block;width:10px;height:10px;background:#FFA726;border-radius:2px;margin-right:8px;vertical-align:middle;"></span>\u041D\u0435\u0434\u043E\u043F\u0443\u0441\u043A</td><td style="padding:7px 10px;border:1px solid #E0E6ED;color:#555;">31\u201350 \u0431\u0430\u043B\u043B\u043E\u0432</td></tr>' +
+            '<tr><td style="padding:7px 10px;border:1px solid #E0E6ED;"><span style="display:inline-block;width:10px;height:10px;background:#42A5F5;border-radius:2px;margin-right:8px;vertical-align:middle;"></span>\u0427\u0430\u0441\u0442\u0438\u0447\u043D\u044B\u0439 \u0434\u043E\u043F\u0443\u0441\u043A</td><td style="padding:7px 10px;border:1px solid #E0E6ED;color:#555;">51\u201395 \u0431\u0430\u043B\u043B\u043E\u0432</td></tr>' +
+            '<tr style="background:#FAFCFF;"><td style="padding:7px 10px;border:1px solid #E0E6ED;"><span style="display:inline-block;width:10px;height:10px;background:#66BB6A;border-radius:2px;margin-right:8px;vertical-align:middle;"></span>\u041F\u043E\u043B\u043D\u044B\u0439 \u0434\u043E\u043F\u0443\u0441\u043A</td><td style="padding:7px 10px;border:1px solid #E0E6ED;color:#555;">96\u2013100 \u0431\u0430\u043B\u043B\u043E\u0432</td></tr>' +
+          '</table>' +
+        '</div>' +
+
+        '<div style="background:#E8F5E9;border-left:4px solid #43A047;padding:14px 18px;margin:16px 0;border-radius:6px;">' +
+          '<p style="margin:0 0 4px 0;"><strong style="color:#2E7D32;">\u041F\u043E\u0437\u0434\u0440\u0430\u0432\u043B\u044F\u0435\u043C!</strong></p>' +
+          '<p style="margin:0;font-size:14px;">\u0412\u0430\u0448 \u0440\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442 \u2014 <strong>97 \u0431\u0430\u043B\u043B\u043E\u0432</strong> \u2014 \u0441\u043E\u043E\u0442\u0432\u0435\u0442\u0441\u0442\u0432\u0443\u0435\u0442 \u0443\u0440\u043E\u0432\u043D\u044E <strong>\u00AB\u041F\u043E\u043B\u043D\u044B\u0439 \u0434\u043E\u043F\u0443\u0441\u043A\u00BB</strong>. \u0412\u044B \u0443\u0441\u043F\u0435\u0448\u043D\u043E \u043F\u0440\u043E\u0448\u043B\u0438 \u0442\u0435\u0441\u0442\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u0435!</p>' +
+        '</div>' +
+
+        '<p style="margin:16px 0 20px 0;font-size:15px;"><strong>\u0416\u0434\u0435\u043C \u0432\u0430\u0441 \u043D\u0430 \u0432\u0441\u0442\u0440\u0435\u0447\u0435!</strong></p>' +
+
+        '<hr style="border:none;border-top:2px solid #E0E6ED;margin:24px 0;">' +
+
+        '<h3 style="margin:0 0 14px 0;font-size:16px;color:#1A237E;">\u0422\u0435\u0441\u0442: \u043D\u0430\u0439\u0434\u0438 \u0441\u0432\u043E\u044E \u0440\u043E\u043B\u044C \u0432 IT</h3>' +
+
+        '<div style="background:linear-gradient(135deg, #1565C0, #1976D2);border-radius:12px;padding:20px;text-align:center;margin:16px 0;color:#fff;">' +
+          '<div style="font-size:16px;opacity:0.9;">\u0412\u0430\u0448\u0430 \u0440\u043E\u043B\u044C</div>' +
+          '<div style="font-size:36px;font-weight:800;margin:8px 0;">\u0420\u0430\u0437\u0440\u0430\u0431\u043E\u0442\u0447\u0438\u043A</div>' +
+          '<div style="font-size:48px;font-weight:800;opacity:0.9;">53%</div>' +
+        '</div>' +
+
+        '<p style="margin:0 0 16px 0;font-size:14px;color:#444;line-height:1.6;">\u0420\u0430\u0437\u0440\u0430\u0431\u043E\u0442\u0447\u0438\u043A \u0441\u043E\u0437\u0434\u0430\u0451\u0442 \u0438 \u043F\u043E\u0434\u0434\u0435\u0440\u0436\u0438\u0432\u0430\u0435\u0442 \u043F\u0440\u043E\u0433\u0440\u0430\u043C\u043C\u043D\u044B\u0435 \u043F\u0440\u043E\u0434\u0443\u043A\u0442\u044B: \u0432\u0435\u0431-\u0441\u0435\u0440\u0432\u0438\u0441\u044B, \u043F\u0440\u0438\u043B\u043E\u0436\u0435\u043D\u0438\u044F, \u0432\u043D\u0443\u0442\u0440\u0435\u043D\u043D\u0438\u0435 \u0441\u0438\u0441\u0442\u0435\u043C\u044B. \u041E\u043D \u043F\u0440\u043E\u0435\u043A\u0442\u0438\u0440\u0443\u0435\u0442 \u0430\u0440\u0445\u0438\u0442\u0435\u043A\u0442\u0443\u0440\u0443, \u043F\u0438\u0448\u0435\u0442 \u043F\u043E\u0434\u0434\u0435\u0440\u0436\u0438\u0432\u0430\u0435\u043C\u044B\u0439 \u043A\u043E\u0434 \u0438 \u0440\u0435\u0448\u0430\u0435\u0442 \u0437\u0430\u0434\u0430\u0447\u0438 \u0431\u0438\u0437\u043D\u0435\u0441\u0430 \u0447\u0435\u0440\u0435\u0437 \u0442\u0435\u0445\u043D\u043E\u043B\u043E\u0433\u0438\u0438.</p>' +
+
+        '<div style="text-align:right;margin:0 0 16px 0;"><a href="https://ru.hexlet.io/assessments/career" style="color:#1565C0;font-size:13px;text-decoration:underline;">\u041F\u043E\u043F\u0440\u043E\u0431\u043E\u0432\u0430\u0442\u044C \u0437\u0430\u043D\u043E\u0432\u043E \u2192</a></div>' +
+
+        '<h4 style="margin:16px 0 10px 0;font-size:14px;color:#333;">\u0421\u0438\u043B\u044C\u043D\u044B\u0435 \u0441\u0442\u043E\u0440\u043E\u043D\u044B</h4>' +
+        '<table style="border-collapse:collapse;width:100%;margin:10px 0;font-size:13px;">' +
+          '<tr><td style="padding:8px 12px;border:1px solid #E0E6ED;width:24px;font-size:16px;">\uD83E\uDDE0</td><td style="padding:8px 12px;border:1px solid #E0E6ED;">\u0410\u043D\u0430\u043B\u0438\u0442\u0438\u0447\u0435\u0441\u043A\u043E\u0435 \u043C\u044B\u0448\u043B\u0435\u043D\u0438\u0435</td></tr>' +
+          '<tr style="background:#FAFCFF;"><td style="padding:8px 12px;border:1px solid #E0E6ED;width:24px;font-size:16px;">\uD83D\uDCDA</td><td style="padding:8px 12px;border:1px solid #E0E6ED;">\u0421\u043F\u043E\u0441\u043E\u0431\u043D\u043E\u0441\u0442\u044C \u043A \u0441\u0430\u043C\u043E\u043E\u0431\u0443\u0447\u0435\u043D\u0438\u044E</td></tr>' +
+          '<tr><td style="padding:8px 12px;border:1px solid #E0E6ED;width:24px;font-size:16px;">\uD83D\uDD0D</td><td style="padding:8px 12px;border:1px solid #E0E6ED;">\u0412\u043D\u0438\u043C\u0430\u0442\u0435\u043B\u044C\u043D\u043E\u0441\u0442\u044C \u043A \u0434\u0435\u0442\u0430\u043B\u044F\u043C</td></tr>' +
+          '<tr style="background:#FAFCFF;"><td style="padding:8px 12px;border:1px solid #E0E6ED;width:24px;font-size:16px;">\uD83E\uDD1D</td><td style="padding:8px 12px;border:1px solid #E0E6ED;">\u041A\u043E\u043C\u0430\u043D\u0434\u043D\u0430\u044F \u0440\u0430\u0431\u043E\u0442\u0430</td></tr>' +
+        '</table>' +
+
+        '<h4 style="margin:20px 0 10px 0;font-size:14px;color:#333;">\u0420\u0430\u0441\u043F\u0440\u0435\u0434\u0435\u043B\u0435\u043D\u0438\u0435 \u0440\u043E\u043B\u0435\u0439</h4>' +
+        '<div style="margin:10px 0;">' +
+          '<div style="margin:6px 0;font-size:13px;display:flex;align-items:center;">' +
+            '<span style="width:120px;font-weight:500;">\u0420\u0430\u0437\u0440\u0430\u0431\u043E\u0442\u0447\u0438\u043A</span>' +
+            '<div style="flex:1;height:24px;background:#F0F4F8;border-radius:12px;overflow:hidden;margin:0 10px;">' +
+              '<div style="width:53%;height:100%;background:linear-gradient(90deg,#1565C0,#1976D2);border-radius:12px;"></div>' +
+            '</div>' +
+            '<span style="width:40px;text-align:right;font-weight:700;color:#1565C0;">53%</span>' +
+          '</div>' +
+          '<div style="margin:6px 0;font-size:13px;display:flex;align-items:center;">' +
+            '<span style="width:120px;font-weight:500;">DevOps</span>' +
+            '<div style="flex:1;height:24px;background:#F0F4F8;border-radius:12px;overflow:hidden;margin:0 10px;">' +
+              '<div style="width:24%;height:100%;background:linear-gradient(90deg,#FF8F00,#FFA000);border-radius:12px;"></div>' +
+            '</div>' +
+            '<span style="width:40px;text-align:right;font-weight:700;color:#FF8F00;">24%</span>' +
+          '</div>' +
+          '<div style="margin:6px 0;font-size:13px;display:flex;align-items:center;">' +
+            '<span style="width:120px;font-weight:500;">\u0422\u0435\u0441\u0442\u0438\u0440\u043E\u0432\u0449\u0438\u043A</span>' +
+            '<div style="flex:1;height:24px;background:#F0F4F8;border-radius:12px;overflow:hidden;margin:0 10px;">' +
+              '<div style="width:12%;height:100%;background:linear-gradient(90deg,#43A047,#66BB6A);border-radius:12px;"></div>' +
+            '</div>' +
+            '<span style="width:40px;text-align:right;font-weight:700;color:#43A047;">12%</span>' +
+          '</div>' +
+          '<div style="margin:6px 0;font-size:13px;display:flex;align-items:center;">' +
+            '<span style="width:120px;font-weight:500;">\u0410\u043D\u0430\u043B\u0438\u0442\u0438\u043A</span>' +
+            '<div style="flex:1;height:24px;background:#F0F4F8;border-radius:12px;overflow:hidden;margin:0 10px;">' +
+              '<div style="width:12%;height:100%;background:linear-gradient(90deg,#7B1FA2,#9C27B0);border-radius:12px;"></div>' +
+            '</div>' +
+            '<span style="width:40px;text-align:right;font-weight:700;color:#7B1FA2;">12%</span>' +
+          '</div>' +
+        '</div>' +
+
+        '<hr style="border:none;border-top:2px solid #E0E6ED;margin:24px 0;">' +
+
+        '<h3 style="margin:0 0 14px 0;font-size:16px;color:#1A237E;">\u0427\u0442\u043E \u0434\u0430\u043B\u044C\u0448\u0435?</h3>' +
+
+        '<div style="background:#F0F4FF;border:1px solid #BBDEFB;border-radius:10px;padding:16px 18px;margin:12px 0;">' +
+          '<p style="margin:0 0 8px 0;font-weight:600;font-size:15px;">\uD83C\uDF93 \u041D\u0430\u0447\u0430\u0442\u044C \u043A\u0430\u0440\u044C\u0435\u0440\u0443 \u0440\u0430\u0437\u0440\u0430\u0431\u043E\u0442\u0447\u0438\u043A\u0430 \u0437\u0430 10 \u043C\u0435\u0441\u044F\u0446\u0435\u0432</p>' +
+          '<p style="margin:0;font-size:13px;color:#444;line-height:1.5;">\u041D\u0430\u0443\u0447\u0438\u0442\u0435\u0441\u044C \u043F\u0440\u043E\u0433\u0440\u0430\u043C\u043C\u0438\u0440\u043E\u0432\u0430\u0442\u044C \u043D\u0430 Java, Python, Frontend \u0438\u043B\u0438 PHP. \u041A\u0443\u0440\u0441\u044B \u0432\u043A\u043B\u044E\u0447\u0430\u044E\u0442 \u0434\u0438\u043F\u043B\u043E\u043C. \u0420\u0435\u0430\u043B\u044C\u043D\u044B\u0439 \u043E\u043F\u044B\u0442 \u0440\u0430\u0431\u043E\u0442\u044B \u0443\u0436\u0435 \u0432 \u043F\u0440\u043E\u0446\u0435\u0441\u0441\u0435 \u0443\u0447\u0435\u0431\u044B. \u041F\u043E\u043C\u043E\u0449\u044C \u0441\u043E \u0441\u0442\u0430\u0436\u0438\u0440\u043E\u0432\u043A\u043E\u0439 \u0438 \u0442\u0440\u0443\u0434\u043E\u0443\u0441\u0442\u0440\u043E\u0439\u0441\u0442\u0432\u043E\u043C.</p>' +
+        '</div>' +
+
+        '<h4 style="margin:20px 0 10px 0;font-size:14px;color:#333;">\u0412\u0430\u043A\u0430\u043D\u0441\u0438\u0438</h4>' +
+
+        '<table style="border-collapse:collapse;width:100%;margin:10px 0;font-size:13px;">' +
+          '<tr style="background:#1A237E;color:#fff;">' +
+            '<td style="padding:8px 12px;border:1px solid #1A237E;font-weight:600;">\u0414\u043E\u043B\u0436\u043D\u043E\u0441\u0442\u044C</td>' +
+            '<td style="padding:8px 12px;border:1px solid #1A237E;font-weight:600;">\u0417\u0430\u0440\u043F\u043B\u0430\u0442\u0430 (\u043E\u0440\u0438\u0435\u043D\u0442\u0438\u0440\u044B)</td>' +
+          '</tr>' +
+          '<tr>' +
+            '<td style="padding:8px 12px;border:1px solid #E0E6ED;font-weight:500;">\u0420\u0430\u0437\u0440\u0430\u0431\u043E\u0442\u0447\u0438\u043A (Junior)</td>' +
+            '<td style="padding:8px 12px;border:1px solid #E0E6ED;color:#2E7D32;font-weight:700;">85 000 \u2013 190 000 \u20BD</td>' +
+          '</tr>' +
+          '<tr style="background:#FAFCFF;">' +
+            '<td style="padding:8px 12px;border:1px solid #E0E6ED;font-weight:500;">\u0420\u0430\u0437\u0440\u0430\u0431\u043E\u0442\u0447\u0438\u043A (Middle)</td>' +
+            '<td style="padding:8px 12px;border:1px solid #E0E6ED;color:#2E7D32;font-weight:700;">190 000 \u2013 300 000 \u20BD</td>' +
+          '</tr>' +
+        '</table>' +
+        '<p style="margin:0 0 14px 0;font-size:12px;color:#888;">* \u0414\u0438\u0430\u043F\u0430\u0437\u043E\u043D\u044B \u043F\u0440\u0438\u043C\u0435\u0440\u043D\u044B\u0435 \u0438 \u0437\u0430\u0432\u0438\u0441\u044F\u0442 \u043E\u0442 \u0433\u043E\u0440\u043E\u0434\u0430, \u043A\u043E\u043C\u043F\u0430\u043D\u0438\u0438 \u0438 \u0437\u0430\u0434\u0430\u0447</p>' +
+
+        '<h4 style="margin:16px 0 10px 0;font-size:14px;color:#333;">\u041A\u043B\u044E\u0447\u0435\u0432\u044B\u0435 \u043D\u0430\u0432\u044B\u043A\u0438</h4>' +
+        '<table style="border-collapse:collapse;width:100%;margin:10px 0;font-size:13px;">' +
+          '<tr><td style="padding:6px 12px;border:1px solid #E0E6ED;">\uD83D\uDCBB</td><td style="padding:6px 12px;border:1px solid #E0E6ED;">\u041F\u0438\u0441\u0430\u0442\u044C \u043A\u043E\u0434 \u043D\u0430 \u043E\u0434\u043D\u043E\u043C \u0438\u043B\u0438 \u043D\u0435\u0441\u043A\u043E\u043B\u044C\u043A\u0438\u0445 \u044F\u0437\u044B\u043A\u0430\u0445 \u043F\u0440\u043E\u0433\u0440\u0430\u043C\u043C\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u044F</td></tr>' +
+          '<tr style="background:#FAFCFF;"><td style="padding:6px 12px;border:1px solid #E0E6ED;">\uD83D\uDD00</td><td style="padding:6px 12px;border:1px solid #E0E6ED;">\u0418\u0441\u043F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u044C \u0441\u0438\u0441\u0442\u0435\u043C\u044B \u043A\u043E\u043D\u0442\u0440\u043E\u043B\u044F \u0432\u0435\u0440\u0441\u0438\u0439 (Git)</td></tr>' +
+          '<tr><td style="padding:6px 12px;border:1px solid #E0E6ED;">\uD83D\uDEE0\uFE0F</td><td style="padding:6px 12px;border:1px solid #E0E6ED;">\u0420\u0430\u0431\u043E\u0442\u0430\u0442\u044C \u0441 \u0444\u0440\u0435\u0439\u043C\u0432\u043E\u0440\u043A\u0430\u043C\u0438 \u0438 \u0431\u0438\u0431\u043B\u0438\u043E\u0442\u0435\u043A\u0430\u043C\u0438</td></tr>' +
+          '<tr style="background:#FAFCFF;"><td style="padding:6px 12px;border:1px solid #E0E6ED;">\uD83E\uDDEA</td><td style="padding:6px 12px;border:1px solid #E0E6ED;">\u041E\u0442\u043B\u0430\u0436\u0438\u0432\u0430\u0442\u044C \u0438 \u0442\u0435\u0441\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C \u0441\u0432\u043E\u0439 \u043A\u043E\u0434</td></tr>' +
+        '</table>' +
+
+        '<hr style="border:none;border-top:2px solid #E0E6ED;margin:24px 0;">' +
+
+        '<h4 style="margin:0 0 10px 0;font-size:14px;color:#333;">\u0418\u043D\u0441\u0442\u0440\u0443\u043C\u0435\u043D\u0442\u044B \u043F\u043E \u0432\u0430\u0448\u0438\u043C \u0440\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442\u0430\u043C</h4>' +
+        '<h4 style="margin:16px 0 8px 0;font-size:14px;color:#333;">\u0418\u043D\u0442\u0435\u0440\u0435\u0441\u044B \u043A \u043F\u0440\u0435\u0434\u043C\u0435\u0442\u0430\u043C</h4>' +
+        '<div style="margin:10px 0;">' +
+          '<div style="margin:6px 0;font-size:13px;display:flex;align-items:center;">' +
+            '<span style="width:140px;font-weight:500;">\u0422\u0435\u043A\u0441\u0442\u044B \u0438 \u044F\u0437\u044B\u043A\u0438</span>' +
+            '<div style="flex:1;height:20px;background:#F0F4F8;border-radius:10px;overflow:hidden;margin:0 10px;">' +
+              '<div style="width:97%;height:100%;background:linear-gradient(90deg,#1565C0,#42A5F5);border-radius:10px;"></div>' +
+            '</div>' +
+            '<span style="width:50px;text-align:right;font-weight:700;color:#1565C0;">9.7</span>' +
+          '</div>' +
+          '<div style="margin:6px 0;font-size:13px;display:flex;align-items:center;">' +
+            '<span style="width:140px;font-weight:500;">\u0421\u0438\u0441\u0442\u0435\u043C\u044B \u0438 \u043C\u0435\u0445\u0430\u043D\u0438\u0437\u043C\u044B</span>' +
+            '<div style="flex:1;height:20px;background:#F0F4F8;border-radius:10px;overflow:hidden;margin:0 10px;">' +
+              '<div style="width:72%;height:100%;background:linear-gradient(90deg,#FF8F00,#FFCA28);border-radius:10px;"></div>' +
+            '</div>' +
+            '<span style="width:50px;text-align:right;font-weight:700;color:#FF8F00;">7.2</span>' +
+          '</div>' +
+          '<div style="margin:6px 0;font-size:13px;display:flex;align-items:center;">' +
+            '<span style="width:140px;font-weight:500;">\u041E\u0431\u0440\u0430\u0437\u044B \u0438 \u0432\u0438\u0437\u0443\u0430\u043B\u0438\u0437\u0430\u0446\u0438\u044F</span>' +
+            '<div style="flex:1;height:20px;background:#F0F4F8;border-radius:10px;overflow:hidden;margin:0 10px;">' +
+              '<div style="width:68%;height:100%;background:linear-gradient(90deg,#43A047,#81C784);border-radius:10px;"></div>' +
+            '</div>' +
+            '<span style="width:50px;text-align:right;font-weight:700;color:#43A047;">6.8</span>' +
+          '</div>' +
+          '<div style="margin:6px 0;font-size:13px;display:flex;align-items:center;">' +
+            '<span style="width:140px;font-weight:500;">\u041B\u044E\u0434\u0438 \u0438 \u0432\u0437\u0430\u0438\u043C\u043E\u0434\u0435\u0439\u0441\u0442\u0432\u0438\u0435</span>' +
+            '<div style="flex:1;height:20px;background:#F0F4F8;border-radius:10px;overflow:hidden;margin:0 10px;">' +
+              '<div style="width:55%;height:100%;background:linear-gradient(90deg,#7B1FA2,#CE93D8);border-radius:10px;"></div>' +
+            '</div>' +
+            '<span style="width:50px;text-align:right;font-weight:700;color:#7B1FA2;">5.5</span>' +
+          '</div>' +
+          '<div style="margin:6px 0;font-size:13px;display:flex;align-items:center;">' +
+            '<span style="width:140px;font-weight:500;">\u0427\u0438\u0441\u043B\u0430 \u0438 \u0432\u044B\u0447\u0438\u0441\u043B\u0435\u043D\u0438\u044F</span>' +
+            '<div style="flex:1;height:20px;background:#F0F4F8;border-radius:10px;overflow:hidden;margin:0 10px;">' +
+              '<div style="width:82%;height:100%;background:linear-gradient(90deg,#E53935,#EF9A9A);border-radius:10px;"></div>' +
+            '</div>' +
+            '<span style="width:50px;text-align:right;font-weight:700;color:#E53935;">8.2</span>' +
+          '</div>' +
+        '</div>' +
+
+        '<p style="margin:10px 0 16px 0;font-size:13px;color:#555;line-height:1.6;"><strong>\u0421\u0438\u043B\u044C\u043D\u044B\u0439 \u0438\u043D\u0442\u0435\u0440\u0435\u0441 \u043A \u0442\u0435\u043A\u0441\u0442\u0430\u043C \u0438 \u044F\u0437\u044B\u043A\u0430\u043C.</strong> \u0412\u0430\u043C \u043D\u0440\u0430\u0432\u0438\u0442\u0441\u044F \u0440\u0430\u0431\u043E\u0442\u0430\u0442\u044C \u0441\u043E \u0441\u043B\u043E\u0432\u0430\u043C\u0438, \u0442\u0435\u043A\u0441\u0442\u0430\u043C\u0438 \u0438 \u044F\u0437\u044B\u043A\u0430\u043C\u0438, \u0432 \u0442\u043E\u043C \u0447\u0438\u0441\u043B\u0435 \u0438\u0441\u043A\u0443\u0441\u0441\u0442\u0432\u0435\u043D\u043D\u044B\u043C\u0438 \u2014 \u043D\u0430\u043F\u0440\u0438\u043C\u0435\u0440, \u0441 \u043A\u043E\u0434\u043E\u043C \u0432 \u043F\u0440\u043E\u0433\u0440\u0430\u043C\u043C\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u0438. \u0412\u0430\u043C \u043C\u043E\u0436\u0435\u0442 \u0431\u044B\u0442\u044C \u0438\u043D\u0442\u0435\u0440\u0435\u0441\u043D\u043E \u043F\u0440\u0438\u0434\u0443\u043C\u044B\u0432\u0430\u0442\u044C \u0438\u0441\u0442\u043E\u0440\u0438\u0438, \u043E\u043F\u0438\u0441\u044B\u0432\u0430\u0442\u044C \u0441\u043E\u0431\u044B\u0442\u0438\u044F, \u0432\u044B\u0440\u0430\u0436\u0430\u0442\u044C \u0441\u043B\u043E\u0432\u0430\u043C\u0438 \u0438\u0434\u0435\u0438, \u043C\u044B\u0441\u043B\u0438 \u0438 \u0447\u0443\u0432\u0441\u0442\u0432\u0430. \u0418\u043B\u0438 \u0438\u0441\u043A\u0430\u0442\u044C \u0438 \u0438\u0441\u043F\u0440\u0430\u0432\u043B\u044F\u0442\u044C \u043E\u0448\u0438\u0431\u043A\u0438 \u0432 \u043A\u043E\u0434\u0435, \u0442\u0435\u043A\u0441\u0442\u0430\u0445 \u0438 \u0434\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u0430\u0445.</p>' +
+
+        '<h4 style="margin:16px 0 8px 0;font-size:14px;color:#333;">\u0418\u043D\u0442\u0435\u0440\u0435\u0441\u044B \u043A \u0434\u0435\u0439\u0441\u0442\u0432\u0438\u044F\u043C</h4>' +
+        '<div style="margin:10px 0;">' +
+          '<div style="margin:6px 0;font-size:13px;display:flex;align-items:center;">' +
+            '<span style="width:165px;font-weight:500;">\u041F\u0440\u043E\u0434\u0432\u0438\u0436\u0435\u043D\u0438\u0435</span>' +
+            '<div style="flex:1;height:20px;background:#F0F4F8;border-radius:10px;overflow:hidden;margin:0 10px;">' +
+              '<div style="width:100%;height:100%;background:linear-gradient(90deg,#1565C0,#42A5F5);border-radius:10px;"></div>' +
+            '</div>' +
+            '<span style="width:50px;text-align:right;font-weight:700;color:#1565C0;">10</span>' +
+          '</div>' +
+          '<div style="margin:6px 0;font-size:13px;display:flex;align-items:center;">' +
+            '<span style="width:165px;font-weight:500;">\u0418\u0441\u0441\u043B\u0435\u0434\u043E\u0432\u0430\u043D\u0438\u0435 \u0438 \u0430\u043D\u0430\u043B\u0438\u0437</span>' +
+            '<div style="flex:1;height:20px;background:#F0F4F8;border-radius:10px;overflow:hidden;margin:0 10px;">' +
+              '<div style="width:85%;height:100%;background:linear-gradient(90deg,#FF8F00,#FFCA28);border-radius:10px;"></div>' +
+            '</div>' +
+            '<span style="width:50px;text-align:right;font-weight:700;color:#FF8F00;">8.5</span>' +
+          '</div>' +
+          '<div style="margin:6px 0;font-size:13px;display:flex;align-items:center;">' +
+            '<span style="width:165px;font-weight:500;">\u0420\u0430\u0437\u0440\u0430\u0431\u043E\u0442\u043A\u0430 \u0438 \u0441\u043E\u0437\u0434\u0430\u043D\u0438\u0435 \u043D\u043E\u0432\u043E\u0433\u043E</span>' +
+            '<div style="flex:1;height:20px;background:#F0F4F8;border-radius:10px;overflow:hidden;margin:0 10px;">' +
+              '<div style="width:78%;height:100%;background:linear-gradient(90deg,#43A047,#81C784);border-radius:10px;"></div>' +
+            '</div>' +
+            '<span style="width:50px;text-align:right;font-weight:700;color:#43A047;">7.8</span>' +
+          '</div>' +
+          '<div style="margin:6px 0;font-size:13px;display:flex;align-items:center;">' +
+            '<span style="width:165px;font-weight:500;">\u041E\u0440\u0433\u0430\u043D\u0438\u0437\u0430\u0446\u0438\u044F \u0438 \u0443\u043F\u0440\u0430\u0432\u043B\u0435\u043D\u0438\u0435</span>' +
+            '<div style="flex:1;height:20px;background:#F0F4F8;border-radius:10px;overflow:hidden;margin:0 10px;">' +
+              '<div style="width:65%;height:100%;background:linear-gradient(90deg,#7B1FA2,#CE93D8);border-radius:10px;"></div>' +
+            '</div>' +
+            '<span style="width:50px;text-align:right;font-weight:700;color:#7B1FA2;">6.5</span>' +
+          '</div>' +
+          '<div style="margin:6px 0;font-size:13px;display:flex;align-items:center;">' +
+            '<span style="width:165px;font-weight:500;">\u0421\u0442\u0440\u0443\u043A\u0442\u0443\u0440\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u0435 \u0438 \u043A\u043E\u043D\u0442\u0440\u043E\u043B\u044C</span>' +
+            '<div style="flex:1;height:20px;background:#F0F4F8;border-radius:10px;overflow:hidden;margin:0 10px;">' +
+              '<div style="width:60%;height:100%;background:linear-gradient(90deg,#E53935,#EF9A9A);border-radius:10px;"></div>' +
+            '</div>' +
+            '<span style="width:50px;text-align:right;font-weight:700;color:#E53935;">6.0</span>' +
+          '</div>' +
+        '</div>' +
+
+        '<p style="margin:10px 0 20px 0;font-size:13px;color:#555;line-height:1.6;"><strong>\u0421\u0438\u043B\u044C\u043D\u044B\u0439 \u0438\u043D\u0442\u0435\u0440\u0435\u0441 \u043A \u043F\u0440\u043E\u0434\u0432\u0438\u0436\u0435\u043D\u0438\u044E.</strong> \u0412\u0430\u043C \u0438\u043D\u0442\u0435\u0440\u0435\u0441\u043D\u043E \u043F\u0440\u0438\u0434\u0443\u043C\u044B\u0432\u0430\u0442\u044C, \u043A\u0430\u043A \u043F\u0440\u043E\u0434\u0432\u0438\u0433\u0430\u0442\u044C \u0442\u043E\u0432\u0430\u0440\u044B \u0438 \u0443\u0441\u043B\u0443\u0433\u0438 \u0438\u043B\u0438 \u043F\u043E\u0432\u044B\u0448\u0430\u0442\u044C \u043F\u0440\u043E\u0434\u0430\u0436\u0438. \u0412\u0430\u043C \u043D\u0440\u0430\u0432\u0438\u0442\u0441\u044F \u0438\u0441\u043A\u0430\u0442\u044C \u0446\u0435\u043B\u0435\u0432\u0443\u044E \u0430\u0443\u0434\u0438\u0442\u043E\u0440\u0438\u044E \u0438 \u043A\u0430\u043D\u0430\u043B\u044B \u043F\u0440\u043E\u0434\u0430\u0436, \u0432\u044B\u0441\u0442\u0440\u0430\u0438\u0432\u0430\u0442\u044C \u0446\u0435\u043F\u043E\u0447\u043A\u0438 \u043F\u0440\u043E\u0434\u0432\u0438\u0436\u0435\u043D\u0438\u044F \u0438 \u043F\u0440\u043E\u0441\u0442\u043E \u0443\u0431\u0435\u0436\u0434\u0430\u0442\u044C \u0441\u043E\u0431\u0435\u0441\u0435\u0434\u043D\u0438\u043A\u043E\u0432. \u0412\u0430\u0441, \u0432\u0435\u0440\u043E\u044F\u0442\u043D\u043E, \u043F\u0440\u0438\u0432\u043B\u0435\u043A\u0430\u0435\u0442 \u0440\u0430\u0431\u043E\u0442\u0430, \u0441\u0432\u044F\u0437\u0430\u043D\u043D\u0430\u044F \u0441 \u043C\u0430\u0440\u043A\u0435\u0442\u0438\u043D\u0433\u043E\u043C \u0438 \u0440\u0435\u043A\u043B\u0430\u043C\u043E\u0439.</p>' +
+
+        '<hr style="border:none;border-top:2px solid #E0E6ED;margin:24px 0;">' +
+
+        '<h3 style="margin:0 0 14px 0;font-size:16px;color:#1A237E;">\u0420\u0435\u043A\u043E\u043C\u0435\u043D\u0434\u0443\u0435\u043C\u044B\u0435 \u0432\u0430\u043A\u0430\u043D\u0441\u0438\u0438 \u043D\u0430 hh.ru</h3>' +
+
+        '<div class="vacancy-block" onclick="showToast(\'Открыть вакансию на hh.ru\')">' +
+          '<div class="v-title">\uD83D\uDCCC Junior Python Developer</div>' +
+          '<div class="v-company">\uD83C\uDFED \u041E\u041E\u041E \u00AB\u0422\u0435\u0445\u043D\u043E\u041F\u0440\u043E\u0433\u0440\u0435\u0441\u0441\u00BB \u2014 \u041C\u043E\u0441\u043A\u0432\u0430 (\u043C. \u041A\u0443\u0440\u0441\u043A\u0430\u044F)</div>' +
+          '<div class="v-salary">\uD83D\uDCB0 \u043E\u0442 85 000 \u0434\u043E 120 000 \u20BD</div>' +
+          '<div class="v-sub"><strong>\u0422\u0440\u0435\u0431\u043E\u0432\u0430\u043D\u0438\u044F:</strong> Python 3.x, Django/FastAPI, PostgreSQL, Git, Linux</div>' +
+          '<div class="v-sub"><strong>\u041F\u0440\u043E\u0441\u043C\u043E\u0442\u0440\u044B:</strong> 2 847</div>' +
+          '<div class="v-tags"><span class="v-tag">Python</span><span class="v-tag">Django</span><span class="v-tag">PostgreSQL</span><span class="v-tag">Git</span></div>' +
+          '<div style="margin-top:8px;"><a href="https://hh.ru/vacancy/112345678" style="color:#1565C0;font-weight:600;font-size:13px;" target="_blank">\u041E\u0442\u043A\u0440\u044B\u0442\u044C \u043D\u0430 hh.ru \u2192</a></div>' +
+        '</div>' +
+
+        '<div class="vacancy-block" onclick="showToast(\'Открыть вакансию на hh.ru\')">' +
+          '<div class="v-title">\uD83D\uDCCC Frontend-\u0440\u0430\u0437\u0440\u0430\u0431\u043E\u0442\u0447\u0438\u043A (React/TypeScript)</div>' +
+          '<div class="v-company">\uD83C\uDFED \u0410\u041E \u00AB\u0412\u0435\u0431\u0421\u0442\u0443\u0434\u0438\u044F\u00BB \u2014 \u041C\u043E\u0441\u043A\u0432\u0430 (\u043C. \u041F\u0430\u0432\u0435\u043B\u0435\u0446\u043A\u0430\u044F)</div>' +
+          '<div class="v-salary">\uD83D\uDCB0 \u043E\u0442 90 000 \u0434\u043E 140 000 \u20BD</div>' +
+          '<div class="v-sub"><strong>\u0422\u0440\u0435\u0431\u043E\u0432\u0430\u043D\u0438\u044F:</strong> React 17+, TypeScript, Redux Toolkit, HTML5/CSS3, \u0430\u0434\u0430\u043F\u0442\u0438\u0432\u043D\u0430\u044F \u0432\u0451\u0440\u0441\u0442\u043A\u0430</div>' +
+          '<div class="v-sub"><strong>\u041F\u0440\u043E\u0441\u043C\u043E\u0442\u0440\u044B:</strong> 3 521</div>' +
+          '<div class="v-tags"><span class="v-tag">React</span><span class="v-tag">TypeScript</span><span class="v-tag">Redux</span><span class="v-tag">HTML5</span></div>' +
+          '<div style="margin-top:8px;"><a href="https://hh.ru/vacancy/112345679" style="color:#1565C0;font-weight:600;font-size:13px;" target="_blank">\u041E\u0442\u043A\u0440\u044B\u0442\u044C \u043D\u0430 hh.ru \u2192</a></div>' +
+        '</div>' +
+
+        '<div class="vacancy-block" onclick="showToast(\'Открыть вакансию на hh.ru\')">' +
+          '<div class="v-title">\uD83D\uDCCC \u0421\u0442\u0430\u0436\u0451\u0440-\u0440\u0430\u0437\u0440\u0430\u0431\u043E\u0442\u0447\u0438\u043A Java/Kotlin</div>' +
+          '<div class="v-company">\uD83C\uDFED \u041F\u0410\u041E \u00AB\u0418\u0422-\u0420\u0435\u0448\u0435\u043D\u0438\u044F\u00BB \u2014 \u041C\u043E\u0441\u043A\u0432\u0430 (\u043C. \u0411\u0435\u043B\u043E\u0440\u0443\u0441\u0441\u043A\u0430\u044F)</div>' +
+          '<div class="v-salary">\uD83D\uDCB0 70 000 \u20BD (\u0441\u0442\u0430\u0436\u0438\u0440\u043E\u0432\u043A\u0430 \u0441 \u043F\u0435\u0440\u0435\u0445\u043E\u0434\u043E\u043C \u0432 \u0448\u0442\u0430\u0442)</div>' +
+          '<div class="v-sub"><strong>\u0422\u0440\u0435\u0431\u043E\u0432\u0430\u043D\u0438\u044F:</strong> Java 11+/Kotlin, OOP, SOLID, Spring Boot (\u0431\u0430\u0437\u0430), SQL, JUnit</div>' +
+          '<div class="v-sub"><strong>\u041F\u0440\u043E\u0441\u043C\u043E\u0442\u0440\u044B:</strong> 1 934</div>' +
+          '<div class="v-tags"><span class="v-tag">Java</span><span class="v-tag">Kotlin</span><span class="v-tag">Spring</span><span class="v-tag">SQL</span></div>' +
+          '<div style="margin-top:8px;"><a href="https://hh.ru/vacancy/112345680" style="color:#1565C0;font-weight:600;font-size:13px;" target="_blank">\u041E\u0442\u043A\u0440\u044B\u0442\u044C \u043D\u0430 hh.ru \u2192</a></div>' +
+        '</div>' +
+
+        '<div class="vacancy-block" onclick="showToast(\'Открыть вакансию на hh.ru\')">' +
+          '<div class="v-title">\uD83D\uDCCC Junior Golang Developer</div>' +
+          '<div class="v-company">\uD83C\uDFED \u041E\u041E\u041E \u00AB\u041F\u043B\u0430\u0442\u0444\u043E\u0440\u043C\u0430\u0422\u0435\u0445\u00BB \u2014 \u041C\u043E\u0441\u043A\u0432\u0430 (\u043C. \u0422\u0432\u0435\u0440\u0441\u043A\u0430\u044F)</div>' +
+          '<div class="v-salary">\uD83D\uDCB0 \u043E\u0442 100 000 \u0434\u043E 150 000 \u20BD</div>' +
+          '<div class="v-sub"><strong>\u0422\u0440\u0435\u0431\u043E\u0432\u0430\u043D\u0438\u044F:</strong> Go, gRPC, PostgreSQL, Docker, \u043E\u043F\u044B\u0442 \u043D\u0430\u043F\u0438\u0441\u0430\u043D\u0438\u044F \u043C\u0438\u043A\u0440\u043E\u0441\u0435\u0440\u0432\u0438\u0441\u043E\u0432</div>' +
+          '<div class="v-sub"><strong>\u041F\u0440\u043E\u0441\u043C\u043E\u0442\u0440\u044B:</strong> 4 102</div>' +
+          '<div class="v-tags"><span class="v-tag">Go</span><span class="v-tag">gRPC</span><span class="v-tag">Docker</span><span class="v-tag">PostgreSQL</span></div>' +
+          '<div style="margin-top:8px;"><a href="https://hh.ru/vacancy/112345681" style="color:#1565C0;font-weight:600;font-size:13px;" target="_blank">\u041E\u0442\u043A\u0440\u044B\u0442\u044C \u043D\u0430 hh.ru \u2192</a></div>' +
+        '</div>' +
+
+        '<div class="vacancy-block" onclick="showToast(\'Открыть вакансию на hh.ru\')">' +
+          '<div class="v-title">\uD83D\uDCCC Fullstack-\u0440\u0430\u0437\u0440\u0430\u0431\u043E\u0442\u0447\u0438\u043A (\u0441\u0442\u0430\u0436\u0438\u0440\u043E\u0432\u043A\u0430)</div>' +
+          '<div class="v-company">\uD83C\uDFED \u0417\u0410\u041E \u00AB\u0421\u043E\u0444\u0442\u0418\u043D\u0442\u0435\u0433\u0440\u0430\u0446\u0438\u044F\u00BB \u2014 \u041C\u043E\u0441\u043A\u0432\u0430 (\u043C. \u0411\u0430\u0443\u043C\u0430\u043D\u0441\u043A\u0430\u044F)</div>' +
+          '<div class="v-salary">\uD83D\uDCB0 \u043E\u0442 60 000 \u0434\u043E 90 000 \u20BD (\u0441\u0442\u0430\u0436\u0438\u0440\u043E\u0432\u043A\u0430)</div>' +
+          '<div class="v-sub"><strong>\u0422\u0440\u0435\u0431\u043E\u0432\u0430\u043D\u0438\u044F:</strong> JavaScript/TypeScript, React, Node.js, MongoDB, Git, \u0431\u0430\u0437\u043E\u0432\u044B\u0435 \u0437\u043D\u0430\u043D\u0438\u044F HTML/CSS</div>' +
+          '<div class="v-sub"><strong>\u041F\u0440\u043E\u0441\u043C\u043E\u0442\u0440\u044B:</strong> 2 210</div>' +
+          '<div class="v-tags"><span class="v-tag">JavaScript</span><span class="v-tag">React</span><span class="v-tag">Node.js</span><span class="v-tag">MongoDB</span></div>' +
+          '<div style="margin-top:8px;"><a href="https://hh.ru/vacancy/112345682" style="color:#1565C0;font-weight:600;font-size:13px;" target="_blank">\u041E\u0442\u043A\u0440\u044B\u0442\u044C \u043D\u0430 hh.ru \u2192</a></div>' +
+        '</div>' +
+
+        '<hr style="border:none;border-top:2px solid #E0E6ED;margin:24px 0;">' +
+
+        '<div style="background:linear-gradient(135deg, #1A237E, #283593);border-radius:12px;padding:20px;text-align:center;margin:20px 0;color:#fff;">' +
+          '<div style="font-size:18px;font-weight:700;margin-bottom:8px;">\uD83D\uDCC5 \u0416\u0434\u0435\u043C \u0432\u0430\u0441 \u043D\u0430 \u0441\u043E\u0431\u0435\u0441\u0435\u0434\u043E\u0432\u0430\u043D\u0438\u0438!</div>' +
+          '<div style="font-size:24px;font-weight:800;margin:8px 0;">14 \u0438\u044E\u043B\u044F 2026 \u0433\u043E\u0434\u0430 \u0432 12:00</div>' +
+          '<div style="font-size:14px;opacity:0.9;margin-top:8px;">\u041F\u043E \u0430\u0434\u0440\u0435\u0441\u0443: \u0433. \u041C\u043E\u0441\u043A\u0432\u0430, \u0443\u043B. \u0410\u043A\u0430\u0434\u0435\u043C\u0438\u043A\u0430 \u0412\u0438\u043D\u043E\u0433\u0440\u0430\u0434\u043E\u0432\u0430, \u0434. 20, \u043A\u0430\u0431. 301</div>' +
+          '<div style="font-size:14px;opacity:0.9;">\u0412\u043E\u0437\u043C\u043E\u0436\u043D\u043E \u0434\u0438\u0441\u0442\u0430\u043D\u0446\u0438\u043E\u043D\u043D\u043E\u0435 \u043F\u043E\u0434\u043A\u043B\u044E\u0447\u0435\u043D\u0438\u0435</div>' +
+        '</div>' +
+
+        '<p style="margin:16px 0 4px 0;font-size:15px;font-weight:600;color:#1A237E;">\u0423\u0434\u0430\u0447\u0438 \u0432 \u0431\u0443\u0434\u0443\u0449\u0435\u0439 \u043A\u0430\u0440\u044C\u0435\u0440\u0435!</p>' +
+        '<p style="margin:16px 0 4px 0;">\u0421 \u0443\u0432\u0430\u0436\u0435\u043D\u0438\u0435\u043C,</p>' +
+        '<p style="margin:0 0 2px 0;"><strong>\u041A\u0443\u0431\u0430\u043D\u043E\u0432\u0430 \u041E\u043B\u044C\u0433\u0430 \u041D\u0438\u043A\u043E\u043B\u0430\u0435\u0432\u043D\u0430</strong></p>' +
+        '<p style="margin:0 0 2px 0;">\u0421\u043F\u0435\u0446\u0438\u0430\u043B\u0438\u0441\u0442 \u043F\u043E \u0442\u0440\u0443\u0434\u043E\u0443\u0441\u0442\u0440\u043E\u0439\u0441\u0442\u0432\u0443</p>' +
+        '<p style="margin:0 0 2px 0;">\u0426\u0435\u043D\u0442\u0440 \u0441\u043E\u0434\u0435\u0439\u0441\u0442\u0432\u0438\u044F \u0442\u0440\u0443\u0434\u043E\u0443\u0441\u0442\u0440\u043E\u0439\u0441\u0442\u0432\u0443 \u0432\u044B\u043F\u0443\u0441\u043A\u043D\u0438\u043A\u043E\u0432 \u0438 \u0441\u0442\u0443\u0434\u0435\u043D\u0442\u043E\u0432</p>' +
+        '<p style="margin:0 0 2px 0;">E-mail: kubanova.on@yandex.ru</p>' +
+        '<p style="margin:0;">\u0422\u0435\u043B.: 8 (495) 123-45-67</p>'
+    },
+    {
+      id: 'e0',
+      folder: 'inbox',
+      unread: true,
+      flagged: false,
+      avatar: '\u0425\u0415',
+      avatarClass: 'purple',
+      from: '\u0425\u0435\u0439\u0441\u0442\u043E\u0435\u043D\u0435\u043D \u0415\u0432\u0433\u0435\u043D\u0438\u044F \u0412\u043B\u0430\u0434\u0438\u043C\u0438\u0440\u043E\u0432\u043D\u0430',
+      emailFrom: 'heystonen.ev@edu.ru',
+      subject: '\uD83D\uDCEC \u041F\u0440\u0438\u0433\u043B\u0430\u0448\u0435\u043D\u0438\u0435 \u043D\u0430 \u0441\u043E\u0431\u0435\u0441\u0435\u0434\u043E\u0432\u0430\u043D\u0438\u0435 \u2014 \u041A\u0410\u0418\u042220',
+      dateLabel: '10:40',
+      dateFull: '04 \u0438\u044E\u043B\u044F 2026 \u0432 10:40',
+      to: 'hlebnikovdanya2006@gmail.com',
+      bodyHtml: true,
+      body: '<p style="margin:0 0 12px 0;"><strong>\u0423\u0432\u0430\u0436\u0430\u0435\u043C\u044B\u0439 \u0425\u043B\u0435\u0431\u043D\u0438\u043A\u043E\u0432 \u0414\u0430\u043D\u0438\u0438\u043B!</strong></p>' +
+        '<p style="margin:0 0 12px 0;"><strong>\u0414\u043E\u0431\u0440\u043E\u0435 \u0443\u0442\u0440\u043E!</strong></p>' +
+        '<p style="margin:0 0 12px 0;">\u041C\u0435\u043D\u044F \u0437\u043E\u0432\u0443\u0442 <strong>\u0425\u0435\u0439\u0441\u0442\u043E\u0435\u043D\u0435\u043D \u0415\u0432\u0433\u0435\u043D\u0438\u044F \u0412\u043B\u0430\u0434\u0438\u043C\u0438\u0440\u043E\u0432\u043D\u0430</strong>, \u044F \u044F\u0432\u043B\u044F\u044E\u0441\u044C \u043A\u0443\u0440\u0430\u0442\u043E\u0440\u043E\u043C \u0433\u0440\u0443\u043F\u043F\u044B \u0432 <strong>\u041A\u043E\u043B\u043B\u0435\u0434\u0436\u0435 \u0430\u0432\u0442\u043E\u043C\u0430\u0442\u0438\u0437\u0430\u0446\u0438\u0438 \u0438 \u0438\u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0438\u043E\u043D\u043D\u044B\u0445 \u0442\u0435\u0445\u043D\u043E\u043B\u043E\u0433\u0438\u0439 \u211620 (\u041A\u0410\u0418\u042220)</strong> \u0433\u043E\u0440\u043E\u0434\u0430 \u041C\u043E\u0441\u043A\u0432\u044B. \u041A \u043C\u043E\u0435\u043C\u0443 \u0441\u0432\u0435\u0434\u0435\u043D\u0438\u044E \u043F\u043E\u0441\u0442\u0443\u043F\u0438\u043B\u0430 \u0438\u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0438\u044F \u043E\u0442 \u0426\u0435\u043D\u0442\u0440\u0430 \u0441\u043E\u0434\u0435\u0439\u0441\u0442\u0432\u0438\u044F \u0442\u0440\u0443\u0434\u043E\u0443\u0441\u0442\u0440\u043E\u0439\u0441\u0442\u0432\u0443 \u043E \u0442\u043E\u043C, \u0447\u0442\u043E \u0412\u044B \u043D\u0430\u0445\u043E\u0434\u0438\u0442\u0435\u0441\u044C \u0432 \u0430\u043A\u0442\u0438\u0432\u043D\u043E\u043C \u043F\u043E\u0438\u0441\u043A\u0435 \u0440\u0430\u0431\u043E\u0442\u044B \u043F\u043E \u0441\u043F\u0435\u0446\u0438\u0430\u043B\u044C\u043D\u043E\u0441\u0442\u0438 \u0432 \u0441\u0444\u0435\u0440\u0435 \u0438\u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0438\u043E\u043D\u043D\u044B\u0445 \u0442\u0435\u0445\u043D\u043E\u043B\u043E\u0433\u0438\u0439 \u0438 \u043F\u0440\u043E\u0433\u0440\u0430\u043C\u043C\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u044F \u0441 \u0438\u0441\u043F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u043D\u0438\u0435\u043C \u043D\u0430\u0448\u0435\u0439 \u0432\u043D\u0443\u0442\u0440\u0435\u043D\u043D\u0435\u0439 \u043F\u043B\u0430\u0442\u0444\u043E\u0440\u043C\u044B \u0442\u0440\u0443\u0434\u043E\u0443\u0441\u0442\u0440\u043E\u0439\u0441\u0442\u0432\u0430 <strong>\u041A\u0410\u0418\u042220</strong>.</p>' +
+        '<p style="margin:0 0 12px 0;">\u0412 \u0441\u0432\u044F\u0437\u0438 \u0441 \u0432\u044B\u0448\u0435\u0438\u0437\u043B\u043E\u0436\u0435\u043D\u043D\u044B\u043C, \u0440\u0443\u043A\u043E\u0432\u043E\u0434\u0441\u0442\u0432\u043E \u043A\u043E\u043B\u043B\u0435\u0434\u0436\u0430 \u0438 \u043F\u043E\u0442\u0435\u043D\u0446\u0438\u0430\u043B\u044C\u043D\u044B\u0435 \u0440\u0430\u0431\u043E\u0442\u043E\u0434\u0430\u0442\u0435\u043B\u0438 \u0432\u044B\u0440\u0430\u0437\u0438\u043B\u0438 \u0437\u0430\u0438\u043D\u0442\u0435\u0440\u0435\u0441\u043E\u0432\u0430\u043D\u043D\u043E\u0441\u0442\u044C \u0432 \u0412\u0430\u0448\u0435\u0439 \u043A\u0430\u043D\u0434\u0438\u0434\u0430\u0442\u0443\u0440\u0435. \u041D\u0430 \u043E\u0441\u043D\u043E\u0432\u0430\u043D\u0438\u0438 \u044D\u0442\u043E\u0433\u043E \u0438\u043C\u0435\u044E \u0447\u0435\u0441\u0442\u044C \u043F\u0440\u0438\u0433\u043B\u0430\u0441\u0438\u0442\u044C \u0412\u0430\u0441 \u043D\u0430 <strong>\u0441\u043E\u0431\u0435\u0441\u0435\u0434\u043E\u0432\u0430\u043D\u0438\u0435</strong>, \u043A\u043E\u0442\u043E\u0440\u043E\u0435 \u0441\u043E\u0441\u0442\u043E\u0438\u0442\u0441\u044F <strong>14 \u0438\u044E\u043D\u044F 2026 \u0433\u043E\u0434\u0430 \u0432 12:00</strong> \u043F\u043E \u0430\u0434\u0440\u0435\u0441\u0443: <strong>\u0433. \u041C\u043E\u0441\u043A\u0432\u0430, \u0443\u043B. \u0410\u043A\u0430\u0434\u0435\u043C\u0438\u043A\u0430 \u0412\u0438\u043D\u043E\u0433\u0440\u0430\u0434\u043E\u0432\u0430, \u0434. 20, \u043A\u0430\u0431. 301</strong> (\u0433\u043B\u0430\u0432\u043D\u044B\u0439 \u043A\u043E\u0440\u043F\u0443\u0441 \u041A\u0410\u0418\u042220) \u0441 \u0432\u043E\u0437\u043C\u043E\u0436\u043D\u043E\u0441\u0442\u044C\u044E \u043F\u043E\u0434\u043A\u043B\u044E\u0447\u0435\u043D\u0438\u044F \u0432 \u0434\u0438\u0441\u0442\u0430\u043D\u0446\u0438\u043E\u043D\u043D\u043E\u043C \u0444\u043E\u0440\u043C\u0430\u0442\u0435.</p>' +
+        '<p style="margin:0 0 12px 0;">\u0412 \u0445\u043E\u0434\u0435 \u0441\u043E\u0431\u0435\u0441\u0435\u0434\u043E\u0432\u0430\u043D\u0438\u044F \u043F\u043B\u0430\u043D\u0438\u0440\u0443\u0435\u0442\u0441\u044F \u043E\u0431\u0441\u0443\u0434\u0438\u0442\u044C \u0441\u043B\u0435\u0434\u0443\u044E\u0449\u0438\u0435 \u0432\u043E\u043F\u0440\u043E\u0441\u044B:</p>' +
+        '<ol style="margin:0 0 12px 20px;">' +
+          '<li>\u0412\u0430\u0448\u0438 \u043F\u0440\u043E\u0444\u0435\u0441\u0441\u0438\u043E\u043D\u0430\u043B\u044C\u043D\u044B\u0435 \u043A\u043E\u043C\u043F\u0435\u0442\u0435\u043D\u0446\u0438\u0438, \u043D\u0430\u0432\u044B\u043A\u0438 \u0438 \u043A\u0430\u0440\u044C\u0435\u0440\u043D\u044B\u0435 \u043F\u0440\u0435\u0434\u043F\u043E\u0447\u0442\u0435\u043D\u0438\u044F \u0432 \u043E\u0431\u043B\u0430\u0441\u0442\u0438 \u0440\u0430\u0437\u0440\u0430\u0431\u043E\u0442\u043A\u0438 \u043F\u0440\u043E\u0433\u0440\u0430\u043C\u043C\u043D\u043E\u0433\u043E \u043E\u0431\u0435\u0441\u043F\u0435\u0447\u0435\u043D\u0438\u044F.</li>' +
+          '<li>\u0412\u043E\u0437\u043C\u043E\u0436\u043D\u044B\u0439 <strong>\u0444\u043E\u0440\u043C\u0430\u0442 \u0440\u0430\u0431\u043E\u0442\u044B</strong>: \u043F\u043E\u043B\u043D\u0430\u044F \u0443\u0434\u0430\u043B\u0451\u043D\u043D\u0430\u044F \u0437\u0430\u043D\u044F\u0442\u043E\u0441\u0442\u044C, \u0433\u0438\u0431\u0440\u0438\u0434\u043D\u044B\u0439 \u0433\u0440\u0430\u0444\u0438\u043A \u043B\u0438\u0431\u043E \u0440\u0430\u0431\u043E\u0442\u0430 \u043D\u0430 \u0442\u0435\u0440\u0440\u0438\u0442\u043E\u0440\u0438\u0438 \u0440\u0430\u0431\u043E\u0442\u043E\u0434\u0430\u0442\u0435\u043B\u044F.</li>' +
+          '<li>\u0423\u0441\u043B\u043E\u0432\u0438\u044F \u0442\u0440\u0443\u0434\u0430, \u0443\u0440\u043E\u0432\u0435\u043D\u044C \u043E\u043F\u043B\u0430\u0442\u044B, \u0441\u043E\u0446\u0438\u0430\u043B\u044C\u043D\u044B\u0439 \u043F\u0430\u043A\u0435\u0442 \u0438 \u043F\u0435\u0440\u0441\u043F\u0435\u043A\u0442\u0438\u0432\u044B \u043F\u0440\u043E\u0444\u0435\u0441\u0441\u0438\u043E\u043D\u0430\u043B\u044C\u043D\u043E\u0433\u043E \u0440\u043E\u0441\u0442\u0430.</li>' +
+          '<li>\u041F\u0440\u0435\u0434\u043F\u043E\u043B\u0430\u0433\u0430\u0435\u043C\u044B\u0439 \u043A\u0440\u0443\u0433 \u0434\u043E\u043B\u0436\u043D\u043E\u0441\u0442\u043D\u044B\u0445 \u043E\u0431\u044F\u0437\u0430\u043D\u043D\u043E\u0441\u0442\u0435\u0439 \u0438 \u0441\u0442\u0435\u043A \u0442\u0435\u0445\u043D\u043E\u043B\u043E\u0433\u0438\u0439, \u0441 \u043A\u043E\u0442\u043E\u0440\u044B\u043C\u0438 \u043F\u0440\u0435\u0434\u0441\u0442\u043E\u0438\u0442 \u0440\u0430\u0431\u043E\u0442\u0430\u0442\u044C.</li>' +
+          '<li>\u0413\u0440\u0430\u0444\u0438\u043A \u0440\u0430\u0431\u043E\u0442\u044B, \u0440\u0435\u0436\u0438\u043C \u0440\u0430\u0431\u043E\u0447\u0435\u0433\u043E \u0432\u0440\u0435\u043C\u0435\u043D\u0438 \u0438 \u0441\u0438\u0441\u0442\u0435\u043C\u0430 \u043E\u0442\u0447\u0451\u0442\u043D\u043E\u0441\u0442\u0438.</li>' +
+        '</ol>' +
+        '<p style="margin:0 0 12px 0;">\u041D\u0430 \u0432\u0441\u0442\u0440\u0435\u0447\u0435 \u0412\u044B \u0441\u043C\u043E\u0436\u0435\u0442\u0435 <strong>\u043B\u0438\u0447\u043D\u043E \u043F\u043E\u043E\u0431\u0449\u0430\u0442\u044C\u0441\u044F \u0441 \u0432\u0430\u0448\u0438\u043C \u043F\u043E\u0442\u0435\u043D\u0446\u0438\u0430\u043B\u044C\u043D\u044B\u043C \u0440\u0430\u0431\u043E\u0442\u043E\u0434\u0430\u0442\u0435\u043B\u0435\u043C</strong>, \u0437\u0430\u0434\u0430\u0442\u044C \u0432\u0441\u0435 \u0438\u043D\u0442\u0435\u0440\u0435\u0441\u0443\u044E\u0449\u0438\u0435 \u0412\u0430\u0441 \u0432\u043E\u043F\u0440\u043E\u0441\u044B, \u0443\u0442\u043E\u0447\u043D\u0438\u0442\u044C \u0434\u0435\u0442\u0430\u043B\u0438 \u0432\u0430\u043A\u0430\u043D\u0441\u0438\u0438 \u0438 \u043E\u043F\u0440\u0435\u0434\u0435\u043B\u0438\u0442\u044C, \u043A\u0430\u043A\u043E\u0435 \u043D\u0430\u043F\u0440\u0430\u0432\u043B\u0435\u043D\u0438\u0435 \u0434\u0435\u044F\u0442\u0435\u043B\u044C\u043D\u043E\u0441\u0442\u0438 \u043F\u043E\u0434\u0445\u043E\u0434\u0438\u0442 \u0412\u0430\u043C \u0432 \u043D\u0430\u0438\u0431\u043E\u043B\u044C\u0448\u0435\u0439 \u0441\u0442\u0435\u043F\u0435\u043D\u0438. \u0420\u0430\u0431\u043E\u0442\u043E\u0434\u0430\u0442\u0435\u043B\u044C \u0431\u0443\u0434\u0435\u0442 \u0433\u043E\u0442\u043E\u0432 \u043F\u043E\u0434\u0440\u043E\u0431\u043D\u043E \u0440\u0430\u0441\u0441\u043A\u0430\u0437\u0430\u0442\u044C \u043E \u0442\u0435\u043A\u0443\u0449\u0438\u0445 \u043F\u0440\u043E\u0435\u043A\u0442\u0430\u0445, \u043A\u043E\u0440\u043F\u043E\u0440\u0430\u0442\u0438\u0432\u043D\u043E\u0439 \u043A\u0443\u043B\u044C\u0442\u0443\u0440\u0435 \u0438 \u0442\u0440\u0435\u0431\u043E\u0432\u0430\u043D\u0438\u044F\u0445 \u043A \u043A\u0430\u043D\u0434\u0438\u0434\u0430\u0442\u0430\u043C.</p>' +
+        '<p style="margin:0 0 12px 0;">\u0423\u0431\u0435\u0434\u0438\u0442\u0435\u043B\u044C\u043D\u043E \u043F\u0440\u043E\u0448\u0443 \u0412\u0430\u0441 \u043D\u0430\u043F\u0440\u0430\u0432\u0438\u0442\u044C \u043F\u0438\u0441\u044C\u043C\u0435\u043D\u043D\u044B\u0439 \u043E\u0442\u0432\u0435\u0442 \u043E \u0412\u0430\u0448\u0435\u043C \u0440\u0435\u0448\u0435\u043D\u0438\u0438 \u043E\u0442\u043D\u043E\u0441\u0438\u0442\u0435\u043B\u044C\u043D\u043E \u0443\u0447\u0430\u0441\u0442\u0438\u044F \u0432 \u0441\u043E\u0431\u0435\u0441\u0435\u0434\u043E\u0432\u0430\u043D\u0438\u0438 \u0432 \u0441\u0440\u043E\u043A <strong>\u0434\u043E 20:00 \u0442\u0435\u043A\u0443\u0449\u0435\u0433\u043E \u0434\u043D\u044F (04 \u0438\u044E\u043B\u044F 2026 \u0433\u043E\u0434\u0430)</strong> \u043E\u0434\u043D\u0438\u043C \u0438\u0437 \u0441\u043B\u0435\u0434\u0443\u044E\u0449\u0438\u0445 \u0441\u043F\u043E\u0441\u043E\u0431\u043E\u0432:</p>' +
+        '<ul style="margin:0 0 12px 20px;">' +
+          '<li><strong>\u0415\u0441\u043B\u0438 \u0412\u044B \u043D\u0430\u043C\u0435\u0440\u0435\u043D\u044B \u043F\u043E\u0441\u0435\u0442\u0438\u0442\u044C \u0441\u043E\u0431\u0435\u0441\u0435\u0434\u043E\u0432\u0430\u043D\u0438\u0435</strong> (\u043E\u0447\u043D\u043E \u0438\u043B\u0438 \u0434\u0438\u0441\u0442\u0430\u043D\u0446\u0438\u043E\u043D\u043D\u043E) \u2014 \u043F\u0440\u043E\u0448\u0443 \u043F\u043E\u0434\u0442\u0432\u0435\u0440\u0434\u0438\u0442\u044C \u0412\u0430\u0448\u0435 \u0443\u0447\u0430\u0441\u0442\u0438\u0435, \u0443\u043A\u0430\u0437\u0430\u0432 \u043F\u0440\u0435\u0434\u043F\u043E\u0447\u0442\u0438\u0442\u0435\u043B\u044C\u043D\u044B\u0439 \u0444\u043E\u0440\u043C\u0430\u0442 \u043F\u0440\u0438\u0441\u0443\u0442\u0441\u0442\u0432\u0438\u044F.</li>' +
+          '<li><strong>\u0415\u0441\u043B\u0438 \u0412\u044B \u043E\u0442\u043A\u0430\u0437\u044B\u0432\u0430\u0435\u0442\u0435\u0441\u044C \u043E\u0442 \u0443\u0447\u0430\u0441\u0442\u0438\u044F</strong> \u2014 \u043F\u0440\u043E\u0448\u0443 \u0441\u043E\u043E\u0431\u0449\u0438\u0442\u044C \u043E\u0431 \u044D\u0442\u043E\u043C \u0441 \u0443\u043A\u0430\u0437\u0430\u043D\u0438\u0435\u043C \u043F\u0440\u0438\u0447\u0438\u043D\u044B, \u0435\u0441\u043B\u0438 \u044D\u0442\u043E \u043D\u0435 \u044F\u0432\u043B\u044F\u0435\u0442\u0441\u044F \u043A\u043E\u043D\u0444\u0438\u0434\u0435\u043D\u0446\u0438\u0430\u043B\u044C\u043D\u043E\u0439 \u0438\u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0438\u0435\u0439.</li>' +
+        '</ul>' +
+        '<p style="margin:0 0 12px 0;">\u0412 \u0441\u043B\u0443\u0447\u0430\u0435 \u043E\u0442\u0441\u0443\u0442\u0441\u0442\u0432\u0438\u044F \u043E\u0442\u0432\u0435\u0442\u0430 \u0432 \u0443\u0441\u0442\u0430\u043D\u043E\u0432\u043B\u0435\u043D\u043D\u044B\u0439 \u0441\u0440\u043E\u043A \u043F\u0440\u0438\u0433\u043B\u0430\u0448\u0435\u043D\u0438\u0435 \u0431\u0443\u0434\u0435\u0442 \u0430\u043D\u043D\u0443\u043B\u0438\u0440\u043E\u0432\u0430\u043D\u043E, \u0438 \u0432\u0430\u043A\u0430\u043D\u0441\u0438\u044F \u0431\u0443\u0434\u0435\u0442 \u043F\u0440\u0435\u0434\u043B\u043E\u0436\u0435\u043D\u0430 \u0434\u0440\u0443\u0433\u043E\u043C\u0443 \u043A\u0430\u043D\u0434\u0438\u0434\u0430\u0442\u0443.</p>' +
+        '<p style="margin:0 0 12px 0;">\u042F \u0431\u0443\u0434\u0443 \u043E\u0436\u0438\u0434\u0430\u0442\u044C \u0412\u0430\u0448\u0435\u0433\u043E \u0440\u0435\u0448\u0435\u043D\u0438\u044F \u0434\u043E \u0432\u0435\u0447\u0435\u0440\u0430 \u0441\u0435\u0433\u043E\u0434\u043D\u044F\u0448\u043D\u0435\u0433\u043E \u0434\u043D\u044F. \u041D\u0430\u0434\u0435\u044E\u0441\u044C \u043D\u0430 \u043F\u043B\u043E\u0434\u043E\u0442\u0432\u043E\u0440\u043D\u043E\u0435 \u0441\u043E\u0442\u0440\u0443\u0434\u043D\u0438\u0447\u0435\u0441\u0442\u0432\u043E \u0438 \u043F\u0440\u043E\u0434\u0443\u043A\u0442\u0438\u0432\u043D\u044B\u0439 \u0434\u0438\u0430\u043B\u043E\u0433.</p>' +
+        '<p style="margin:0 0 12px 0;">\u041F\u043E \u0432\u0441\u0435\u043C \u0432\u043E\u043F\u0440\u043E\u0441\u0430\u043C, \u0441\u0432\u044F\u0437\u0430\u043D\u043D\u044B\u043C \u0441 \u043E\u0440\u0433\u0430\u043D\u0438\u0437\u0430\u0446\u0438\u0435\u0439 \u0441\u043E\u0431\u0435\u0441\u0435\u0434\u043E\u0432\u0430\u043D\u0438\u044F, \u0412\u044B \u043C\u043E\u0436\u0435\u0442\u0435 \u043E\u0431\u0440\u0430\u0449\u0430\u0442\u044C\u0441\u044F \u043A\u043E \u043C\u043D\u0435 \u043F\u043E\u0441\u0440\u0435\u0434\u0441\u0442\u0432\u043E\u043C \u043E\u0442\u0432\u0435\u0442\u043D\u043E\u0433\u043E \u043F\u0438\u0441\u044C\u043C\u0430 \u0438\u043B\u0438 \u043F\u043E \u0442\u0435\u043B\u0435\u0444\u043E\u043D\u0443: <strong>8 (495) 555-34-20</strong>.</p>' +
+        '<p style="margin:0 0 4px 0;"><strong>\u0416\u0434\u0443 \u0412\u0430\u0441 14 \u0438\u044E\u043D\u044F 2026 \u0433\u043E\u0434\u0430 \u0432 12:00.</strong></p>' +
+        '<p style="margin:0 0 12px 0;">\u0416\u0435\u043B\u0430\u044E \u0443\u0434\u0430\u0447\u043D\u043E\u0433\u043E \u0434\u043D\u044F!</p>' +
+        '<p style="margin:0 0 4px 0;">\u0421 \u0443\u0432\u0430\u0436\u0435\u043D\u0438\u0435\u043C \u0438 \u043D\u0430\u0434\u0435\u0436\u0434\u043E\u0439 \u043D\u0430 \u0441\u043A\u043E\u0440\u0443\u044E \u0432\u0441\u0442\u0440\u0435\u0447\u0443,</p>' +
+        '<p style="margin:0 0 2px 0;"><strong>\u0425\u0435\u0439\u0441\u0442\u043E\u0435\u043D\u0435\u043D \u0415\u0432\u0433\u0435\u043D\u0438\u044F \u0412\u043B\u0430\u0434\u0438\u043C\u0438\u0440\u043E\u0432\u043D\u0430</strong></p>' +
+        '<p style="margin:0 0 2px 0;">\u041A\u0443\u0440\u0430\u0442\u043E\u0440 \u0433\u0440\u0443\u043F\u043F\u044B</p>' +
+        '<p style="margin:0 0 2px 0;">\u041A\u043E\u043B\u043B\u0435\u0434\u0436 \u0430\u0432\u0442\u043E\u043C\u0430\u0442\u0438\u0437\u0430\u0446\u0438\u0438 \u0438 \u0438\u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0438\u043E\u043D\u043D\u044B\u0445 \u0442\u0435\u0445\u043D\u043E\u043B\u043E\u0433\u0438\u0439 \u211620 (\u041A\u0410\u0418\u042220)</p>' +
+        '<p style="margin:0 0 2px 0;">\u0433. \u041C\u043E\u0441\u043A\u0432\u0430</p>' +
+        '<p style="margin:0 0 2px 0;">E-mail: heystonen.ev@edu.ru</p>' +
+        '<p style="margin:0;">\u0422\u0435\u043B.: 8 (495) 555-34-20</p>'
+    },
+    {
+      id: 'e2',
+      folder: 'inbox',
+      unread: true,
+      flagged: false,
+      avatar: 'hh',
+      avatarClass: 'blue',
+      from: 'hh.ru — HR-подборка',
+      emailFrom: 'job-alert@hh.ru',
+      subject: '\uD83D\uDCC8 5 новых вакансий для разработчиков',
+      dateLabel: '9:32',
+      dateFull: '9:32 (сегодня)',
+      to: 'hlebnikovdanya2006@gmail.com',
+      body: '<p style="margin:0 0 10px 0;">Даниил, здравствуйте!</p>' +
+        '<p style="margin:0 0 10px 0;">По итогам анализа Вашего резюме мы подобрали 5 новых вакансий:</p>' +
+        '<table style="border-collapse:collapse;width:100%;margin:10px 0;font-size:14px;">' +
+          '<tr style="background:#F0F4F8;"><td style="padding:8px 12px;border:1px solid #E0E6ED;">1.</td><td style="padding:8px 12px;border:1px solid #E0E6ED;">Middle Python Developer</td><td style="padding:8px 12px;border:1px solid #E0E6ED;">ООО «КодБюро»</td><td style="padding:8px 12px;border:1px solid #E0E6ED;font-weight:700;color:#2E7D32;">от 130 000 ₽</td></tr>' +
+          '<tr><td style="padding:8px 12px;border:1px solid #E0E6ED;">2.</td><td style="padding:8px 12px;border:1px solid #E0E6ED;">Junior Go Developer</td><td style="padding:8px 12px;border:1px solid #E0E6ED;">АО «Платформа»</td><td style="padding:8px 12px;border:1px solid #E0E6ED;font-weight:700;color:#2E7D32;">от 90 000 ₽</td></tr>' +
+          '<tr style="background:#F0F4F8;"><td style="padding:8px 12px;border:1px solid #E0E6ED;">3.</td><td style="padding:8px 12px;border:1px solid #E0E6ED;">Frontend (Vue.js)</td><td style="padding:8px 12px;border:1px solid #E0E6ED;">ООО «ВебЛаб»</td><td style="padding:8px 12px;border:1px solid #E0E6ED;font-weight:700;color:#2E7D32;">от 85 000 ₽</td></tr>' +
+          '<tr><td style="padding:8px 12px;border:1px solid #E0E6ED;">4.</td><td style="padding:8px 12px;border:1px solid #E0E6ED;">C# /.NET стажёр</td><td style="padding:8px 12px;border:1px solid #E0E6ED;">ЗАО «СофтЛайн»</td><td style="padding:8px 12px;border:1px solid #E0E6ED;font-weight:700;color:#2E7D32;">от 60 000 ₽</td></tr>' +
+          '<tr style="background:#F0F4F8;"><td style="padding:8px 12px;border:1px solid #E0E6ED;">5.</td><td style="padding:8px 12px;border:1px solid #E0E6ED;">Data Analyst</td><td style="padding:8px 12px;border:1px solid #E0E6ED;">ООО «ДатаМастер»</td><td style="padding:8px 12px;border:1px solid #E0E6ED;font-weight:700;color:#2E7D32;">от 95 000 ₽</td></tr>' +
+        '</table>' +
+        '<p style="margin:0 0 10px 0;">Подробнее: <span style="color:#1565C0;cursor:pointer;" onclick="showToast(\'Открыт hh.ru\')">https://hh.ru/search/vacancy?text=программист</span></p>' +
+        '<p style="margin:0;">С уважением, Команда hh.ru</p>'
+    },
+    {
+      id: 'e3',
+      folder: 'inbox',
+      unread: true,
+      flagged: false,
+      avatar: 'ЦЗ',
+      avatarClass: 'green',
+      from: 'Центр занятости населения',
+      emailFrom: 'info@czn.moscow.ru',
+      subject: '\uD83D\uDCCB Программа «Молодые специалисты»',
+      dateLabel: 'вчера',
+      dateFull: 'вчера в 14:15',
+      to: 'hlebnikovdanya2006@gmail.com',
+      body: '<p style="margin:0 0 10px 0;">Уважаемый Даниил!</p>' +
+        '<p style="margin:0 0 10px 0;">Центр занятости населения г. Москвы сообщает о новых вакансиях по программе «Молодые специалисты»:</p>' +
+        '<ul style="margin:0 0 10px 20px;">' +
+          '<li><strong>Программист 1С (стажёр)</strong> — ООО «БизнесСофт» — <strong style="color:#2E7D32;">от 65 000 ₽</strong></li>' +
+          '<li><strong>Разработчик мобильных приложений (Flutter)</strong> — ИП Иванов — <strong style="color:#2E7D32;">от 80 000 ₽</strong></li>' +
+          '<li><strong>Технический писатель (IT)</strong> — АО «ДокТех» — <strong style="color:#2E7D32;">от 55 000 ₽</strong></li>' +
+        '</ul>' +
+        '<p style="margin:0 0 10px 0;">Для получения направления обратитесь в ваш центр занятости.</p>' +
+        '<p style="margin:0;">С уважением, ГКУ ЦЗН г. Москвы</p>'
+    },
+    {
+      id: 'e4',
+      folder: 'inbox',
+      unread: false,
+      flagged: true,
+      avatar: 'ХЕ',
+      avatarClass: 'purple',
+      from: 'Хейстоенен Евгения Владимировна',
+      emailFrom: 'heystonen.ev@edu.ru',
+      subject: '\uD83D\uDCDD Согласование трудоустройства',
+      dateLabel: '11 мар',
+      dateFull: '11 марта в 16:42',
+      to: 'hlebnikovdanya2006@gmail.com',
+      body: '<p style="margin:0 0 10px 0;">Даниил, добрый день!</p>' +
+        '<p style="margin:0 0 10px 0;">Для согласования Вашего трудоустройства предоставьте в учебный отдел:</p>' +
+        '<ol style="margin:0 0 10px 20px;">' +
+          '<li>Заявление на имя директора института</li>' +
+          '<li>Справку с места работы (после оформления)</li>' +
+          '<li>Копию трудового договора</li>' +
+          '<li>Согласие от родителей (при необходимости)</li>' +
+        '</ol>' +
+        '<p style="margin:0 0 10px 0;">Прошу подойти на консультацию для обсуждения деталей.</p>' +
+        '<p style="margin:0;">С уважением,<br>Хейстоенен Евгения Владимировна<br>Куратор группы</p>'
+    },
+    {
+      id: 'e5',
+      folder: 'inbox',
+      unread: false,
+      flagged: false,
+      avatar: 'Я',
+      avatarClass: 'gray',
+      from: 'Яндекс.Почта',
+      emailFrom: 'welcome@yandex.ru',
+      subject: 'Добро пожаловать в Яндекс.Почту!',
+      dateLabel: '1 мар',
+      dateFull: '1 марта в 10:00',
+      to: 'hlebnikovdanya2006@gmail.com',
+      body: '<p style="margin:0 0 10px 0;">Здравствуйте!</p>' +
+        '<p style="margin:0 0 10px 0;">Вы успешно создали почтовый ящик — <strong>hlebnikovdanya2006@gmail.com</strong></p>' +
+        '<p style="margin:0 0 10px 0;">Что дальше?</p>' +
+        '<ul style="margin:0 0 10px 20px;">' +
+          '<li>Настройте оформление писем</li>' +
+          '<li>Добавьте подпись</li>' +
+          '<li>Создайте папки для сортировки</li>' +
+          '<li>Установите мобильное приложение</li>' +
+        '</ul>' +
+        '<p style="margin:0;">Спасибо, что выбрали Яндекс.Почту!</p>'
+    }
+  ];
+
+  // ===== DELAYED EMAIL DATA =====
+  var DELAYED_EMAIL = {
+    id: 'e1b',
+    folder: 'inbox',
+    unread: true,
+    flagged: false,
+    avatar: 'OK',
+    avatarClass: 'orange',
+    from: 'Кубанова Ольга Николаевна',
+    emailFrom: 'kubanova.on@yandex.ru',
+    subject: '\u041F\u043E\u0434\u0442\u0432\u0435\u0440\u0436\u0434\u0435\u043D\u0438\u0435: \u0440\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442\u044B \u0442\u0435\u0441\u0442\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u044F',
+    dateLabel: '15:41',
+    dateFull: '5 \u0438\u044E\u043B\u044F 2026 \u0432 15:41',
+    to: 'hlebnikovdanya2006@gmail.com',
+    bodyHtml: true,
+    body: '<p style="margin:0 0 14px 0;"><strong>\u0414\u043E\u0431\u0440\u044B\u0439 \u0434\u0435\u043D\u044C, \u0414\u0430\u043D\u0438\u0438\u043B!</strong></p>' +
+      '<p style="margin:0 0 14px 0;">\u042D\u0442\u043E \u043F\u043E\u0434\u0442\u0432\u0435\u0440\u0436\u0434\u0430\u044E\u0449\u0435\u0435 \u043F\u0438\u0441\u044C\u043C\u043E \u043E \u0442\u043E\u043C, \u0447\u0442\u043E \u0412\u0430\u0448\u0438 \u0440\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442\u044B \u0442\u0435\u0441\u0442\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u044F \u0443\u0441\u043F\u0435\u0448\u043D\u043E \u043E\u0431\u0440\u0430\u0431\u043E\u0442\u0430\u043D\u044B \u0438 \u0437\u0430\u043D\u0435\u0441\u0435\u043D\u044B \u0432 \u0441\u0438\u0441\u0442\u0435\u043C\u0443.</p>' +
+      '<div style="background:#E8F5E9;border-left:4px solid #43A047;padding:14px 18px;margin:16px 0;border-radius:6px;">' +
+        '<p style="margin:0 0 4px 0;"><strong style="color:#2E7D32;">\u2713 \u041F\u043E\u0434\u0442\u0432\u0435\u0440\u0436\u0434\u0435\u043D\u043E</strong></p>' +
+        '<p style="margin:0;font-size:14px;">\u0412\u0430\u0448 \u0440\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442: <strong>97 \u0431\u0430\u043B\u043B\u043E\u0432</strong> \u2014 \u043F\u043E\u043B\u043D\u044B\u0439 \u0434\u043E\u043F\u0443\u0441\u043A. \u0412\u044B \u043F\u0440\u0438\u0433\u043B\u0430\u0448\u0435\u043D\u044B \u043D\u0430 \u0441\u043E\u0431\u0435\u0441\u0435\u0434\u043E\u0432\u0430\u043D\u0438\u0435 <strong>14 \u0438\u044E\u043B\u044F 2026 \u0433\u043E\u0434\u0430 \u0432 12:00</strong>.</p>' +
+        '<p style="margin:8px 0 0 0;font-size:14px;">\u041F\u043E\u0434\u0440\u043E\u0431\u043D\u044B\u0439 \u043E\u0442\u0447\u0451\u0442 \u043D\u0430\u0445\u043E\u0434\u0438\u0442\u0441\u044F \u0432 \u043F\u0440\u0435\u0434\u044B\u0434\u0443\u0449\u0435\u043C \u043F\u0438\u0441\u044C\u043C\u0435.</p>' +
+      '</div>' +
+      '<p style="margin:16px 0 4px 0;">\u0421 \u0443\u0432\u0430\u0436\u0435\u043D\u0438\u0435\u043C,</p>' +
+      '<p style="margin:0 0 2px 0;"><strong>\u041A\u0443\u0431\u0430\u043D\u043E\u0432\u0430 \u041E\u043B\u044C\u0433\u0430 \u041D\u0438\u043A\u043E\u043B\u0430\u0435\u0432\u043D\u0430</strong></p>'
+  };
+
+  // ===== SOUND NOTIFICATION =====
+  function playNotificationSound() {
+    try {
+      var ctx = new (window.AudioContext || window.webkitAudioContext)();
+      // First beep
+      var osc1 = ctx.createOscillator();
+      var gain1 = ctx.createGain();
+      osc1.connect(gain1);
+      gain1.connect(ctx.destination);
+      osc1.frequency.setValueAtTime(880, ctx.currentTime);
+      osc1.type = 'sine';
+      gain1.gain.setValueAtTime(0.3, ctx.currentTime);
+      gain1.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+
+      // Second beep (slightly higher)
+      var osc2 = ctx.createOscillator();
+      var gain2 = ctx.createGain();
+      osc2.connect(gain2);
+      gain2.connect(ctx.destination);
+      osc2.frequency.setValueAtTime(1100, ctx.currentTime + 0.15);
+      osc2.type = 'sine';
+      gain2.gain.setValueAtTime(0, ctx.currentTime);
+      gain2.gain.setValueAtTime(0.3, ctx.currentTime + 0.15);
+      gain2.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
+
+      osc1.start(ctx.currentTime);
+      osc1.stop(ctx.currentTime + 0.15);
+      osc2.start(ctx.currentTime + 0.15);
+      osc2.stop(ctx.currentTime + 0.35);
+    } catch(e) {}
+  }
+
+  // ===== STATE =====
+  var currentFolder = 'inbox';
+  var allEmails = JSON.parse(JSON.stringify(EMAILS));
+
+  // ===== RENDER LIST =====
+  function renderList(emails) {
+    var list = document.getElementById('emailList');
+    var count = document.getElementById('mailCount');
+    list.innerHTML = '';
+
+    if (emails.length === 0) {
+      list.innerHTML = '<div style="padding:60px 20px;text-align:center;color:#8E9CAB;"><div style="font-size:40px;margin-bottom:12px;">&#128236;</div>Нет писем</div>';
+      count.textContent = '0 писем';
+      return;
+    }
+
+    var total = allEmails.filter(function(e) { return e.folder === currentFolder; }).length;
+    count.textContent = '1\u2013' + emails.length + ' из ' + total;
+
+    for (var i = 0; i < emails.length; i++) {
+      var e = emails[i];
+      var row = document.createElement('div');
+      row.className = 'email-row' + (e.unread ? ' unread' : '');
+      row.dataset.id = e.id;
+
+      var infoMatch = e.from.match(/^([A-ZА-ЯЁ])/);
+      var initial = infoMatch ? infoMatch[1] : '?';
+
+      var labelHtml = e.label ? '<span class="label ' + e.label + '">' + e.label + '</span>' : '';
+      var flagHtml = e.flagged ? '<span class="pin-icon">&#9733;</span>' : '';
+
+      row.innerHTML =
+        '<div class="cb"><input type="checkbox" onclick="event.stopPropagation()"></div>' +
+        '<div class="avatar-wrap"><div class="avatar ' + e.avatarClass + '">' + initial + '</div></div>' +
+        '<div class="from-wrap"><div class="from">' + escHtml(e.from) + '</div></div>' +
+        '<div class="subject-wrap">' +
+          flagHtml +
+          labelHtml +
+          '<div class="subject">' + escHtml(e.subject) + '</div>' +
+        '</div>' +
+        '<div class="date-wrap">' +
+          '<span class="date-text">' + escHtml(e.dateLabel) + '</span>' +
+        '</div>';
+
+      (function(id) {
+        row.addEventListener('click', function(ev) {
+          if (ev.target.type === 'checkbox') return;
+          openEmail(id);
+        });
+      })(e.id);
+
+      list.appendChild(row);
+    }
+  }
+
+  function escHtml(s) {
+    var d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  // ===== FILTER =====
+  function filterEmails(query) {
+    var q = query.toLowerCase().trim();
+    var filtered = allEmails.filter(function(e) { return e.folder === currentFolder; });
+    if (q) {
+      filtered = filtered.filter(function(e) {
+        return e.from.toLowerCase().indexOf(q) !== -1 ||
+               e.subject.toLowerCase().indexOf(q) !== -1 ||
+               (e.body && e.body.toLowerCase().indexOf(q) !== -1);
+      });
+    }
+    renderList(filtered);
+  }
+
+  // ===== FOLDER SWITCH =====
+  function switchFolder(el) {
+    var items = document.querySelectorAll('.nav-item');
+    for (var i = 0; i < items.length; i++) items[i].classList.remove('active');
+    el.classList.add('active');
+    currentFolder = el.dataset.folder;
+    closeEmail();
+    var filtered = allEmails.filter(function(e) { return e.folder === currentFolder; });
+    renderList(filtered);
+    updateBadge();
+  }
+
+  function updateBadge() {
+    var badge = document.getElementById('inboxBadge');
+    var cnt = 0;
+    for (var i = 0; i < allEmails.length; i++) {
+      if (allEmails[i].folder === 'inbox' && allEmails[i].unread) cnt++;
+    }
+    badge.textContent = cnt;
+    badge.style.display = cnt > 0 ? 'inline' : 'none';
+  }
+
+  // ===== OPEN / CLOSE EMAIL =====
+  function openEmail(id) {
+    var e = null;
+    for (var i = 0; i < allEmails.length; i++) {
+      if (allEmails[i].id === id) { e = allEmails[i]; break; }
+    }
+    if (!e) return;
+
+    currentEmailId = id;
+    e.unread = false;
+    updateBadge();
+
+    document.getElementById('emailList').style.display = 'none';
+    var reader = document.getElementById('emailReader');
+    reader.classList.add('open');
+    reader.style.display = 'flex';
+    document.getElementById('readerBack').style.display = 'inline-flex';
+
+    document.getElementById('readerSubject').textContent = e.subject;
+    document.getElementById('readerDate').textContent = e.dateFull;
+    var av = document.getElementById('readerAvatar');
+    av.textContent = e.avatar;
+    av.className = 'avatar ' + e.avatarClass;
+    document.getElementById('readerName').textContent = e.from;
+    document.getElementById('readerEmail').textContent = e.emailFrom;
+    document.getElementById('readerTo').textContent = e.to || 'hlebnikovdanya2006@gmail.com';
+
+    var bodyDiv = document.getElementById('readerBody');
+    if (e.bodyHtml) {
+      bodyDiv.innerHTML = e.body;
+    } else {
+      bodyDiv.innerHTML = e.body.replace(/\n/g, '<br>');
+    }
+
+    document.getElementById('readerScroll').scrollTop = 0;
+
+    var filtered = allEmails.filter(function(m) { return m.folder === currentFolder; });
+    renderList(filtered);
+  }
+
+  function closeEmail() {
+    currentEmailId = null;
+    document.getElementById('emailList').style.display = 'block';
+    var reader = document.getElementById('emailReader');
+    reader.classList.remove('open');
+    reader.style.display = 'none';
+    document.getElementById('readerBack').style.display = 'none';
+  }
+
+  // ===== TOOLBAR =====
+  function toggleSelectAll() {
+    var checked = document.getElementById('selectAllCb').checked;
+    var cbs = document.querySelectorAll('.email-row .cb input');
+    for (var i = 0; i < cbs.length; i++) cbs[i].checked = checked;
+  }
+
+  function deleteSelected() {
+    var cbs = document.querySelectorAll('.email-row .cb input:checked');
+    if (cbs.length === 0) { showToast('Выберите письма для удаления'); return; }
+    for (var i = 0; i < cbs.length; i++) {
+      var row = cbs[i].closest('.email-row');
+      if (row) {
+        var id = row.dataset.id;
+        for (var j = 0; j < allEmails.length; j++) {
+          if (allEmails[j].id === id) { allEmails[j].folder = 'trash'; break; }
+        }
+      }
+    }
+    var filtered = allEmails.filter(function(e) { return e.folder === currentFolder; });
+    renderList(filtered);
+    updateBadge();
+    showToast('Удалено');
+    document.getElementById('selectAllCb').checked = false;
+  }
+
+  function markRead() {
+    var cbs = document.querySelectorAll('.email-row .cb input:checked');
+    if (cbs.length === 0) { showToast('Выберите письма'); return; }
+    for (var i = 0; i < cbs.length; i++) {
+      var row = cbs[i].closest('.email-row');
+      if (row) {
+        var id = row.dataset.id;
+        for (var j = 0; j < allEmails.length; j++) {
+          if (allEmails[j].id === id) { allEmails[j].unread = false; break; }
+        }
+      }
+    }
+    var filtered = allEmails.filter(function(e) { return e.folder === currentFolder; });
+    renderList(filtered);
+    updateBadge();
+    showToast('Помечено как прочитано');
+  }
+
+  function markUnread() {
+    var cbs = document.querySelectorAll('.email-row .cb input:checked');
+    if (cbs.length === 0) { showToast('Выберите письма'); return; }
+    for (var i = 0; i < cbs.length; i++) {
+      var row = cbs[i].closest('.email-row');
+      if (row) {
+        var id = row.dataset.id;
+        for (var j = 0; j < allEmails.length; j++) {
+          if (allEmails[j].id === id) { allEmails[j].unread = true; break; }
+        }
+      }
+    }
+    var filtered = allEmails.filter(function(e) { return e.folder === currentFolder; });
+    renderList(filtered);
+    updateBadge();
+    showToast('Помечено как непрочитанное');
+  }
+
+  // ===== CURRENT EMAIL ID FOR REPLY =====
+  var currentEmailId = null;
+
+  // ===== COMPOSE =====
+  function openCompose() {
+    document.getElementById('composeTo').value = '';
+    document.getElementById('composeModal').classList.add('open');
+    document.getElementById('composeSubject').value = '';
+    document.getElementById('composeBody').value = '';
+  }
+
+  function replyToCurrent() {
+    if (!currentEmailId) { showToast('Сначала откройте письмо'); return; }
+    var e = null;
+    for (var i = 0; i < allEmails.length; i++) {
+      if (allEmails[i].id === currentEmailId) { e = allEmails[i]; break; }
+    }
+    if (!e) return;
+    document.getElementById('composeTo').value = e.emailFrom || '';
+    document.getElementById('composeSubject').value = 'Re: ' + e.subject;
+    document.getElementById('composeBody').value = '';
+    document.getElementById('composeModal').classList.add('open');
+  }
+
+  function closeCompose() {
+    document.getElementById('composeModal').classList.remove('open');
+  }
+
+  function sendMail() {
+    var toEmail = document.getElementById('composeTo').value || 'Неизвестный адрес';
+    showToast('\u2709 \u041F\u0438\u0441\u044C\u043C\u043E \u043E\u0442\u043F\u0440\u0430\u0432\u043B\u0435\u043D\u043E \u043D\u0430 ' + toEmail);
+    closeCompose();
+    allEmails.push({
+      id: 'sent-' + Date.now(),
+      folder: 'sent',
+      unread: false,
+      flagged: false,
+      avatar: '\u0414\u0425',
+      avatarClass: 'red',
+      from: '\u0425\u043B\u0435\u0431\u043D\u0438\u043A\u043E\u0432 \u0414\u0430\u043D\u0438\u0438\u043B',
+      emailFrom: 'hlebnikovdanya2006@gmail.com',
+      subject: document.getElementById('composeSubject').value || '(\u0431\u0435\u0437 \u0442\u0435\u043C\u044B)',
+      dateLabel: '\u0442\u043E\u043B\u044C\u043A\u043E \u0447\u0442\u043E',
+      dateFull: '\u0442\u043E\u043B\u044C\u043A\u043E \u0447\u0442\u043E',
+      to: toEmail,
+      body: '<p style="margin:0;">' + escHtml(document.getElementById('composeBody').value || '...').replace(/\n/g, '<br>') + '</p>',
+      bodyHtml: true
+    });
+  }
+
+  // ===== TOAST =====
+  function showToast(msg) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(function() { t.classList.remove('show'); }, 2200);
+  }
+
+  // ===== NOTIFICATION BANNER TIMER =====
+  var notifTimer = null;
+
+  function hideNotifBanner() {
+    var banner = document.getElementById('notifBanner');
+    banner.classList.remove('show');
+  }
+
+  // ===== ADD DELAYED EMAIL =====
+  function addDelayedEmail() {
+    allEmails.unshift(DELAYED_EMAIL);
+    playNotificationSound();
+
+    var banner = document.getElementById('notifBanner');
+    banner.classList.add('show');
+    clearTimeout(notifTimer);
+    notifTimer = setTimeout(hideNotifBanner, 5000);
+
+    var filtered = allEmails.filter(function(e) { return e.folder === 'inbox'; });
+    renderList(filtered);
+    updateBadge();
+
+    var rows = document.querySelectorAll('.email-row');
+    if (rows.length > 0) {
+      rows[0].classList.add('new-email');
+    }
+
+    showToast('\uD83D\uDCE8 Новое письмо от Кубановой О. Н. — тестирование перед собеседованием');
+  }
+
+  // ===== INIT =====
+  document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('emailReader').style.display = 'none';
+    var list = document.getElementById('emailList');
+    list.innerHTML = '<div style="padding:60px 20px;text-align:center;color:#8E9CAB;"><div style="font-size:40px;margin-bottom:12px;">&#128236;</div>Загрузка писем...</div>';
+    document.getElementById('mailCount').textContent = 'загрузка...';
+    setTimeout(function() {
+      var filtered = allEmails.filter(function(e) { return e.folder === 'inbox'; });
+      renderList(filtered);
+      updateBadge();
+    }, 5000);
+  });
+
+  document.getElementById('composeModal').addEventListener('click', function(e) {
+    if (e.target === this) closeCompose();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') { closeCompose(); closeEmail(); }
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1191 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Windows 11</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;user-select:none}
+body{font-family:'Segoe UI','Segoe UI Variable',system-ui,-apple-system,sans-serif;background:#0a0a14;overflow:hidden;height:100vh;width:100vw}
+.monitor{width:100vw;height:100vh;background:#000;position:relative;overflow:hidden}
+.screen{width:100%;height:100%;position:relative;overflow:hidden}
+
+/* BOOT SCREEN */
+.boot-screen{position:absolute;inset:0;z-index:9999;background:#1c1c1c;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .8s,transform .8s}
+.boot-screen.hidden{opacity:0;transform:scale(1.05);pointer-events:none}
+.boot-logo{width:80px;height:80px;margin-bottom:40px}
+.boot-logo svg{width:100%;height:100%}
+.boot-spinner{width:32px;height:32px;border:3px solid rgba(255,255,255,.12);border-top-color:#60cdff;border-radius:50%;animation:spin .8s linear infinite;margin-bottom:24px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.boot-bar-wrap{width:280px;height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin-bottom:16px}
+.boot-bar{height:100%;width:0%;background:linear-gradient(90deg,#60cdff,#a78bfa);border-radius:2px;transition:width .3s}
+.boot-text{color:rgba(255,255,255,.5);font-size:12px;text-align:center}
+
+/* LOCK SCREEN */
+.lock-screen{position:absolute;inset:0;z-index:9998;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.25);backdrop-filter:blur(25px) saturate(1.5);-webkit-backdrop-filter:blur(25px) saturate(1.5);transition:opacity .6s,transform .6s}
+.lock-screen.hidden{opacity:0;transform:scale(1.03);pointer-events:none}
+.lock-time{font-size:82px;font-weight:300;color:#fff;letter-spacing:-2px;text-shadow:0 2px 20px rgba(0,0,0,.3)}
+.lock-date{font-size:18px;color:rgba(255,255,255,.7);margin-top:4px;margin-bottom:40px}
+.lock-icon{width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+.lock-icon svg{width:24px;height:24px;color:rgba(255,255,255,.7)}
+.lock-input{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:10px 16px;color:#fff;font-size:16px;width:260px;outline:none;text-align:center;letter-spacing:4px}
+.lock-input:focus{border-color:rgba(96,205,255,.4)}
+.lock-hint{color:rgba(255,255,255,.3);font-size:12px;margin-top:12px}
+.lock-weather{position:absolute;top:60px;right:60px;text-align:right;color:#fff}
+.lock-weather .temp{font-size:32px;font-weight:300}
+.lock-weather .desc{font-size:14px;opacity:.7}
+.lock-notif{position:absolute;bottom:80px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.5);font-size:13px}
+
+/* WALLPAPER */
+.wallpaper{position:absolute;inset:0;background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);z-index:0;transition:background .8s;background-size:cover;background-position:center;background-repeat:no-repeat}
+.wallpaper::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(100,100,255,.08) 0%,transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(200,100,255,.05) 0%,transparent 50%),radial-gradient(ellipse at 50% 80%,rgba(50,150,255,.06) 0%,transparent 50%)}
+
+/* DESKTOP */
+.desktop{position:absolute;inset:0;z-index:1;padding:12px 12px 52px 12px;display:flex;flex-wrap:wrap;align-content:flex-start;gap:2px}
+.desktop-icon{width:72px;height:76px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:4px;border-radius:6px;cursor:default;transition:background .15s;color:rgba(255,255,255,.9);font-size:11px;text-align:center;text-shadow:0 1px 4px rgba(0,0,0,.7)}
+.desktop-icon:hover{background:rgba(255,255,255,.08)}
+.desktop-icon svg{width:30px;height:30px;filter:drop-shadow(0 1px 3px rgba(0,0,0,.5))}
+.desktop-icon span{line-height:1.2;word-break:break-word;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+/* WIDGETS */
+.desktop-widgets{position:absolute;top:12px;right:12px;z-index:3;display:flex;flex-direction:column;align-items:flex-end;gap:6px;pointer-events:none}
+.widget-card{background:rgba(255,255,255,.04);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.05);border-radius:10px;padding:10px 14px;color:rgba(255,255,255,.85);min-width:150px;pointer-events:auto;box-shadow:0 2px 12px rgba(0,0,0,.15)}
+.widget-card .w-title{font-size:10px;opacity:.5;margin-bottom:2px;text-transform:uppercase;letter-spacing:.5px}
+.widget-card .w-value{font-size:20px;font-weight:300}
+.widget-card .w-sub{font-size:11px;opacity:.6;margin-top:2px}
+.widget-card .w-list{font-size:11px;opacity:.6;margin-top:4px;line-height:1.5}
+.widget-card .w-task{display:flex;align-items:center;gap:6px;font-size:11px;padding:2px 0}
+
+/* TASKBAR */
+.taskbar{position:absolute;bottom:0;left:0;right:0;height:48px;z-index:100;background:rgba(30,30,46,.75);backdrop-filter:blur(30px) saturate(1.4);-webkit-backdrop-filter:blur(30px) saturate(1.4);border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:center;padding:0 8px}
+.taskbar-center{flex:1;display:flex;align-items:center;justify-content:center;gap:2px;height:100%}
+.taskbar-left{display:flex;align-items:center;gap:2px;height:100%}
+.taskbar-right{display:flex;align-items:center;gap:2px;height:100%}
+.start-btn{width:36px;height:36px;border:none;background:rgba(255,255,255,.04);border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;color:rgba(255,255,255,.9)}
+.start-btn:hover{background:rgba(255,255,255,.1)}
+.taskbar-app{width:40px;height:36px;border:none;background:transparent;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;position:relative;color:rgba(255,255,255,.8)}
+.taskbar-app:hover{background:rgba(255,255,255,.08)}
+.taskbar-app.active{background:rgba(255,255,255,.04)}
+.taskbar-app.active::after{content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:14px;height:3px;background:#60cdff;border-radius:2px}
+.taskbar-app svg{width:18px;height:18px}
+.tray-item{height:36px;display:flex;align-items:center;gap:4px;padding:0 6px;border-radius:6px;cursor:pointer;color:rgba(255,255,255,.9);font-size:12px;transition:background .15s}
+.tray-item:hover{background:rgba(255,255,255,.08)}
+.tray-item svg{width:16px;height:16px}
+.tray-clock{text-align:right;line-height:1.15;padding:0 6px;font-size:11px;cursor:pointer}
+.tray-clock .time{font-weight:600;font-size:12px}
+.tray-clock .date{font-size:9px;opacity:.6}
+
+/* START MENU */
+.start-menu{position:absolute;bottom:52px;left:8px;z-index:99;width:580px;height:620px;max-height:80vh;background:rgba(30,30,46,.82);backdrop-filter:blur(40px) saturate(1.5);-webkit-backdrop-filter:blur(40px) saturate(1.5);border-radius:16px;border:1px solid rgba(255,255,255,.08);box-shadow:0 8px 60px rgba(0,0,0,.5);display:none;flex-direction:column;padding:20px 24px;animation:startOpen .3s cubic-bezier(.22,1,.36,1)}
+@keyframes startOpen{0%{opacity:0;transform:scale(.92) translateY(20px)}100%{opacity:1;transform:scale(1) translateY(0)}}
+.start-menu.open{display:flex}
+.start-search{width:100%;padding:8px 14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#fff;font-size:14px;outline:none;margin-bottom:12px}
+.start-search:focus{border-color:rgba(96,205,255,.4)}
+.pinned-header{display:flex;justify-content:space-between;align-items:center;color:rgba(255,255,255,.6);font-size:12px;margin-bottom:8px}
+.pinned-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin-bottom:12px}
+.pinned-app{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;border-radius:8px;cursor:pointer;transition:background .15s;color:rgba(255,255,255,.9);font-size:10px}
+.pinned-app:hover{background:rgba(255,255,255,.08)}
+.pinned-app svg{width:24px;height:24px}
+.recommended-header{font-size:12px;color:rgba(255,255,255,.6);margin-bottom:4px}
+.recommended-list{flex:1;overflow-y:auto}
+.recommended-item{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;cursor:pointer;color:rgba(255,255,255,.65);font-size:11px;transition:background .15s}
+.recommended-item:hover{background:rgba(255,255,255,.06)}
+.recommended-item .meta{margin-left:auto;font-size:9px;opacity:.4}
+.profile-section{display:flex;align-items:center;gap:8px;padding:8px 0 0;margin-top:8px;border-top:1px solid rgba(255,255,255,.06)}
+.profile-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#60cdff,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff}
+.profile-name{font-size:12px;color:rgba(255,255,255,.8)}
+.profile-actions{margin-left:auto;display:flex;gap:4px}
+.profile-actions button{background:rgba(255,255,255,.04);border:none;border-radius:6px;padding:4px 8px;cursor:pointer;color:rgba(255,255,255,.6);font-size:11px}
+
+/* WINDOWS */
+.window{position:absolute;z-index:50;background:rgba(28,28,40,.88);backdrop-filter:blur(25px) saturate(1.3);-webkit-backdrop-filter:blur(25px) saturate(1.3);border-radius:10px;border:1px solid rgba(255,255,255,.07);box-shadow:0 8px 40px rgba(0,0,0,.45);display:flex;flex-direction:column;min-width:280px;min-height:160px;animation:winOpen .3s cubic-bezier(.22,1,.36,1)}
+@keyframes winOpen{0%{opacity:0;transform:scale(.85) translateY(30px)}100%{opacity:1;transform:scale(1) translateY(0)}}
+.window.closing{animation:winClose .2s cubic-bezier(.55,0,1,.45) forwards}
+@keyframes winClose{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.8)}}
+.window.minimized{display:none}
+.window.maximized{width:100%!important;height:calc(100% - 48px)!important;top:0!important;left:0!important;border-radius:0!important}
+.window.focused{z-index:80;border-color:rgba(255,255,255,.1)}
+.win-titlebar{display:flex;align-items:center;height:34px;padding:0 10px;background:rgba(255,255,255,.02);border-radius:10px 10px 0 0;cursor:default;flex-shrink:0}
+.win-title{flex:1;font-size:12px;color:rgba(255,255,255,.85);display:flex;align-items:center;gap:6px;font-weight:500}
+.win-title svg{width:14px;height:14px}
+.win-controls{display:flex;gap:6px}
+.win-btn{width:13px;height:13px;border-radius:50%;border:none;cursor:pointer}
+.win-btn.close{background:#e81123}
+.win-btn.minimize{background:#fdbc40}
+.win-btn.maximize{background:#36c843}
+.win-btn svg{width:6px;height:6px;opacity:0}
+.win-btn:hover svg{opacity:.7}
+.win-content{flex:1;overflow:hidden;border-radius:0 0 10px 10px;position:relative;display:flex;flex-direction:column}
+.resize-handle{position:absolute;z-index:10}
+.resize-n{top:-3px;left:4px;right:4px;height:6px;cursor:n-resize}
+.resize-s{bottom:-3px;left:4px;right:4px;height:6px;cursor:s-resize}
+.resize-e{right:-3px;top:4px;bottom:4px;width:6px;cursor:e-resize}
+.resize-w{left:-3px;top:4px;bottom:4px;width:6px;cursor:w-resize}
+.resize-ne{top:-3px;right:-3px;width:10px;height:10px;cursor:ne-resize}
+.resize-nw{top:-3px;left:-3px;width:10px;height:10px;cursor:nw-resize}
+.resize-se{bottom:-3px;right:-3px;width:10px;height:10px;cursor:se-resize}
+.resize-sw{bottom:-3px;left:-3px;width:10px;height:10px;cursor:sw-resize}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:3px}
+
+/* CONTEXT MENU */
+.context-menu{position:fixed;z-index:200;background:rgba(38,38,50,.92);backdrop-filter:blur(30px) saturate(1.3);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:4px;min-width:220px;box-shadow:0 8px 40px rgba(0,0,0,.5);display:none}
+.context-menu.open{display:block}
+.ctx-item{display:flex;align-items:center;gap:10px;padding:5px 10px;border-radius:6px;cursor:pointer;color:rgba(255,255,255,.85);font-size:12px}
+.ctx-item:hover{background:rgba(255,255,255,.08)}
+.ctx-item svg{width:15px;height:15px;opacity:.7;flex-shrink:0}
+.ctx-divider{height:1px;background:rgba(255,255,255,.06);margin:4px 8px}
+
+/* NOTIFICATION */
+.notification{position:fixed;bottom:56px;right:12px;z-index:150;background:rgba(38,38,50,.9);backdrop-filter:blur(25px);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px 14px;width:300px;box-shadow:0 8px 40px rgba(0,0,0,.4);display:none;animation:notifIn .3s ease}
+@keyframes notifIn{0%{opacity:0;transform:translateX(40px)}100%{opacity:1;transform:translateX(0)}}
+.notification.open{display:block}
+.notif-header{display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:11px;color:rgba(255,255,255,.9)}
+.notif-text{font-size:12px;color:rgba(255,255,255,.65)}
+.notif-close{position:absolute;top:6px;right:6px;background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:12px}
+
+/* TOAST */
+.toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:999;background:rgba(0,0,0,.75);backdrop-filter:blur(20px);border-radius:10px;padding:14px 24px;color:#fff;font-size:13px;display:none;pointer-events:none}
+.toast.open{display:block}
+
+/* BSOD */
+.bsod-overlay{position:fixed;inset:0;z-index:10000;background:#0067b8;display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px}
+.bsod-overlay.open{display:flex}
+.bsod-overlay .sad-face{font-size:80px;margin-bottom:20px}
+.bsod-overlay h2{color:#fff;font-size:22px;font-weight:400;margin-bottom:12px}
+.bsod-overlay p{color:rgba(255,255,255,.7);font-size:14px;max-width:500px;text-align:center;margin-bottom:20px}
+.bsod-overlay .error-code{color:rgba(255,255,255,.4);font-size:12px;margin-bottom:30px}
+.bsod-overlay .progress-ring{width:280px;height:4px;background:rgba(255,255,255,.15);border-radius:2px;overflow:hidden;margin-bottom:8px}
+.bsod-overlay .progress-ring div{height:100%;animation:bsodProgress 3s ease-in-out infinite}
+@keyframes bsodProgress{0%{width:0%}50%{width:70%}100%{width:100%}}
+.bsod-overlay .bsod-close{position:absolute;bottom:40px;background:rgba(255,255,255,.1);border:none;border-radius:6px;padding:8px 20px;color:#fff;cursor:pointer;font-size:14px}
+
+/* POWER MENU */
+.power-menu{position:absolute;bottom:52px;right:8px;z-index:99;background:rgba(38,38,50,.92);backdrop-filter:blur(30px);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:6px;min-width:140px;box-shadow:0 8px 40px rgba(0,0,0,.5);display:none}
+.power-menu.open{display:block}
+.power-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;cursor:pointer;color:rgba(255,255,255,.8);font-size:13px}
+.power-item:hover{background:rgba(255,255,255,.08)}
+.power-item svg{width:18px;height:18px}
+
+/* SETTINGS */
+.settings-sidebar{width:200px;background:rgba(0,0,0,.08);padding:8px;overflow-y:auto;flex-shrink:0;font-size:12px}
+.settings-item{padding:6px 10px;border-radius:6px;cursor:pointer;color:rgba(255,255,255,.6);transition:background .1s;display:flex;align-items:center;gap:8px}
+.settings-item:hover{background:rgba(255,255,255,.06)}
+.settings-item.active{background:rgba(60,180,255,.12);color:#60cdff}
+.settings-content{flex:1;padding:16px 20px;overflow-y:auto}
+.settings-content h2{font-size:22px;font-weight:500;color:rgba(255,255,255,.9);margin-bottom:16px}
+.settings-group{background:rgba(255,255,255,.03);border-radius:10px;padding:12px 16px;margin-bottom:8px}
+.settings-group h3{font-size:14px;font-weight:500;color:rgba(255,255,255,.8);margin-bottom:8px}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.03)}
+.settings-row:last-child{border-bottom:none}
+.settings-row label{font-size:13px;color:rgba(255,255,255,.7)}
+.settings-row select{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:5px;padding:4px 8px;color:#fff;font-size:12px;outline:none}
+.settings-row select option{background:#2a2a3e}
+.settings-row .toggle{width:36px;height:20px;border-radius:10px;background:rgba(255,255,255,.12);cursor:pointer;position:relative}
+.settings-row .toggle.on{background:#60cdff}
+.settings-row .toggle::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .2s}
+.settings-row .toggle.on::after{transform:translateX(16px)}
+.settings-btn{background:rgba(96,205,255,.12);border:none;border-radius:6px;padding:6px 14px;color:#60cdff;font-size:12px;cursor:pointer}
+
+/* CALCULATOR */
+.calc-display{background:rgba(0,0,0,.15);padding:12px 14px;text-align:right}
+.calc-expr{font-size:11px;color:rgba(255,255,255,.4);min-height:16px}
+.calc-result{font-size:32px;font-weight:300;color:#fff}
+.calc-buttons{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;padding:1px;background:rgba(0,0,0,.1);flex:1}
+.calc-btn{border:none;font-size:16px;cursor:pointer;padding:10px;transition:background .1s;display:flex;align-items:center;justify-content:center}
+.calc-btn.num{background:rgba(255,255,255,.04);color:#fff}
+.calc-btn.num:hover{background:rgba(255,255,255,.1)}
+.calc-btn.op{background:rgba(96,205,255,.08);color:#60cdff}
+.calc-btn.op:hover{background:rgba(96,205,255,.16)}
+.calc-btn.fn{background:rgba(255,255,255,.03);color:rgba(255,255,255,.6)}
+.calc-btn.fn:hover{background:rgba(255,255,255,.08)}
+.calc-btn.equals{background:rgba(96,205,255,.2);color:#60cdff}
+.calc-btn.equals:hover{background:rgba(96,205,255,.3)}
+
+/* TERMINAL */
+.terminal-header{display:flex;align-items:center;padding:6px 12px;background:rgba(0,0,0,.15);flex-shrink:0;font-size:11px;color:rgba(255,255,255,.5)}
+.terminal-body{flex:1;overflow-y:auto;background:rgba(0,0,0,.3);padding:8px 12px;font-family:'Cascadia Code','Fira Code','Consolas',monospace;font-size:13px}
+.terminal-output{color:rgba(255,255,255,.8);font-size:13px;line-height:1.4}
+.terminal-output .prompt{color:#60cdff}
+.terminal-input-line{display:flex;align-items:center;gap:6px;margin-top:4px}
+.terminal-input-line .prompt{color:#60cdff;white-space:pre;font-size:13px}
+.terminal-input{flex:1;background:transparent;border:none;color:#fff;font-family:inherit;font-size:13px;outline:none}
+
+/* BROWSER */
+.browser-tabs{display:flex;align-items:center;padding:4px 6px 0;background:rgba(0,0,0,.08);flex-shrink:0}
+.browser-tab{padding:4px 12px;font-size:11px;color:rgba(255,255,255,.5);border-radius:6px 6px 0 0;cursor:pointer}
+.browser-tab.active{color:#fff;background:rgba(255,255,255,.04)}
+.browser-tab.new-tab{padding:4px 8px;font-size:14px}
+.browser-nav{padding:4px 6px;background:rgba(0,0,0,.05);flex-shrink:0}
+.browser-url{width:100%;height:28px;padding:0 10px;border:none;border-radius:6px;background:rgba(255,255,255,.06);color:#fff;font-size:12px;outline:none}
+.browser-content{flex:1;padding:16px;overflow-y:auto;color:rgba(255,255,255,.7);font-size:13px}
+.browser-content h2{font-size:18px;font-weight:500;color:#fff;margin-bottom:8px}
+.fake-img{width:100%;height:120px;background:linear-gradient(135deg,rgba(96,205,255,.08),rgba(167,139,250,.08));border-radius:8px;display:flex;align-items:center;justify-content:center;margin:8px 0;font-size:14px;color:rgba(255,255,255,.3)}
+
+/* NOTEPAD */
+.notepad-toolbar{display:flex;align-items:center;padding:4px 8px;background:rgba(0,0,0,.06);flex-shrink:0}
+.notepad-toolbar button{background:rgba(255,255,255,.06);border:none;border-radius:4px;padding:2px 8px;color:rgba(255,255,255,.6);cursor:pointer;font-size:11px}
+.notepad-edit{flex:1;border:none;background:rgba(0,0,0,.08);padding:10px 12px;color:#fff;font-size:14px;font-family:'Consolas','Courier New',monospace;outline:none;resize:none}
+.notepad-status{display:flex;justify-content:space-between;padding:3px 10px;font-size:10px;color:rgba(255,255,255,.3);background:rgba(0,0,0,.06);flex-shrink:0}
+
+/* DOCTOR GAME */
+.doctor-scene{padding:12px;display:flex;flex-direction:column;gap:8px;height:100%}
+.doctor-patient{background:rgba(255,255,255,.03);border-radius:10px;padding:12px}
+.doctor-patient h3{font-size:15px;color:#fff;font-weight:400}
+.doctor-patient p{font-size:12px;color:rgba(255,255,255,.5);margin-top:4px}
+.doctor-tools{display:flex;flex-wrap:wrap;gap:6px}
+.doctor-tool{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:8px 12px;cursor:pointer;font-size:12px;color:rgba(255,255,255,.7);transition:all .15s}
+.doctor-tool:hover{background:rgba(96,205,255,.1);border-color:rgba(96,205,255,.2);color:#60cdff}
+.doctor-result{font-size:12px;color:rgba(255,255,255,.5);padding:8px;font-style:italic}
+
+/* PUZZLE */
+.game-container{padding:12px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.game-grid{display:grid;gap:4px}
+.game-cell{width:60px;height:60px;background:rgba(96,205,255,.08);border:1px solid rgba(96,205,255,.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;cursor:pointer;transition:background .15s}
+.game-cell:hover{background:rgba(96,205,255,.15)}
+.game-cell.empty{background:transparent;border-color:transparent;cursor:default}
+.game-score{font-size:12px;color:rgba(255,255,255,.4)}
+.game-btn{background:rgba(96,205,255,.12);border:none;border-radius:6px;padding:6px 16px;color:#60cdff;font-size:12px;cursor:pointer}
+
+/* STORE */
+.store-content{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:12px}
+.store-banner{background:linear-gradient(135deg,rgba(96,205,255,.12),rgba(130,80,220,.12));border-radius:10px;padding:16px}
+.store-banner h3{font-size:16px;font-weight:500;color:#fff}
+.store-banner p{font-size:12px;color:rgba(255,255,255,.6)}
+.store-section h3{font-size:14px;font-weight:500;color:rgba(255,255,255,.8);margin-bottom:8px}
+.store-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+.store-card{background:rgba(255,255,255,.03);border-radius:8px;padding:10px}
+.store-card h4{font-size:12px;color:rgba(255,255,255,.9)}
+.store-card .rating{font-size:10px;color:rgba(255,255,255,.4)}
+.store-get-btn{background:rgba(96,205,255,.12);border:none;border-radius:4px;padding:3px 10px;color:#60cdff;font-size:10px;cursor:pointer;margin-top:4px}
+
+/* SCREENSAVER */
+.screensaver{position:absolute;inset:0;z-index:9997;pointer-events:none;opacity:0;transition:opacity 1s}
+.screensaver.active{opacity:1}
+
+/* ACTION CENTER */
+.action-center{position:absolute;top:0;right:0;bottom:48px;z-index:98;width:320px;background:rgba(25,25,40,.88);backdrop-filter:blur(35px) saturate(1.3);border-left:1px solid rgba(255,255,255,.07);display:none;flex-direction:column;padding:16px;animation:acOpen .25s ease}
+@keyframes acOpen{0%{transform:translateX(100%)}100%{transform:translateX(0)}}
+.action-center.open{display:flex}
+.ac-header{font-size:14px;font-weight:500;color:#fff;margin-bottom:12px}
+.ac-buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px}
+.ac-btn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px;background:rgba(255,255,255,.05);border-radius:10px;cursor:pointer;color:rgba(255,255,255,.8);font-size:10px;transition:background .15s}
+.ac-btn:hover{background:rgba(255,255,255,.1)}
+.ac-btn svg{width:18px;height:18px}
+.ac-notifs{flex:1;overflow-y:auto;border-top:1px solid rgba(255,255,255,.06);padding-top:8px}
+.ac-notif-item{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.ac-n-title{font-size:12px;color:rgba(255,255,255,.8)}
+.ac-n-text{font-size:11px;color:rgba(255,255,255,.4);margin-top:2px}
+
+/* VIDEO PLAYER */
+.video-player{display:flex;flex-direction:column;height:100%;background:#000}
+.video-canvas{flex:1;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1a1a2e,#16213e);position:relative;overflow:hidden}
+.video-placeholder{font-size:64px;color:rgba(255,255,255,.15);cursor:pointer;transition:color .3s,transform .3s}
+.video-placeholder:hover{color:rgba(255,255,255,.4);transform:scale(1.1)}
+.video-controls{display:flex;align-items:center;gap:6px;padding:6px 10px;background:rgba(0,0,0,.6)}
+.video-info{padding:8px 12px;background:rgba(0,0,0,.4)}
+.video-title{font-size:13px;color:rgba(255,255,255,.9)}
+.video-desc{font-size:10px;color:rgba(255,255,255,.4)}
+
+/* MUSIC PLAYER */
+.player-cover-wrap{display:flex;align-items:center;justify-content:center;padding:20px}
+.player-cover{font-size:64px;width:120px;height:120px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(96,205,255,.12),rgba(167,139,250,.12));border-radius:16px}
+.player-info{text-align:center;padding:0 12px 8px}
+.player-song-title{font-size:14px;font-weight:500;color:rgba(255,255,255,.9)}
+.player-song-artist{font-size:11px;color:rgba(255,255,255,.4)}
+.player-controls{display:flex;align-items:center;gap:6px;padding:6px 10px}
+.player-btn{background:rgba(255,255,255,.06);border:none;border-radius:6px;width:32px;height:32px;cursor:pointer;color:#fff;font-size:14px;display:flex;align-items:center;justify-content:center}
+.player-btn:hover{background:rgba(255,255,255,.12)}
+.play-btn{width:40px;height:40px;font-size:18px;background:rgba(96,205,255,.15)}
+.play-btn:hover{background:rgba(96,205,255,.25)}
+.player-progress{flex:1;height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden}
+.player-progress-fill{height:100%;background:linear-gradient(90deg,#60cdff,#a78bfa);border-radius:2px;transition:width .3s}
+.player-time{font-size:10px;color:rgba(255,255,255,.4);min-width:70px;text-align:right}
+.player-playlist{border-top:1px solid rgba(255,255,255,.06);flex:1;overflow-y:auto;padding:4px}
+.pl-header{font-size:10px;color:rgba(255,255,255,.4);padding:4px 8px;text-transform:uppercase;letter-spacing:.5px}
+.pl-item{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;cursor:pointer;font-size:12px;color:rgba(255,255,255,.65)}
+.pl-item:hover{background:rgba(255,255,255,.06)}
+.pl-item.active{color:#60cdff;background:rgba(96,205,255,.08)}
+.pl-dur{margin-left:auto;font-size:10px;opacity:.5}
+
+/* PHOTO VIEWER */
+.img-viewer-toolbar{display:flex;align-items:center;gap:4px;padding:4px 8px;background:rgba(0,0,0,.1);flex-shrink:0}
+.img-viewer-toolbar button{background:rgba(255,255,255,.06);border:none;border-radius:5px;padding:4px 8px;color:rgba(255,255,255,.8);cursor:pointer;font-size:11px}
+.img-viewer-toolbar button:hover{background:rgba(255,255,255,.12)}
+.img-viewer-canvas{flex:1;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.2);overflow:hidden}
+.photo-img{max-width:100%;max-height:100%;object-fit:contain;border-radius:4px;transition:opacity .3s}
+
+/* EXPLORER */
+.exp-toolbar{display:flex;align-items:center;gap:4px;padding:4px 8px;background:rgba(0,0,0,.06);flex-shrink:0}
+.exp-toolbar .exp-path{flex:1;height:24px;padding:0 8px;border:none;border-radius:4px;background:rgba(255,255,255,.06);color:rgba(255,255,255,.8);font-size:11px;outline:none}
+.exp-sidebar{width:160px;background:rgba(0,0,0,.08);padding:6px;overflow-y:auto;flex-shrink:0;font-size:11px}
+.exp-sidebar-item{padding:5px 8px;border-radius:4px;cursor:pointer;color:rgba(255,255,255,.55);display:flex;align-items:center;gap:6px}
+.exp-sidebar-item:hover{background:rgba(255,255,255,.06)}
+.exp-sidebar-item.active{background:rgba(60,180,255,.12);color:#fff}
+.exp-grid{flex:1;padding:8px;overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:3px;align-content:start}
+.exp-grid .exp-item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 4px;border-radius:6px;cursor:pointer;color:rgba(255,255,255,.85);font-size:10px;text-align:center}
+.exp-grid .exp-item:hover{background:rgba(255,255,255,.06)}
+.exp-grid .exp-item svg{width:28px;height:28px}
+.exp-status{display:flex;justify-content:space-between;padding:2px 10px;font-size:10px;color:rgba(255,255,255,.35);background:rgba(0,0,0,.06);flex-shrink:0}
+</style>
+</head>
+<body>
+<div class="monitor">
+<div class="screen">
+
+<div class="wallpaper" id="wallpaper"></div>
+
+<!-- BOOT SCREEN -->
+<div class="boot-screen" id="bootScreen">
+  <div class="boot-logo"><svg viewBox="0 0 80 80"><rect x="8" y="8" width="28" height="28" rx="4" fill="#60cdff" opacity=".8"/><rect x="44" y="8" width="28" height="28" rx="4" fill="#a78bfa" opacity=".8"/><rect x="8" y="44" width="28" height="28" rx="4" fill="#a78bfa" opacity=".8"/><rect x="44" y="44" width="28" height="28" rx="4" fill="#60cdff" opacity=".8"/></svg></div>
+  <div class="boot-spinner"></div>
+  <div class="boot-bar-wrap"><div class="boot-bar" id="bootBar"></div></div>
+  <div class="boot-text" id="bootText">Загрузка Windows 11...</div>
+</div>
+
+<!-- LOCK SCREEN -->
+<div class="lock-screen" id="lockScreen">
+  <div class="lock-weather"><div class="temp" id="lockTemp">+22°</div><div class="desc">Солнечно</div></div>
+  <div class="lock-time" id="lockTime">12:00</div>
+  <div class="lock-date" id="lockDate">Понедельник, 7 июля</div>
+  <div class="lock-icon"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 11V7a4 4 0 018 0v4" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="16" r="1.5" fill="currentColor"/></svg></div>
+  <input class="lock-input" id="lockInput" type="password" placeholder="Пароль" maxlength="16" autocomplete="off">
+  <div class="lock-hint" id="lockHint">Нажмите Enter (пароль: 1234 или пусто)</div>
+  <div class="lock-notif"><svg viewBox="0 0 16 16" width="14" height="14"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="1"/><line x1="8" y1="5" x2="8" y2="9" stroke="currentColor" stroke-width="1"/><circle cx="8" cy="11" r=".6" fill="currentColor"/></svg><span>Нет новых уведомлений</span></div>
+</div>
+
+<!-- WIDGETS -->
+<div class="desktop-widgets" id="widgets">
+  <div class="widget-card">
+    <div class="w-title">Погода</div>
+    <div class="w-value" id="weatherTemp">+22°</div>
+    <div class="w-sub" id="weatherDesc">Солнечно</div>
+  </div>
+  <div class="widget-card">
+    <div class="w-title">Календарь</div>
+    <div class="w-value" id="widgetDate">14</div>
+    <div class="w-sub" id="widgetMonth">Июль</div>
+  </div>
+  <div class="widget-card" id="notesWidget" style="display:none">
+    <div class="w-title">Заметки</div>
+    <div class="w-sub" id="notesPreview">ПКМ > Заметка</div>
+  </div>
+</div>
+
+<!-- DESKTOP -->
+<div class="desktop" id="desktop"></div>
+
+<!-- CONTEXT MENU -->
+<div class="context-menu" id="contextMenu">
+  <div class="ctx-item" onclick="hideContextMenu();showToast('Персонализация')"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.5" fill="none" stroke="currentColor" stroke-width="1"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M2.5 2.5l1.5 1.5M12 12l1.5 1.5M2.5 13.5l1.5-1.5M12 4l1.5-1.5" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>Персонализация</div>
+  <div class="ctx-divider"></div>
+  <div class="ctx-item" onclick="hideContextMenu();createWindow('explorer')"><svg viewBox="0 0 16 16"><path d="M1 6l3.5-2.5H8l2.5 2.5H5l-4 4V6z" fill="none" stroke="currentColor" stroke-width="1"/><rect x="3" y="6" width="12" height="8" rx="1" fill="none" stroke="currentColor" stroke-width="1"/></svg>Проводник</div>
+  <div class="ctx-item" onclick="hideContextMenu();cycleWallpaper()"><svg viewBox="0 0 16 16"><rect x="1" y="2" width="14" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1"/><circle cx="6" cy="7" r="1.5" fill="none" stroke="currentColor" stroke-width="1"/><path d="M1 11l4-3 3 3 3-2 4 3" fill="none" stroke="currentColor" stroke-width="1"/></svg>Сменить обои</div>
+  <div class="ctx-divider"></div>
+  <div class="ctx-item" onclick="hideContextMenu();sortDesktopIcons()"><svg viewBox="0 0 16 16"><line x1="2" y1="4" x2="14" y2="4" stroke="currentColor" stroke-width="1"/><line x1="2" y1="8" x2="14" y2="8" stroke="currentColor" stroke-width="1"/><line x1="2" y1="12" x2="14" y2="12" stroke="currentColor" stroke-width="1"/></svg>Сортировка</div>
+  <div class="ctx-divider"></div>
+  <div class="ctx-item" onclick="hideContextMenu();createWindow('notepad')"><svg viewBox="0 0 16 16"><rect x="2" y="1" width="12" height="14" rx="1.5" fill="none" stroke="currentColor" stroke-width="1"/><line x1="5" y1="5" x2="11" y2="5" stroke="currentColor" stroke-width=".8"/></svg>Создать > Текст</div>
+  <div class="ctx-item" onclick="hideContextMenu();showBSOD()"><svg viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1"/><line x1="5" y1="6" x2="11" y2="6" stroke="currentColor" stroke-width=".8"/></svg>BSOD (шутка)</div>
+</div>
+
+<!-- NOTIFICATION -->
+<div class="notification" id="notification">
+  <button class="notif-close" onclick="hideNotification()">?</button>
+  <div class="notif-header"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="1"/><line x1="8" y1="5" x2="8" y2="9" stroke="currentColor" stroke-width="1"/><circle cx="8" cy="11" r=".6" fill="currentColor"/></svg><span>Уведомление</span></div>
+  <div class="notif-text" id="notifText">Система готова.</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- SCREENSAVER -->
+<canvas class="screensaver" id="screensaver"></canvas>
+
+<!-- ACTION CENTER -->
+<div class="action-center" id="actionCenter">
+  <div class="ac-header">Центр уведомлений</div>
+  <div class="ac-buttons">
+    <div class="ac-btn" onclick="showToast('Wi-Fi')"><svg viewBox="0 0 16 16"><path d="M2 7c2-2 4-3 6-3s4 1 6 3" fill="none" stroke="currentColor" stroke-width="1.2"/><circle cx="8" cy="12.5" r="1" fill="currentColor"/></svg><span>Wi-Fi</span></div>
+    <div class="ac-btn" onclick="showToast('Bluetooth')"><svg viewBox="0 0 16 16"><path d="M5 1l6 5-6 5V1zM5 11l6 5-6-5z" fill="none" stroke="currentColor" stroke-width="1"/></svg><span>Bluetooth</span></div>
+    <div class="ac-btn" onclick="cycleWallpaper()"><svg viewBox="0 0 16 16"><rect x="1" y="2" width="14" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1"/></svg><span>Обои</span></div>
+    <div class="ac-btn" onclick="showToast('Ночной свет')"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="1"/><path d="M8 2a6 6 0 000 12V2z" fill="currentColor" opacity=".3"/></svg><span>Ночной свет</span></div>
+    <div class="ac-btn" onclick="showToast('Громкость')"><svg viewBox="0 0 16 16"><path d="M4 5l4-3v12l-4-3H2V5h2z" fill="none" stroke="currentColor" stroke-width="1"/></svg><span>Громкость</span></div>
+    <div class="ac-btn" onclick="showBSOD()"><svg viewBox="0 0 16 16"><path d="M8 1v7M5 3a6 6 0 106 0" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>Выкл</span></div>
+  </div>
+  <div class="ac-notifs" id="acNotifs">
+    <div class="ac-notif-item"><div class="ac-n-title">Система</div><div class="ac-n-text">Всё работает отлично</div></div>
+    <div class="ac-notif-item"><div class="ac-n-title">Погода</div><div class="ac-n-text">Солнечно, +22°C</div></div>
+  </div>
+</div>
+
+<!-- BSOD -->
+<div class="bsod-overlay" id="bsodOverlay">
+  <div class="sad-face">:(</div>
+  <h2>Windows 11 столкнулась с проблемой</h2>
+  <p>Это просто шутка — ваша система в порядке.</p>
+  <div class="error-code">STOP: 0x000000DE</div>
+  <div class="progress-ring"><div></div></div>
+  <p style="font-size:12px;opacity:.4">Сбор сведений...</p>
+  <button class="bsod-close" onclick="hideBSOD()">Вернуться ></button>
+</div>
+
+<!-- POWER MENU -->
+<div class="power-menu" id="powerMenu">
+  <div class="power-item" onclick="hidePowerMenu();showToast('Выключение...');setTimeout(()=>showBSOD(),600)"><svg viewBox="0 0 18 18"><path d="M9 2v7M5.5 4.5a6 6 0 107 0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Завершение</div>
+  <div class="power-item" onclick="hidePowerMenu();showToast('Перезагрузка...')"><svg viewBox="0 0 18 18"><path d="M9 2a7 7 0 11-4.5 12.3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M9 2v3H6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>Перезагрузка</div>
+  <div class="power-item" onclick="hidePowerMenu();showToast('Режим сна')"><svg viewBox="0 0 18 18"><circle cx="9" cy="9" r="6" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M9 5v4l3 2" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>Сон</div>
+</div>
+
+<!-- START MENU -->
+<div class="start-menu" id="startMenu">
+  <input class="start-search" id="startSearch" placeholder="Поиск..." oninput="filterApps(this.value)">
+  <div class="pinned-header"><span>Закреплённые</span><span style="font-size:10px;opacity:.4">Все ›</span></div>
+  <div class="pinned-grid" id="pinnedGrid">
+    <div class="pinned-app" onclick="hideStartMenu();createWindow('browser')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>Edge</span></div>
+    <div class="pinned-app" onclick="hideStartMenu();createWindow('notepad')"><svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2" fill="none" stroke="currentColor" stroke-width="1.2"/><line x1="7" y1="7" x2="17" y2="7" stroke="currentColor" stroke-width=".8"/></svg><span>Блокнот</span></div>
+    <div class="pinned-app" onclick="hideStartMenu();createWindow('calculator')"><svg viewBox="0 0 24 24"><rect x="3" y="2" width="18" height="20" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>Калькулятор</span></div>
+    <div class="pinned-app" onclick="hideStartMenu();createWindow('terminal')"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M6 10l3 2.5L6 15" fill="none" stroke="currentColor" stroke-width="1"/></svg><span>Терминал</span></div>
+    <div class="pinned-app" onclick="hideStartMenu();createWindow('explorer')"><svg viewBox="0 0 24 24"><path d="M2 8l5-4h7l4 4h4v10a2 2 0 01-2 2H4a2 2 0 01-2-2V8z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>Проводник</span></div>
+    <div class="pinned-app" onclick="hideStartMenu();createWindow('store')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>Microsoft Store</span></div>
+    <div class="pinned-app" onclick="hideStartMenu();createWindow('settings')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg><span>Параметры</span></div>
+    <div class="pinned-app" onclick="hideStartMenu();createWindow('mediaplayer')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M10 8l6 4-6 4V8z" fill="currentColor" opacity=".6"/></svg><span>Музыка</span></div>
+    <div class="pinned-app" onclick="hideStartMenu();createWindow('imageviewer')"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>Фото</span></div>
+    <div class="pinned-app" onclick="hideStartMenu();createWindow('doctorgame')"><svg viewBox="0 0 24 24"><circle cx="12" cy="6" r="3" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M9 14h6l-2 8h-2l-2-8z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>Чат докторов</span></div>
+    <div class="pinned-app" onclick="hideStartMenu();createWindow('puzzle')"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="3" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>Пятнашки</span></div>
+    <div class="pinned-app" onclick="hideStartMenu();createWindow('video')"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>Кино и ТВ</span></div>
+  </div>
+  <div class="recommended-header"><span>Рекомендуется</span></div>
+  <div class="recommended-list" id="recommendedList" style="flex:1;overflow-y:auto">
+    <div class="recommended-item" onclick="hideStartMenu()"><svg viewBox="0 0 18 18"><rect x="2" y="2" width="14" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1"/></svg>Отчёт Q2 2026.docx<span class="meta">2ч</span></div>
+    <div class="recommended-item" onclick="hideStartMenu()"><svg viewBox="0 0 18 18"><rect x="2" y="2" width="14" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1"/></svg>README.md<span class="meta">Вчера</span></div>
+  </div>
+  <div class="profile-section">
+    <div class="profile-avatar">U</div>
+    <div class="profile-name">Пользователь</div>
+    <div class="profile-actions">
+      <button onclick="hideStartMenu();createWindow('settings')"><svg viewBox="0 0 14 14" width="12" height="12"><circle cx="7" cy="7" r="2" fill="none" stroke="currentColor" stroke-width="1"/><path d="M7 1v1.5M7 11.5V13M1 7h2.5M10.5 7H13" fill="none" stroke="currentColor" stroke-width=".8" stroke-linecap="round"/></svg></button>
+      <button onclick="hideStartMenu();document.getElementById('powerMenu').classList.toggle('open')"><svg viewBox="0 0 14 14" width="12" height="12"><path d="M7 1v6M4.5 3a5 5 0 105 0" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></button>
+    </div>
+  </div>
+</div>
+
+<!-- TASKBAR -->
+<div class="taskbar">
+  <div class="taskbar-left">
+    <button class="start-btn" id="startBtn" onclick="toggleStartMenu()"><svg viewBox="0 0 20 20" width="16" height="16"><rect x="2" y="2" width="7" height="7" rx="1" fill="currentColor"/><rect x="11" y="2" width="7" height="7" rx="1" fill="currentColor"/><rect x="2" y="11" width="7" height="7" rx="1" fill="currentColor"/><rect x="11" y="11" width="7" height="7" rx="1" fill="currentColor"/></svg></button>
+  </div>
+  <div class="taskbar-center" id="taskbarCenter">
+    <button class="taskbar-app" data-app="browser" onclick="toggleWindow('browser')"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="1.3"/></svg></button>
+    <button class="taskbar-app" data-app="explorer" onclick="toggleWindow('explorer')"><svg viewBox="0 0 20 20"><path d="M2 7l4-3h5l3 3h4v7a1.5 1.5 0 01-1.5 1.5h-13A1.5 1.5 0 012 14V7z" fill="none" stroke="currentColor" stroke-width="1.3"/></svg></button>
+    <button class="taskbar-app" data-app="notepad" onclick="toggleWindow('notepad')"><svg viewBox="0 0 20 20"><rect x="3" y="1" width="14" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="1.3"/></svg></button>
+    <button class="taskbar-app" data-app="calculator" onclick="toggleWindow('calculator')"><svg viewBox="0 0 20 20"><rect x="2" y="1" width="16" height="18" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.3"/></svg></button>
+    <button class="taskbar-app" data-app="terminal" onclick="toggleWindow('terminal')"><svg viewBox="0 0 20 20"><rect x="2" y="3" width="16" height="14" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.3"/></svg></button>
+    <button class="taskbar-app" data-app="settings" onclick="toggleWindow('settings')"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="2.5" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M10 1v2.5M10 16.5V19" fill="none" stroke="currentColor" stroke-width=".8" stroke-linecap="round"/></svg></button>
+    <button class="taskbar-app" data-app="store" onclick="toggleWindow('store')"><svg viewBox="0 0 20 20"><rect x="3" y="3" width="14" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></button>
+    <button class="taskbar-app" data-app="video" onclick="toggleWindow('video')"><svg viewBox="0 0 20 20"><rect x="2" y="5" width="16" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></button>
+  </div>
+  <div class="taskbar-right" id="tray">
+    <div class="tray-item" onclick="showNotification('RU')" style="font-size:10px;font-weight:600">RU</div>
+    <div class="tray-item" onclick="showNotification('Wi-Fi')"><svg viewBox="0 0 16 16"><path d="M2 7c2-2 4-3 6-3s4 1 6 3" fill="none" stroke="currentColor" stroke-width="1.2"/><circle cx="8" cy="12.5" r="1" fill="currentColor"/></svg></div>
+    <div class="tray-item" onclick="showNotification('Громкость: 70%')"><svg viewBox="0 0 16 16"><path d="M4 5l4-3v12l-4-3H2V5h2z" fill="none" stroke="currentColor" stroke-width="1"/><path d="M10 5.5c.5.5.8 1.5.8 2.5" fill="none" stroke="currentColor" stroke-width="1"/></svg></div>
+    <div class="tray-item" onclick="showNotification('Батарея: 85%')"><svg viewBox="0 0 16 16"><rect x="1" y="5" width="11" height="6" rx="1.5" fill="none" stroke="currentColor" stroke-width="1"/><rect x="12" y="7" width="1.5" height="2" rx=".5" fill="currentColor"/></svg></div>
+    <div class="tray-item notif-icon" onclick="toggleActionCenter()"><svg viewBox="0 0 16 16"><path d="M8 2a4 4 0 00-4 4v3l-1 2h10l-1-2V6a4 4 0 00-4-4z" fill="none" stroke="currentColor" stroke-width="1"/></svg></div>
+    <div class="tray-clock" id="clock" onclick="toggleActionCenter()"><div class="time" id="clockTime">12:00</div><div class="date" id="clockDate">Пн, 1 янв</div></div>
+    <div class="tray-item" onclick="document.getElementById('powerMenu').classList.toggle('open')"><svg viewBox="0 0 16 16"><path d="M8 1v7M5 3a6 6 0 106 0" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+  </div>
+</div>
+
+<div id="windowsContainer"></div>
+</div></div>
+
+<script>
+// ============= FILE SYSTEM =============
+const fs = {
+  '':{'Этот компьютер':{t:'f','i':'pc'},'Корзина':{t:'f','i':'trash'}},
+  'Документы':{'Отчёт Q2 2026.docx':{t:'f',s:'24КБ',i:'word'},'Презентация.pptx':{t:'f',s:'2.3МБ',i:'ppt'},'Бюджет.xlsx':{t:'f',s:'156КБ',i:'excel'},'README.md':{t:'f',s:'3КБ',i:'text'},'Письмо.txt':{t:'f',s:'1КБ',i:'text'},'Резюме.pdf':{t:'f',s:'420КБ',i:'pdf'}},
+  'Изображения':{'Отпуск.jpg':{t:'f',s:'3.2МБ',i:'image'},'Котик.png':{t:'f',s:'1.8МБ',i:'image'},'Закат.gif':{t:'f',s:'2.1МБ',i:'image'},'Скриншот_01.png':{t:'f',s:'890КБ',i:'image'},'Градиент.webp':{t:'f',s:'320КБ',i:'image'}},
+  'Музыка':{'Lofi_Beats.mp3':{t:'f',s:'5.6МБ',i:'music'},'Piano.wav':{t:'f',s:'12.3МБ',i:'music'},'Summer.flac':{t:'f',s:'28.1МБ',i:'music'},'Podcast.mp3':{t:'f',s:'45МБ',i:'music'}},
+  'Видео':{'Vlog.mp4':{t:'f',s:'156МБ',i:'video'},'Tutorial.avi':{t:'f',s:'89МБ',i:'video'},'Game.mkv':{t:'f',s:'2.3ГБ',i:'video'}},
+  'Загрузки':{'driver.exe':{t:'f',s:'12МБ',i:'exe'},'editor.msi':{t:'f',s:'45МБ',i:'exe'},'manual.pdf':{t:'f',s:'2МБ',i:'pdf'},'pack.zip':{t:'f',s:'156МБ',i:'zip'}},
+  'Игры':{'Казуальные':{t:'d'},'Головоломки':{t:'d'},'Симуляторы':{t:'d'},'Solitaire.lnk':{t:'f',s:'2КБ',i:'lnk'}},
+  'Проекты':{'Веб-приложение':{t:'d'},'Курсовая':{t:'d'},'Хобби_3D':{t:'d'},'todo.txt':{t:'f',s:'1КБ',i:'text'}},
+  'Архив':{'2023':{t:'d'},'2024':{t:'d'},'2025':{t:'d'},'Фото.zip':{t:'f',s:'890МБ',i:'zip'},'Backup.7z':{t:'f',s:'2.1ГБ',i:'zip'}},
+  'Temp':{'tmp_7f3a.tmp':{t:'f',s:'34КБ',i:'tmp'},'cache.dat':{t:'f',s:'128КБ',i:'tmp'},'~$temp.txt':{t:'f',s:'0КБ',i:'tmp'}},
+  'OneDrive':{'Рабочие':{t:'d'},'Фото':{t:'d'},'doc.docx':{t:'f',s:'45КБ',i:'word'},'notes.txt':{t:'f',s:'2КБ',i:'text'}},
+  'Скриншоты':{'Screenshot_2026-07-01.png':{t:'f',s:'890КБ',i:'image'},'Screenshot_2026-07-05.png':{t:'f',s:'1.2МБ',i:'image'}},
+  'Игра в доктора':{'Стетоскоп.png':{t:'f',s:'45КБ',i:'image'},'Халат.png':{t:'f',s:'67КБ',i:'image'},'Пациент_001.txt':{t:'f',s:'2КБ',i:'text'},'Рецепт.txt':{t:'f',s:'1КБ',i:'text'},'Таблетки.png':{t:'f',s:'23КБ',i:'image'},'Шприц.png':{t:'f',s:'31КБ',i:'image'}},
+  'Весёлые фото':{'Мем_кот.png':{t:'f',s:'256КБ',i:'image'},'Лицо.jpg':{t:'f',s:'180КБ',i:'image'},'Дети.jpg':{t:'f',s:'2.1МБ',i:'image'},'Котик.png':{t:'f',s:'1.5МБ',i:'image'},'Стикер.png':{t:'f',s:'45КБ',i:'image'},'Мем.gif':{t:'f',s:'890КБ',i:'image'}},
+  'Обои':{'Горы.jpg':{t:'f',s:'3.2МБ',i:'image'},'Космос.jpg':{t:'f',s:'4.1МБ',i:'image'},'Волны.jpg':{t:'f',s:'2.8МБ',i:'image'},'Аниме.png':{t:'f',s:'1.5МБ',i:'image'}},
+  'Шрифты':{'Custom.ttf':{t:'f',s:'156КБ',i:'font'},'Handwriting.otf':{t:'f',s:'89КБ',i:'font'},'Bold.otf':{t:'f',s:'234КБ',i:'font'}},
+  'Звуки':{'Startup.wav':{t:'f',s:'1.2МБ',i:'music'},'Notification.wav':{t:'f',s:'89КБ',i:'music'},'Error.wav':{t:'f',s:'45КБ',i:'music'},'Ring.mp3':{t:'f',s:'234КБ',i:'music'}},
+  'Темы':{'Тёмная.theme':{t:'f',s:'12КБ',i:'text'},'Светлая.theme':{t:'f',s:'12КБ',i:'text'}},
+  'Скрипты':{'backup.bat':{t:'f',s:'2КБ',i:'script'},'cleanup.ps1':{t:'f',s:'5КБ',i:'script'},'scraper.js':{t:'f',s:'8КБ',i:'script'}},
+  'Резервные копии':{'System_Backup.zip':{t:'f',s:'4.2ГБ',i:'zip'},'Docs_Backup.7z':{t:'f',s:'890МБ',i:'zip'},'Registry.reg':{t:'f',s:'45КБ',i:'text'}},
+  'Казуальные':{'Match3.exe':{t:'f',s:'45МБ',i:'exe'},'Candy.lnk':{t:'f',s:'2КБ',i:'lnk'}},
+  'Головоломки':{'Sudoku.exe':{t:'f',s:'12МБ',i:'exe'},'2048.lnk':{t:'f',s:'2КБ',i:'lnk'}},
+  'Симуляторы':{'Flight.lnk':{t:'f',s:'2КБ',i:'lnk'},'Farm.exe':{t:'f',s:'890МБ',i:'exe'}},
+  'Веб-приложение':{'index.html':{t:'f',s:'12КБ',i:'text'},'style.css':{t:'f',s:'45КБ',i:'text'},'app.js':{t:'f',s:'89КБ',i:'script'}},
+  'Курсовая':{'Тема.docx':{t:'f',s:'234КБ',i:'word'},'Источники.pdf':{t:'f',s:'1.2МБ',i:'pdf'},'Презентация.pptx':{t:'f',s:'3.4МБ',i:'ppt'}},
+  'Хобби_3D':{'Model.blend':{t:'f',s:'156МБ',i:'exe'},'Render.png':{t:'f',s:'4.5МБ',i:'image'}},
+  'Рабочие':{'contract.pdf':{t:'f',s:'890КБ',i:'pdf'},'notes.docx':{t:'f',s:'45КБ',i:'word'}},
+  'Фото':{'IMG_001.jpg':{t:'f',s:'3.2МБ',i:'image'},'IMG_002.jpg':{t:'f',s:'2.8МБ',i:'image'}},
+  '2023':{'alpha.zip':{t:'f',s:'456МБ',i:'zip'},'notes.txt':{t:'f',s:'12КБ',i:'text'}},
+  '2024':{'tax.pdf':{t:'f',s:'890КБ',i:'pdf'},'photos.zip':{t:'f',s:'1.2ГБ',i:'zip'}},
+  '2025':{'report.xlsx':{t:'f',s:'345КБ',i:'excel'},'backup.zip':{t:'f',s:'2.3ГБ',i:'zip'}}
+};
+const fi = {'pc':'<svg viewBox="0 0 28 28"><rect x="3" y="5" width="22" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>','trash':'<svg viewBox="0 0 28 28"><path d="M5 9h18v14a2 2 0 01-2 2H7a2 2 0 01-2-2V9z" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M10 9V6a2 2 0 012-2h4a2 2 0 012 2v3" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>','doctor':'<svg viewBox="0 0 28 28"><circle cx="14" cy="9" r="4" fill="none" stroke="#60cdff" stroke-width="1.2"/><path d="M10 17h8l-3 8h-2l-3-8z" fill="none" stroke="#60cdff" stroke-width="1.2"/></svg>','folder':'<svg viewBox="0 0 28 28"><path d="M2 8l5-4h7l4 4h8v12a2 2 0 01-2 2H4a2 2 0 01-2-2V8z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>','word':'<svg viewBox="0 0 28 28"><rect x="4" y="2" width="20" height="24" rx="3" fill="none" stroke="#2b5797" stroke-width="1.2"/></svg>','excel':'<svg viewBox="0 0 28 28"><rect x="4" y="2" width="20" height="24" rx="3" fill="none" stroke="#217346" stroke-width="1.2"/></svg>','ppt':'<svg viewBox="0 0 28 28"><rect x="4" y="2" width="20" height="24" rx="3" fill="none" stroke="#d24726" stroke-width="1.2"/></svg>','pdf':'<svg viewBox="0 0 28 28"><rect x="4" y="2" width="20" height="24" rx="3" fill="none" stroke="#e81123" stroke-width="1.2"/></svg>','text':'<svg viewBox="0 0 28 28"><rect x="4" y="2" width="20" height="24" rx="2" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>','image':'<svg viewBox="0 0 28 28"><rect x="2" y="5" width="24" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>','music':'<svg viewBox="0 0 28 28"><circle cx="18" cy="20" r="4" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M22 20V5l-10 2v13" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>','video':'<svg viewBox="0 0 28 28"><rect x="2" y="5" width="24" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>','zip':'<svg viewBox="0 0 28 28"><rect x="4" y="2" width="20" height="24" rx="2" fill="none" stroke="#a78bfa" stroke-width="1.2"/></svg>','exe':'<svg viewBox="0 0 28 28"><rect x="4" y="2" width="20" height="24" rx="3" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>','lnk':'<svg viewBox="0 0 28 28"><rect x="4" y="2" width="20" height="24" rx="3" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>','font':'<svg viewBox="0 0 28 28"><rect x="4" y="2" width="20" height="24" rx="2" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>','script':'<svg viewBox="0 0 28 28"><rect x="4" y="2" width="20" height="24" rx="3" fill="none" stroke="#4ec9b0" stroke-width="1.2"/></svg>','tmp':'<svg viewBox="0 0 28 28"><rect x="4" y="2" width="20" height="24" rx="2" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="1.2"/></svg>'};
+const folderList = ['Документы','Изображения','Музыка','Видео','Загрузки','Игры','Проекты','Архив','Temp','OneDrive','Скриншоты','Игра в доктора','Весёлые фото','Обои','Шрифты','Звуки','Темы','Скрипты','Резервные копии'];
+const wallpapers = [
+  'url(https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80)',
+  'url(https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1920&q=80)',
+  'url(https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1920&q=80)',
+  'url(https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?w=1920&q=80)',
+  'url(https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1920&q=80)',
+  'url(https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?w=1920&q=80)',
+  'url(https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1920&q=80)',
+  'url(https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1920&q=80)',
+  'url(https://images.unsplash.com/photo-1501854140801-50d01698950b?w=1920&q=80)',
+  'url(https://images.unsplash.com/photo-1518173946687-a36f968f7f9d?w=1920&q=80)'
+];
+const bootTexts = ['Загрузка Windows 11...','Инициализация драйверов...','Запуск служб...','Подготовка рабочего стола...','Почти готово...'];
+const state = {zIndex:50,windows:{},windowCount:0,wallpaperIndex:0,startOpen:false,lockUnlocked:false,bootDone:false,expPath:'Этот компьютер',notes:[]};
+
+// ============= BOOT =============
+function boot() {
+  const bar=document.getElementById('bootBar'),text=document.getElementById('bootText');
+  let p=0;
+  const iv=setInterval(()=>{
+    p+=Math.random()*12+3;if(p>100)p=100;
+    bar.style.width=p+'%';
+    text.textContent=bootTexts[Math.min(Math.floor(p/22),bootTexts.length-1)];
+    if(p>=100){clearInterval(iv);setTimeout(()=>{document.getElementById('bootScreen').classList.add('hidden');state.bootDone=true;initDesktop();setTimeout(showLockScreen,300);},400);}
+  },200);
+}
+// ============= LOCK SCREEN =============
+function showLockScreen() {
+  const ls=document.getElementById('lockScreen');ls.classList.remove('hidden');
+  updateLockClock();setInterval(updateLockClock,1000);
+  setTimeout(()=>document.getElementById('lockInput').focus(),500);
+}
+function updateLockClock() {
+  const n=new Date();const h=String(n.getHours()).padStart(2,'0'),m=String(n.getMinutes()).padStart(2,'0');
+  document.getElementById('lockTime').textContent=h+':'+m;
+  const d=['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
+  const mo=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+  document.getElementById('lockDate').textContent=d[n.getDay()]+', '+n.getDate()+' '+mo[n.getMonth()];
+}
+document.getElementById('lockInput').addEventListener('keydown',e=>{
+  if(e.key==='Enter'){const v=e.target.value;if(v==='1234'||v==='')unlockDesktop();else{document.getElementById('lockHint').textContent='Неверный пароль';e.target.value='';}}
+});
+function unlockDesktop(){document.getElementById('lockScreen').classList.add('hidden');  showNotification('Добро пожаловать!');
+  setTimeout(()=>{createWindow('browser');setTimeout(()=>createWindow('notepad'),200);setTimeout(()=>createWindow('terminal'),400);setTimeout(()=>createWindow('doctorgame'),600);},500);}
+
+// ============= CLOCK =============
+function updateClock(){
+  const n=new Date();const h=String(n.getHours()).padStart(2,'0'),m=String(n.getMinutes()).padStart(2,'0');
+  const d=['Вс','Пн','Вт','Ср','Чт','Пт','Сб'],mo=['янв','фев','мар','апр','мая','июн','июл','авг','сен','окт','ноя','дек'];
+  document.getElementById('clockTime').textContent=h+':'+m;
+  document.getElementById('clockDate').textContent=d[n.getDay()]+', '+n.getDate()+' '+mo[n.getMonth()];
+  document.getElementById('widgetDate').textContent=n.getDate();
+  document.getElementById('widgetMonth').textContent=mo[n.getMonth()];
+  // Weather rotation
+  const ws=['+22° Солнечно','+18° Облачно','+25° Ясно','+15° Дождь','+20° Ветрено'];
+  const wi=Math.floor(n.getMinutes()/12)%ws.length;
+  const wp=ws[wi].split(' ');
+  document.getElementById('weatherTemp').textContent=wp[0];
+  document.getElementById('weatherDesc').textContent=wp[1]||'';
+}
+updateClock();setInterval(updateClock,1000);
+
+// ============= TOAST & NOTIFICATION =============
+let toastTimeout;
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('open');clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>t.classList.remove('open'),2000);}
+let notifTimeout;
+function showNotification(msg){const n=document.getElementById('notification');document.getElementById('notifText').textContent=msg;n.classList.add('open');clearTimeout(notifTimeout);notifTimeout=setTimeout(hideNotification,3500);}
+function hideNotification(){document.getElementById('notification').classList.remove('open');}
+function showBSOD(){document.getElementById('bsodOverlay').classList.add('open');}
+function hideBSOD(){document.getElementById('bsodOverlay').classList.remove('open');}
+function hidePowerMenu(){document.getElementById('powerMenu').classList.remove('open');}
+
+// ============= WALLPAPER =============
+function cycleWallpaper(){state.wallpaperIndex=(state.wallpaperIndex+1)%wallpapers.length;document.getElementById('wallpaper').style.background=wallpapers[state.wallpaperIndex];document.getElementById('wallpaper').style.backgroundSize='cover';document.getElementById('wallpaper').style.backgroundPosition='center';hideContextMenu();}
+
+// ============= SCREENSAVER =============
+let screensaverTimer;
+function resetScreensaverTimer(){
+  const ss=document.getElementById('screensaver');
+  if(ss)ss.classList.remove('active');
+  clearTimeout(screensaverTimer);
+  screensaverTimer=setTimeout(activateScreensaver,30000);
+}
+function activateScreensaver(){
+  const canvas=document.getElementById('screensaver');
+  if(!canvas)return;
+  canvas.classList.add('active');
+  canvas.width=window.innerWidth;
+  canvas.height=window.innerHeight;
+  const ctx=canvas.getContext('2d');
+  const particles=[];
+  for(let i=0;i<60;i++){
+    particles.push({
+      x:Math.random()*canvas.width,
+      y:Math.random()*canvas.height,
+      vx:(Math.random()-0.5)*0.8,
+      vy:(Math.random()-0.5)*0.8,
+      r:Math.random()*3+1,
+      o:Math.random()*0.5+0.2,
+      hue:Math.random()*360
+    });
+  }
+  function animate(){
+    if(!canvas.classList.contains('active'))return;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0||p.x>canvas.width)p.vx*=-1;
+      if(p.y<0||p.y>canvas.height)p.vy*=-1;
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle='hsla('+p.hue+',80%,70%,'+p.o+')';
+      ctx.fill();
+    });
+    particles.forEach((a,i)=>{
+      particles.slice(i+1).forEach(b=>{
+        const dx=a.x-b.x,dy=a.y-b.y;
+        const dist=Math.sqrt(dx*dx+dy*dy);
+        if(dist<120){
+          ctx.beginPath();
+          ctx.moveTo(a.x,a.y);
+          ctx.lineTo(b.x,b.y);
+          ctx.strokeStyle='rgba(255,255,255,'+(1-dist/120)*0.15+')';
+          ctx.stroke();
+        }
+      });
+    });
+    requestAnimationFrame(animate);
+  }
+  animate();
+}
+document.addEventListener('mousemove',resetScreensaverTimer);
+document.addEventListener('click',resetScreensaverTimer);
+document.addEventListener('keydown',resetScreensaverTimer);
+setTimeout(resetScreensaverTimer,2000);
+
+// ============= DESKTOP =============
+function initDesktop(){
+  const dt=document.getElementById('desktop');dt.innerHTML='';
+  [['Этот компьютер','pc',()=>{state.expPath='Этот компьютер';createWindow('explorer')}],['Корзина','trash',()=>showToast('Корзина пуста')],['Чат докторов','doctor',()=>createWindow('doctorgame')]].forEach(([n,i,c])=>{
+    const el=document.createElement('div');el.className='desktop-icon';el.dataset.name=n;
+    el.innerHTML=fi[i]+'<span>'+n+'</span>';el.ondblclick=c;dt.appendChild(el);
+  });
+  folderList.forEach(f=>{
+    if(!fs[f])return;
+    const el=document.createElement('div');el.className='desktop-icon';el.dataset.name=f;
+    el.innerHTML=fi.folder+'<span>'+f+'</span>';
+    el.ondblclick=()=>{state.expPath=f;createWindow('explorer');};
+    dt.appendChild(el);
+  });
+}
+function sortDesktopIcons(){const dt=document.getElementById('desktop');const ic=Array.from(dt.querySelectorAll('.desktop-icon'));ic.sort((a,b)=>a.dataset.name.localeCompare(b.dataset.name));ic.forEach(i=>dt.appendChild(i));hideContextMenu();}
+
+// ============= CONTEXT MENU =============
+document.addEventListener('contextmenu',e=>{e.preventDefault();const m=document.getElementById('contextMenu');m.style.left=Math.min(e.clientX,window.innerWidth-240)+'px';m.style.top=Math.min(e.clientY,window.innerHeight-320)+'px';m.classList.add('open');});
+document.addEventListener('click',e=>{if(!e.target.closest('.context-menu'))hideContextMenu();if(!e.target.closest('.power-menu'))hidePowerMenu();});
+function hideContextMenu(){document.getElementById('contextMenu').classList.remove('open');}
+
+// ============= START MENU =============
+function toggleStartMenu(){state.startOpen?hideStartMenu():openStartMenu();}
+function openStartMenu(){document.getElementById('startMenu').classList.add('open');document.getElementById('startSearch').focus();state.startOpen=true;}
+function hideStartMenu(){document.getElementById('startMenu').classList.remove('open');state.startOpen=false;}
+function filterApps(q){document.querySelectorAll('.pinned-app').forEach(el=>{const n=el.querySelector('span').textContent.toLowerCase();el.style.display=n.includes(q.toLowerCase())?'flex':'none';});}
+document.addEventListener('click',e=>{if(state.startOpen&&!e.target.closest('.start-menu')&&!e.target.closest('#startBtn'))hideStartMenu();});
+
+// ============= WINDOW TEMPLATES =============
+const wt={
+  browser:{title:'Microsoft Edge',w:680,h:420,i:'<svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="none" stroke="currentColor" stroke-width=".8"/></svg>'},
+  notepad:{title:'Блокнот',w:520,h:380,i:'<svg viewBox="0 0 14 14"><rect x="2" y="1" width="10" height="12" rx="1.5" fill="none" stroke="currentColor" stroke-width=".8"/></svg>'},
+  calculator:{title:'Калькулятор',w:300,h:400,i:'<svg viewBox="0 0 14 14"><rect x="1" y="1" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width=".8"/></svg>'},
+  terminal:{title:'Терминал',w:580,h:360,i:'<svg viewBox="0 0 14 14"><rect x="1" y="2" width="12" height="10" rx="2" fill="none" stroke="currentColor" stroke-width=".8"/></svg>'},
+  explorer:{title:'Проводник',w:640,h:450,i:'<svg viewBox="0 0 14 14"><path d="M1 5l3.5-2.5H9l2.5 2.5H5l-4 4V5z" fill="none" stroke="currentColor" stroke-width=".8"/></svg>'},
+  settings:{title:'Параметры',w:720,h:520,i:'<svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="2" fill="none" stroke="currentColor" stroke-width=".8"/></svg>'},
+  store:{title:'Microsoft Store',w:740,h:540,i:'<svg viewBox="0 0 14 14"><rect x="2" y="2" width="10" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width=".8"/></svg>'},
+  mediaplayer:{title:'Медиаплеер',w:420,h:320,i:'<svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="none" stroke="currentColor" stroke-width=".8"/></svg>'},
+  imageviewer:{title:'Просмотр фото',w:500,h:380,i:'<svg viewBox="0 0 14 14"><rect x="1" y="3" width="12" height="9" rx="1.5" fill="none" stroke="currentColor" stroke-width=".8"/></svg>'},
+  doctorgame:{title:'🏥 Чат докторов',w:520,h:560,i:'<svg viewBox="0 0 14 14"><circle cx="7" cy="4" r="2" fill="none" stroke="currentColor" stroke-width=".8"/></svg>'},
+  puzzle:{title:'Пятнашки',w:320,h:400,i:'<svg viewBox="0 0 14 14"><rect x="1" y="1" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width=".8"/></svg>'},
+  video:{title:'Кино и ТВ',w:640,h:420,i:'<svg viewBox="0 0 14 14"><rect x="1" y="3" width="12" height="9" rx="1.5" fill="none" stroke="currentColor" stroke-width=".8"/></svg>'}
+};
+// ============= WINDOW MANAGEMENT =============
+function createWindow(type){
+  const t=wt[type];if(!t)return;
+  const id=type+'_'+(state.windowCount++);
+  const c=document.getElementById('windowsContainer');
+  const bx=40+(state.windowCount%6)*28,by=30+(state.windowCount%6)*22;
+  const w=document.createElement('div');w.className='window focused';w.id='win_'+id;w.dataset.type=type;
+  w.style.width=t.w+'px';w.style.height=t.h+'px';
+  w.style.left=Math.min(bx,window.innerWidth-t.w-40)+'px';w.style.top=Math.min(by,window.innerHeight-t.h-70)+'px';
+  w.style.zIndex=++state.zIndex;
+  const tb=document.createElement('div');tb.className='win-titlebar';
+  tb.innerHTML='<div class="win-title">'+t.i+'<span>'+t.title+'</span></div><div class="win-controls"><button class="win-btn minimize" onclick="minWin(\''+id+'\')"><svg viewBox="0 0 8 8"><line x1="1.5" y1="4" x2="6.5" y2="4" stroke="currentColor" stroke-width="1"/></svg></button><button class="win-btn maximize" onclick="maxWin(\''+id+'\')"><svg viewBox="0 0 8 8"><rect x="1.5" y="1.5" width="5" height="5" rx=".5" fill="none" stroke="currentColor" stroke-width="1"/></svg></button><button class="win-btn close" onclick="closeWin(\''+id+'\')"><svg viewBox="0 0 8 8"><line x1="2" y1="2" x2="6" y2="6" stroke="currentColor" stroke-width="1"/><line x1="6" y1="2" x2="2" y2="6" stroke="currentColor" stroke-width="1"/></svg></button></div>';
+  w.appendChild(tb);
+  const ct=document.createElement('div');ct.className='win-content';ct.innerHTML=renderContent(type,id);w.appendChild(ct);
+  ['n','s','e','w','ne','nw','se','sw'].forEach(h=>{const e=document.createElement('div');e.className='resize-handle resize-'+h;e.addEventListener('mousedown',ev=>startResize(ev,id,h));w.appendChild(e);});
+  c.appendChild(w);state.windows[id]={el:w,type:type,minimized:false,maximized:false};
+  w.addEventListener('mousedown',()=>focusWin(id));tb.addEventListener('mousedown',e=>startDrag(e,id));
+  updateTaskbar();showToast('Открыт: '+t.title);
+  if(type==='terminal')initTerm(id);
+  return id;
+}
+
+function renderContent(type,id){
+  switch(type){
+    case 'browser': return '<div class="browser-tabs"><div class="browser-tab active"><span>Новая вкладка</span></div><div class="browser-tab new-tab">+</div></div><div class="browser-nav"><input class="browser-url" id="bUrl_'+id+'" value="https://www.bing.com" onkeydown="if(event.key===\'Enter\')showToast(\'Переход на \'+this.value)" style="width:100%"></div><div class="browser-content" id="bContent_'+id+'"><h2>Microsoft Edge</h2><p>Быстрый и безопасный браузер.</p><div class="fake-img">??? Демо-изображение</div><p>Введите URL для перехода.</p></div>';
+    case 'notepad': return '<div class="notepad-toolbar"><button onclick="document.getElementById(\'nEdit_'+id+'\').value=\'\'">Очистить</button><span style="margin-left:auto;font-size:10px;opacity:.4">Автосохранение ?</span></div><textarea class="notepad-edit" id="nEdit_'+id+'" placeholder="Ввод..." oninput="updateStats(\''+id+'\')">Привет, мир!\nЭто демонстрация Блокнота.</textarea><div class="notepad-status"><span>Готово</span><span id="nStats_'+id+'">Строк: 2</span></div>';
+    case 'calculator': return '<div class="calc-display"><div class="calc-expr" id="calcE_'+id+'"></div><div class="calc-result" id="calcR_'+id+'">0</div></div><div class="calc-buttons"><button class="calc-btn fn" onclick="cIn(\''+id+'\',\'C\')">C</button><button class="calc-btn fn" onclick="cIn(\''+id+'\',\'CE\')">CE</button><button class="calc-btn fn" onclick="cIn(\''+id+'\',\'%\')">%</button><button class="calc-btn op" onclick="cIn(\''+id+'\',\'/\')">?</button><button class="calc-btn num" onclick="cIn(\''+id+'\',\'7\')">7</button><button class="calc-btn num" onclick="cIn(\''+id+'\',\'8\')">8</button><button class="calc-btn num" onclick="cIn(\''+id+'\',\'9\')">9</button><button class="calc-btn op" onclick="cIn(\''+id+'\',\'*\')">?</button><button class="calc-btn num" onclick="cIn(\''+id+'\',\'4\')">4</button><button class="calc-btn num" onclick="cIn(\''+id+'\',\'5\')">5</button><button class="calc-btn num" onclick="cIn(\''+id+'\',\'6\')">6</button><button class="calc-btn op" onclick="cIn(\''+id+'\',\'-\')">?</button><button class="calc-btn num" onclick="cIn(\''+id+'\',\'1\')">1</button><button class="calc-btn num" onclick="cIn(\''+id+'\',\'2\')">2</button><button class="calc-btn num" onclick="cIn(\''+id+'\',\'3\')">3</button><button class="calc-btn op" onclick="cIn(\''+id+'\',\'+\')">+</button><button class="calc-btn fn" onclick="cIn(\''+id+'\',\'±\')">±</button><button class="calc-btn num" onclick="cIn(\''+id+'\',\'0\')">0</button><button class="calc-btn fn" onclick="cIn(\''+id+'\',\'.\')">.</button><button class="calc-btn equals" onclick="cIn(\''+id+'\',\'=\')">=</button></div>';
+    case 'terminal': return '<div class="terminal-header"><span>PowerShell</span></div><div class="terminal-body" id="termB_'+id+'"><div class="terminal-output" id="termO_'+id+'"><span class="prompt">Windows PowerShell</span><br><span style="opacity:.5">© Microsoft</span><br><br></div><div class="terminal-input-line"><span class="prompt" id="termP_'+id+'">PS C:\\Users\\User&gt;</span><input class="terminal-input" id="termI_'+id+'" onkeydown="tCmd(event,\''+id+'\')"></div></div>';
+    case 'explorer': return renderExplorer(id);
+    case 'settings': return renderSettings(id);
+    case 'store': return renderStore(id);
+    case 'mediaplayer': return renderMusicPlayer(id);
+    case 'imageviewer': return '<div class="img-viewer-toolbar"><button onclick="prevPhoto(\''+id+'\')">?</button><button onclick="nextPhoto(\''+id+'\')">?</button><span style="margin-left:8px;font-size:11px;color:rgba(255,255,255,.5)" id="photoCounter_'+id+'">1 / 9</span><button style="margin-left:auto" onclick="showToast(\'Слайд-шоу\')">? Слайд-шоу</button></div><div class="img-viewer-canvas" id="photoCanvas_'+id+'"><img class="photo-img" id="photoImg_'+id+'" src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&q=80" alt="" draggable="false"></div>';
+    case 'doctorgame': setTimeout(()=>startAutoChat(id),100); return renderDoctorChat(id);
+    case 'puzzle': return renderPuzzle(id);
+    case 'video': return '<div class="video-player"><div class="video-canvas" id="videoCanvas_'+id+'"><div class="video-placeholder">?</div></div><div class="video-controls"><button class="player-btn">?</button><button class="player-btn play-btn" onclick="toggleVideo(this,\''+id+'\')">?</button><button class="player-btn">?</button><div class="player-progress"><div class="player-progress-fill" style="width:0%"></div></div><span class="player-time">0:00 / 2:34</span></div><div class="video-info"><div class="video-title">Закат на море</div><div class="video-desc">4K · Природа · Релакс</div></div></div>';
+    default: return '<div style="padding:20px;color:#fff">Приложение</div>';
+  }
+}
+
+function focusWin(id){const w=state.windows[id];if(!w)return;w.el.style.zIndex=++state.zIndex;document.querySelectorAll('.window').forEach(x=>x.classList.remove('focused'));w.el.classList.add('focused');}
+let dragData=null;
+function startDrag(e,id){if(e.target.closest('.win-controls'))return;const w=state.windows[id];if(!w||w.maximized)return;focusWin(id);const r=w.el.getBoundingClientRect();dragData={id,ox:e.clientX-r.left,oy:e.clientY-r.top};e.preventDefault();}
+document.addEventListener('mousemove',e=>{if(!dragData)return;const w=state.windows[dragData.id];if(!w)return;w.el.style.left=Math.max(0,Math.min(e.clientX-dragData.ox,window.innerWidth-w.el.offsetWidth))+'px';w.el.style.top=Math.max(0,Math.min(e.clientY-dragData.oy,window.innerHeight-w.el.offsetHeight-48))+'px';});
+document.addEventListener('mouseup',()=>{dragData=null;});
+let resizeData=null;
+function startResize(e,id,dir){e.stopPropagation();const w=state.windows[id];if(!w||w.maximized)return;focusWin(id);const r=w.el.getBoundingClientRect();resizeData={id,dir,sx:e.clientX,sy:e.clientY,sw:r.width,sh:r.height,sl:r.left,st:r.top};e.preventDefault();}
+document.addEventListener('mousemove',e=>{if(!resizeData)return;const w=state.windows[resizeData.id];if(!w)return;const d=resizeData,dx=e.clientX-d.sx,dy=e.clientY-d.sy;let nw=d.sw,nh=d.sh,nl=d.sl,nt=d.st;if(d.dir.includes('e'))nw=Math.max(280,d.sw+dx);if(d.dir.includes('w')){nw=Math.max(280,d.sw-dx);nl=d.sl+(d.sw-nw);}if(d.dir.includes('s'))nh=Math.max(160,d.sh+dy);if(d.dir.includes('n')){nh=Math.max(160,d.sh-dy);nt=d.st+(d.sh-nh);}w.el.style.width=nw+'px';w.el.style.height=nh+'px';w.el.style.left=nl+'px';w.el.style.top=nt+'px';});
+document.addEventListener('mouseup',()=>{resizeData=null;});
+function minWin(id){const w=state.windows[id];if(!w)return;w.minimized=true;w.el.classList.add('minimized');updateTaskbar();}
+function maxWin(id){const w=state.windows[id];if(!w)return;if(w.maximized){w.maximized=false;w.el.classList.remove('maximized');}else{w.maximized=true;w.el.classList.add('maximized');}}
+function closeWin(id){const w=state.windows[id];if(!w)return;w.el.classList.add('closing');setTimeout(()=>{w.el.remove();delete state.windows[id];updateTaskbar();},200);}
+function toggleWindow(type){for(const[id,w]of Object.entries(state.windows)){if(w.type===type&&!w.el.classList.contains('closing')){if(w.minimized){w.minimized=false;w.el.classList.remove('minimized');focusWin(id);}else minWin(id);return;}}createWindow(type);}
+function updateTaskbar(){document.querySelectorAll('.taskbar-app').forEach(b=>{const t=b.dataset.app;let a=false;for(const[id,w]of Object.entries(state.windows)){if(w.type===t&&!w.el.classList.contains('closing')&&!w.minimized){a=true;break;}}b.classList.toggle('active',a);});}
+function toggleActionCenter(){document.getElementById('actionCenter').classList.toggle('open');}
+document.addEventListener('click',e=>{if(e.target.closest('.action-center')||e.target.closest('#clock')||e.target.closest('.notif-icon'))return;document.getElementById('actionCenter').classList.remove('open');});
+// ============= CALCULATOR =============
+function cIn(id,v){
+  const e=document.getElementById('calcE_'+id),r=document.getElementById('calcR_'+id);
+  let ex=e.textContent||'',res=r.textContent||'0';
+  if(v==='C'){e.textContent='';r.textContent='0';return;}
+  if(v==='CE'){r.textContent='0';return;}
+  if(v==='±'){if(res.startsWith('-'))res=res.slice(1);else if(res!=='0')res='-'+res;r.textContent=res;return;}
+  if(v==='='){try{const re=Function('"use strict";return ('+ex+res+')')();r.textContent=String(Number.isFinite(re)?re:'Error');e.textContent='';}catch(exx){r.textContent='Error';}return;}
+  if('+-*/%'.includes(v)){e.textContent=res+' '+v+' ';r.textContent='0';}
+  else{if(res==='0'&&v!=='.')res='';if(v==='.'&&res.includes('.'))return;res+=v;r.textContent=res;}
+}
+
+// ============= TERMINAL =============
+const termS={};
+function initTerm(id){termS[id]={cwd:'C:\\Users\\User',history:[],hi:0};}
+function tCmd(e,id){
+  if(e.key!=='Enter')return;
+  const inp=document.getElementById('termI_'+id),out=document.getElementById('termO_'+id),body=document.getElementById('termB_'+id);
+  const cmd=inp.value.trim();inp.value='';
+  const ts=termS[id];let res='';
+  if(cmd===''){}
+  else if(cmd.toLowerCase()==='cls'||cmd.toLowerCase()==='clear'){out.innerHTML='';}
+  else if(cmd.toLowerCase()==='help'){res='Команды: help, cls, dir, cd, echo, whoami, systeminfo, ipconfig, date, ver';}
+  else if(cmd.toLowerCase()==='dir'){res='07/07/2026  <DIR>  Documents\n07/07/2026  <DIR>  Downloads\n07/07/2026  2,560  program.py\n07/07/2026  1,024  notes.txt';}
+  else if(cmd.toLowerCase().startsWith('cd ')){const dir=cmd.slice(3).trim();if(dir==='..'){const p=ts.cwd.split('\\');if(p.length>1){p.pop();ts.cwd=p.join('\\');}}else ts.cwd+='\\'+dir;}
+  else if(cmd.toLowerCase()==='cd'){res=ts.cwd;}
+  else if(cmd.toLowerCase()==='whoami'){res='desktop\\user';}
+  else if(cmd.toLowerCase()==='ver'){res='Windows 11 Pro, 23H2, Build 22631';}
+  else if(cmd.toLowerCase()==='date'){res='Current date: '+new Date().toDateString();}
+  else if(cmd.toLowerCase()==='systeminfo'){res='OS: Windows 11 Pro\nRAM: 32 GB\nCPU: Intel i7-14700KF';}
+  else if(cmd.toLowerCase()==='ipconfig'){res='IPv4: 192.168.1.100\nSubnet: 255.255.255.0\nGateway: 192.168.1.1';}
+  else if(cmd.toLowerCase().startsWith('echo ')){res=cmd.slice(5);}
+  else{res='"'+cmd+'" не является командой.';}
+  const l1=document.createElement('div');l1.innerHTML='<span class="prompt">PS '+ts.cwd+'&gt;</span> '+cmd.replace(/</g,'&lt;');out.appendChild(l1);
+  if(res){const l2=document.createElement('div');l2.textContent=res;out.appendChild(l2);}
+  body.scrollTop=body.scrollHeight;
+  const il=out.parentElement.querySelector('.terminal-input-line');
+  if(il){il.querySelector('.prompt').textContent='PS '+ts.cwd+'>';il.querySelector('.terminal-input').focus();}
+}
+
+// ============= NOTEPAD =============
+function updateStats(id){
+  const ta=document.getElementById('nEdit_'+id),st=document.getElementById('nStats_'+id);
+  if(ta&&st){const l=ta.value.split('\n').length,c=ta.value.length;st.textContent='Строк: '+l+' | Символов: '+c;}
+}
+
+// ============= EXPLORER =============
+function renderExplorer(id){
+  const path=state.expPath||'Этот компьютер';
+  let items='';
+  if(path==='Этот компьютер'){
+    const allF=Object.keys(fs).filter(k=>k&&fs[k]&&Object.values(fs[k]).some(v=>v.t==='d'||v.t==='f')).sort();
+    items=allF.map(k=>{
+      const entry=fs[k];if(!entry)return'';
+      const hasFolder=Object.values(entry).some(v=>v.t==='d');
+      return'<div class="exp-item" ondblclick="state.expPath=\''+k+'\';showToast(\'Открытие: '+k+'\')">'+(hasFolder?fi.folder:fi.folder)+'<span>'+k+'</span><span class="exp-size">папка</span></div>';
+    }).join('');
+  } else {
+    const dir=fs[path];if(!dir){items='<div style="padding:12px;color:rgba(255,255,255,.4);font-size:13px">Папка пуста</div>';}
+    else {
+      items=Object.entries(dir).map(([name,data])=>{
+        const icon=data.t==='d'?fi.folder:(fi[data.i]||fi.text);
+        const size=data.t==='d'?'папка':(data.s||'');
+        return '<div class="exp-item" ondblclick="'+(data.t==='d'?'state.expPath=\''+name+'\';showToast(\'Открытие: '+name+'\')':'showToast(\'Открытие: '+name+'\')')+'">'+icon+'<span>'+name+'</span><span class="exp-size">'+size+'</span></div>';
+      }).join('');
+    }
+  }
+  return '<div style="display:flex;height:100%"><div class="exp-sidebar"><div class="exp-sidebar-item active" onclick="state.expPath=\'Этот компьютер\';showToast(\'Этот компьютер\')">?? Этот компьютер</div>'+Object.keys(fs).filter(k=>k&&fs[k]&&Object.values(fs[k]).some(v=>v.t==='d')).sort().map(k=>'<div class="exp-sidebar-item" onclick="state.expPath=\''+k+'\';showToast(\''+k+'\')">?? '+k+'</div>').join('')+'</div><div style="flex:1;display:flex;flex-direction:column"><div class="exp-toolbar"><button onclick="state.expPath=\'Этот компьютер\'">?</button><input class="exp-path" value="'+path+'" readonly></div><div class="exp-grid" id="expGrid_'+id+'">'+items+'</div></div></div>';
+}
+
+// ============= SETTINGS =============
+function renderSettings(id){
+  return '<div style="display:flex;height:100%"><div class="settings-sidebar" id="setSide_'+id+'">'+
+    ['Система','Персонализация','Сеть','Учётные записи','Конфиденциальность','Обновления','Восстановление'].map((s,i)=>'<div class="settings-item'+(i===0?' active':'')+'" onclick="setPage(\''+id+'\',\''+s+'\',this)">'+s+'</div>').join('')+
+    '</div><div class="settings-content" id="setContent_'+id+'">'+getSettingsPage('Система')+'</div></div>';
+}
+function setPage(id,page,el){
+  document.querySelectorAll('#setSide_'+id+' .settings-item').forEach(e=>e.classList.remove('active'));
+  if(el)el.classList.add('active');
+  document.getElementById('setContent_'+id).innerHTML=getSettingsPage(page);
+}
+function getSettingsPage(page){
+  const pages={
+    'Система':'<h2>Система</h2><div class="settings-group"><h3>Дисплей</h3><div class="settings-row"><label>Разрешение</label><select><option>1920?1080</option></select></div><div class="settings-row"><label>Масштаб</label><select><option>100%</option></select></div></div><div class="settings-group"><h3>Питание</h3><div class="settings-row"><label>Режим питания</label><select><option>Сбалансированный</option><option>Высокая производительность</option><option>Экономия энергии</option></select></div></div><div class="settings-group"><h3>Память</h3><div class="settings-row"><label>ОЗУ: 32,0 ГБ (доступно: 18,4 ГБ)</label></div></div><div class="settings-group"><h3>О системе</h3><div class="settings-row"><label>Версия Windows 11 Pro · Сборка 22631</label></div></div>',
+    'Персонализация':'<h2>Персонализация</h2><div class="settings-group"><h3>Фон</h3><div class="settings-row"><label>Обои</label><button class="settings-btn" onclick="cycleWallpaper()">Сменить</button></div></div><div class="settings-group"><h3>Цвета</h3><div class="settings-row"><label>Акцентный цвет</label><select><option selected>Синий</option><option>Зелёный</option><option>Фиолетовый</option><option>Оранжевый</option><option>Красный</option></select></div></div>',
+    'Сеть':'<h2>Сеть и Интернет</h2><div class="settings-group"><h3>Wi-Fi</h3><div class="settings-row"><label>Подключено: Домашняя сеть</label><span style="font-size:12px;color:#60cdff">? Активно</span></div></div><div class="settings-group"><h3>Ethernet</h3><div class="settings-row"><label>Кабельное подключение</label></div></div>',
+    'Учётные записи':'<h2>Учётные записи</h2><div class="settings-group"><h3>Ваши данные</h3><div class="settings-row"><label>Пользователь (Локальная учётная запись)</label></div></div><div class="settings-group"><h3>Параметры входа</h3><div class="settings-row"><label>PIN-код</label><button class="settings-btn">Добавить</button></div></div>',
+    'Конфиденциальность':'<h2>Конфиденциальность</h2><div class="settings-group"><h3>Телеметрия</h3><div class="settings-row"><label>Отправка данных</label><div class="toggle on"></div></div></div><div class="settings-group"><h3>Реклама</h3><div class="settings-row"><label>Персонализация рекламы</label><div class="toggle"></div></div></div>',
+    'Обновления':'<h2>Обновления</h2><div class="settings-group"><h3>Windows Update</h3><div class="settings-row"><label>Статус: Всё актуально</label><span style="font-size:12px;color:#60cdff">? Проверено</span></div></div><div class="settings-group"><h3>Дополнительно</h3><div class="settings-row"><label>Последняя проверка: сегодня, 12:00</label></div></div>',
+    'Восстановление':'<h2>Восстановление</h2><div class="settings-group"><h3>Сброс системы</h3><div class="settings-row"><label>Сохранить или удалить файлы</label></div><div class="settings-row"><button class="settings-btn danger" onclick="showToast(\'Имитация сброса...\')">Начать сброс</button></div></div><div class="settings-group"><h3>Дополнительные параметры</h3><div class="settings-row"><label>Восстановление при загрузке</label></div><div class="settings-row"><label>Командная строка</label></div></div>'
+  };
+  return pages[page]||'<h2>'+page+'</h2><p style="color:rgba(255,255,255,.5)">Раздел в разработке</p>';
+}
+// ============= STORE =============
+const storeApps = [
+  {name:'Spotify',cat:'Музыка',rating:'4.5',icon:'??',desc:'Миллионы треков'},
+  {name:'Netflix',cat:'Видео',rating:'4.7',icon:'??',desc:'Фильмы и сериалы'},
+  {name:'Adobe Reader',cat:'Утилиты',rating:'4.3',icon:'??',desc:'Просмотр PDF'},
+  {name:'Telegram',cat:'Общение',rating:'4.8',icon:'??',desc:'Мессенджер'},
+  {name:'VS Code',cat:'Разработка',rating:'4.9',icon:'??',desc:'Редактор кода'},
+  {name:'Spotify Lite',cat:'Музыка',rating:'4.2',icon:'??',desc:'Лёгкая версия'},
+  {name:'Photoshop',cat:'Графика',rating:'4.6',icon:'??',desc:'Редактор фото'},
+  {name:'Excel',cat:'Офис',rating:'4.4',icon:'??',desc:'Таблицы'},
+  {name:'Word',cat:'Офис',rating:'4.5',icon:'??',desc:'Документы'},
+  {name:'PowerPoint',cat:'Офис',rating:'4.3',icon:'???',desc:'Презентации'},
+  {name:'Wordfeud',cat:'Игры',rating:'4.1',icon:'??',desc:'Головоломка'},
+  {name:'Solitaire',cat:'Игры',rating:'4.6',icon:'??',desc:'Пасьянс'},
+  {name:'Disney+',cat:'Видео',rating:'4.8',icon:'??',desc:'Фильмы Disney'},
+  {name:'YouTube',cat:'Видео',rating:'4.7',icon:'??',desc:'Видеохостинг'},
+  {name:'Candy Crush',cat:'Игры',rating:'4.5',icon:'??',desc:'Головоломка'},
+  {name:'Asphalt 8',cat:'Игры',rating:'4.6',icon:'???',desc:'Гонки'}
+];
+function renderStore(id){
+  let html='<div style="display:flex;flex-direction:column;height:100%">';
+  html+='<div class="store-content">';
+  html+='<div class="store-banner"><div><h3>Microsoft Store</h3><p>Приложения и игры для Windows</p></div></div>';
+  html+='<div class="store-section"><h3>Популярные приложения</h3><div class="store-grid">';
+  storeApps.forEach(a=>{
+    html+='<div class="store-card"><div class="icon" style="font-size:24px">'+a.icon+'</div><h4>'+a.name+'</h4><div class="rating">? '+a.rating+' · '+a.cat+'</div><div style="font-size:10px;color:rgba(255,255,255,.4);margin:2px 0">'+a.desc+'</div><button class="store-get-btn" onclick="installApp(this,\''+a.name+'\')">Получить</button></div>';
+  });
+  html+='</div></div></div></div>';
+  return html;
+}
+function installApp(btn,name){
+  btn.textContent='Устанавливается...';btn.classList.add('installing');
+  setTimeout(()=>{btn.textContent='Готово';btn.classList.remove('installing');btn.classList.add('installed');showToast('Установлено: '+name);},1500);
+}
+
+// ============= MUSIC PLAYER =============
+const playlist = [
+  {title:'Lofi Beats',artist:'Chillhop',dur:'3:45',cover:'??'},
+  {title:'Summer Vibes',artist:'Moody',dur:'4:12',cover:'??'},
+  {title:'Piano Dreams',artist:'Classical',dur:'5:30',cover:'??'},
+  {title:'Ocean Waves',artist:'Nature Sounds',dur:'10:00',cover:'??'},
+  {title:'Jazz Bar',artist:'Smooth Jazz',dur:'4:20',cover:'??'},
+  {title:'Midnight Rain',artist:'Lofi Girl',dur:'6:15',cover:'???'}
+];
+let musicState = {};
+function renderMusicPlayer(id){
+  if(!musicState[id])musicState[id]={current:0,playing:false};
+  const s=musicState[id],t=playlist[s.current];
+  let html='<div class="player-cover-wrap"><div class="player-cover">'+t.cover+'</div></div>';
+  html+='<div class="player-info"><div class="player-song-title">'+t.title+'</div><div class="player-song-artist">'+t.artist+'</div></div>';
+  html+='<div class="player-controls"><button class="player-btn" onclick="prevTrack(\''+id+'\')">?</button><button class="player-btn play-btn" id="playBtn_'+id+'" onclick="togglePlay(\''+id+'\')">'+(s.playing?'?':'?')+'</button><button class="player-btn" onclick="nextTrack(\''+id+'\')">?</button>';
+  html+='<div class="player-progress"><div class="player-progress-fill" id="pProg_'+id+'" style="width:'+(s.playing?'45%':'0%')+'"></div></div>';
+  html+='<span class="player-time" id="pTime_'+id+'">0:00 / '+t.dur+'</span></div>';
+  html+='<div class="player-playlist"><div class="pl-header">Плейлист</div>';
+  playlist.forEach((tr,i)=>{
+    html+='<div class="pl-item'+(i===s.current?' active':'')+'" onclick="playTrack(\''+id+'\','+i+')">'+tr.cover+' <span>'+tr.title+'</span> <span class="pl-dur">'+tr.dur+'</span></div>';
+  });
+  html+='</div>';
+  return html;
+}
+function togglePlay(id){
+  const s=musicState[id];if(!s)return;
+  s.playing=!s.playing;
+  const btn=document.getElementById('playBtn_'+id);
+  if(btn)btn.textContent=s.playing?'?':'?';
+  if(s.playing)simulateProgress(id);
+}
+function simulateProgress(id){
+  // Progress is visual only
+}
+function nextTrack(id){
+  const s=musicState[id];if(!s)return;
+  s.current=(s.current+1)%playlist.length;if(s.playing)s.playing=false;
+  const btn=document.getElementById('playBtn_'+id);if(btn)btn.textContent='?';
+  showToast('Сейчас: '+playlist[s.current].title);
+  updateMusicUI(id);
+}
+function prevTrack(id){
+  const s=musicState[id];if(!s)return;
+  s.current=(s.current-1+playlist.length)%playlist.length;if(s.playing)s.playing=false;
+  const btn=document.getElementById('playBtn_'+id);if(btn)btn.textContent='?';
+  showToast('Сейчас: '+playlist[s.current].title);
+  updateMusicUI(id);
+}
+function playTrack(id,idx){
+  const s=musicState[id];if(!s)return;
+  s.current=idx;if(s.playing)s.playing=false;
+  const btn=document.getElementById('playBtn_'+id);if(btn)btn.textContent='?';
+  showToast('Сейчас: '+playlist[idx].title);
+  updateMusicUI(id);
+}
+function updateMusicUI(id){
+  const s=musicState[id];if(!s)return;
+  const t=playlist[s.current];
+  const cover=document.querySelector('#win_'+id+' .player-cover');
+  const title=document.querySelector('#win_'+id+' .player-song-title');
+  const artist=document.querySelector('#win_'+id+' .player-song-artist');
+  if(cover)cover.textContent=t.cover;
+  if(title)title.textContent=t.title;
+  if(artist)artist.textContent=t.artist;
+  document.querySelectorAll('#win_'+id+' .pl-item').forEach((el,i)=>{
+    el.classList.toggle('active',i===s.current);
+  });
+}
+
+// ============= DOCTOR CHAT ROOM =============
+const chatParticipants = [
+  {name:'Диана', icon:'&#x1F467;', color:'#f9a8d4'},
+  {name:'Соня', icon:'&#x1F476;', color:'#93c5fd'},
+  {name:'Вика', icon:'&#x1F467;&#x200D;&#x2695;&#xFE0F;', color:'#86efac'},
+  {name:'Маша', icon:'&#x1F467;', color:'#fde68a'},
+  {name:'Даша', icon:'&#x1F467;&#x200D;&#x2695;&#xFE0F;', color:'#c4b5fd'},
+  {name:'Пациент Саша', icon:'&#x1F466;', color:'#d4d4d8'}
+];
+const chatPhrases = [
+  {p:0,t:'Держу стетоскоп на голове 5 минут... слушаю...'},
+  {p:1,t:'Так, переставляю стетоскоп на грудь'},
+  {p:2,t:'Стетоскоп слушает, я держу крепко'},
+  {p:3,t:'Держу стетоскоп и слушаю тихо-тихо'},
+  {p:4,t:'Переставляю стетоскоп на животик'},
+  {p:5,t:'Саша, сиди смирно, я слушаю стетоскопом'},
+  {p:0,t:'Стетоскоп на ушах, слушаю тук-тук'},
+  {p:1,t:'Переставила стетоскоп на спинку'},
+  {p:2,t:'Держу стетоскоп, слушаю сердечко'},
+  {p:3,t:'Сейчас стетоскопом послушаю лёгкие'},
+  {p:4,t:'Ой, стетоскоп упал, поднимаю'},
+  {p:5,t:'Стетоскоп холодный, Саша смеётся'},
+  {p:0,t:'Я держу стетоскоп, слушаю минуту'},
+  {p:1,t:'Так, переставляю, теперь с другой стороны'},
+  {p:2,t:'Стетоскопом тук-тук слышно'},
+  {p:3,t:'Держу стетоскоп и считаю удары'},
+  {p:4,t:'Переложила стетоскоп на левый бок'},
+   {p:5,t:'Саша, не вертись, я слушаю!'},
+  {p:0,t:'Стетоскоп на голове, слушаю мозги'},
+  {p:1,t:'Держу стетоскоп двумя руками'},
+  {p:2,t:'Переставляю стетоскоп выше, ниже'},
+  {p:3,t:'Я слушаю стетоскопом, там булькает'},
+  {p:4,t:'Держу стетоскоп, щас услышу'},
+  {p:5,t:'Стетоскоп мериет — всё хорошо'},
+  {p:0,t:'Так, держу стетоскоп, слушаю ещё раз'},
+  {p:1,t:'Переставила стетоскоп, теперь ясно'},
+  {p:2,t:'Стетоскоп слушает животик — там урчит'},
+  {p:3,t:'Держу стетоскоп крепко-крепко'},
+  {p:4,t:'Сейчас переставлю стетоскоп и послушаю'},
+   {p:5,t:'Саша, дыши глубоко, я слушаю!'},
+  {p:0,t:'Я со стетоскопом, слушаю всех!'},
+  {p:1,t:'Держу стетоскоп на Саше 5 минут'},
+  {p:2,t:'Переставляю стетоскоп туда-сюда'},
+  {p:3,t:'Стетоскоп на шее, слушаю'},
+  {p:4,t:'Ой, я забыла стетоскоп, бегу за ним!'},
+  {p:5,t:'Саша, не дыши... дыши... не дыши!'},
+  {p:0,t:'Стетоскоп в ушах, слушаю грудь'},
+  {p:1,t:'Держу стетоскоп и молчу, слушаю'},
+  {p:2,t:'Переставляю стетоскоп на спину'},
+  {p:3,t:'Я мерию стетоскопом, тихо!'},
+  {p:4,t:'Держу стетоскоп уже 3 минуты'},
+  {p:5,t:'Стетоскоп слушает, Саша кашляет'},
+  {p:0,t:'Переставлю стетоскоп на лоб'},
+  {p:1,t:'Стетоскопом слышно, как сердце бьётся'},
+  {p:2,t:'Держу стетоскоп, переставляю набок'}
+];
+const chatTimers = {};
+function renderDoctorChat(id){
+  let participantsHtml = chatParticipants.map((p,i)=>{
+    return '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;background:rgba(255,255,255,.04);border-radius:12px;font-size:10px;color:rgba(255,255,255,.7)">'+p.icon+' '+p.name+'</span>';
+  }).join('');
+  return '<div class="doctor-chat" style="display:flex;flex-direction:column;height:100%">'+
+    '<div style="padding:8px 12px;background:rgba(0,0,0,.12);border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0">'+
+      '<div style="font-size:13px;color:#fff;font-weight:500">&#x1F3E5; Детский чат докторов</div>'+
+      '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">'+participantsHtml+'</div>'+
+      '<div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:4px">&#x1F7E2; 6 участников · Сообщения каждые 10 сек</div>'+
+    '</div>'+
+    '<div class="chat-messages" id="chatMessages_'+id+'" style="flex:1;overflow-y:auto;padding:8px 10px;display:flex;flex-direction:column;gap:5px;background:rgba(0,0,0,.08)">'+
+      '<div style="text-align:center;font-size:10px;color:rgba(255,255,255,.2);padding:8px">Чат загружен · ' + new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'}) + '</div>'+
+    '</div>'+
+    '<div style="padding:6px 8px;border-top:1px solid rgba(255,255,255,.06);display:flex;gap:6px;background:rgba(0,0,0,.06);flex-shrink:0">'+
+      '<input class="chat-input-field" id="chatInput_'+id+'" placeholder="Написать сообщение..." style="flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:7px 10px;color:#fff;font-size:12px;outline:none" onkeydown="if(event.key===\'Enter\')sendChatMessage(\''+id+'\')">'+
+      '<button onclick="sendChatMessage(\''+id+'\')" style="background:rgba(96,205,255,.15);border:none;border-radius:8px;padding:6px 14px;color:#60cdff;cursor:pointer;font-size:13px;font-weight:600">&#x27A4;</button>'+
+    '</div>'+
+  '</div>';
+}
+function addChatMessage(id, participant, text, auto){
+  const container = document.getElementById('chatMessages_'+id);
+  if(!container) return;
+  const msg = document.createElement('div');
+  const time = new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
+  const isUser = !auto;
+  if(isUser){
+    msg.style.cssText = 'display:flex;flex-direction:column;align-items:flex-end;gap:2px';
+    msg.innerHTML = '<div style="font-size:10px;color:rgba(255,255,255,.3);padding:0 4px">Вы · '+time+'</div><div style="background:rgba(96,205,255,.15);border:1px solid rgba(96,205,255,.15);border-radius:12px 12px 4px 12px;padding:6px 10px;color:#fff;font-size:12px;max-width:85%">'+text.replace(/</g,'&lt;')+'</div>';
+  } else {
+    msg.style.cssText = 'display:flex;flex-direction:column;align-items:flex-start;gap:2px';
+    msg.innerHTML = '<div style="font-size:10px;color:'+participant.color+';padding:0 4px">'+participant.icon+' '+participant.name+' · '+time+'</div><div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:12px 12px 12px 4px;padding:6px 10px;color:rgba(255,255,255,.85);font-size:12px;max-width:85%">'+text.replace(/</g,'&lt;')+'</div>';
+  }
+  container.appendChild(msg);
+  container.scrollTop = container.scrollHeight;
+}
+function sendChatMessage(id){
+  const input = document.getElementById('chatInput_'+id);
+  if(!input || !input.value.trim()) return;
+  addChatMessage(id, null, input.value.trim(), false);
+  input.value = '';
+  setTimeout(() => {
+    const p = chatParticipants[Math.floor(Math.random()*chatParticipants.length)];
+    const replies = ['Понял, принято!','Хорошо, коллега','Согласен с вами','Интересное наблюдение','Записал в историю болезни','Да, вы правы','Я тоже так думаю','Принято к сведению','Отлично, продолжаем','Спасибо за информацию'];
+    addChatMessage(id, p, replies[Math.floor(Math.random()*replies.length)], true);
+  }, 2000 + Math.random()*3000);
+}
+function autoChatMessage(id){
+  if(!document.getElementById('chatMessages_'+id)) return;
+  const phrase = chatPhrases[Math.floor(Math.random()*chatPhrases.length)];
+  const participant = chatParticipants[phrase.p];
+  addChatMessage(id, participant, phrase.t, true);
+}
+function startAutoChat(id){
+  if(chatTimers[id]) clearInterval(chatTimers[id]);
+  setTimeout(() => autoChatMessage(id), 3000);
+  chatTimers[id] = setInterval(() => autoChatMessage(id), 10000);
+  setTimeout(() => {
+    const container = document.getElementById('chatMessages_'+id);
+    if(container){
+      const join = document.createElement('div');
+      join.style.cssText = 'text-align:center;font-size:10px;color:rgba(255,255,255,.2);padding:4px';
+      join.textContent = 'Вы присоединились к чату';
+      container.appendChild(join);
+      container.scrollTop = container.scrollHeight;
+    }
+  }, 500);
+}
+
+// ============= PHOTO VIEWER =============
+const photoUrls = [
+  'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&q=80',
+  'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=400&q=80',
+  'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=400&q=80',
+  'https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?w=400&q=80',
+  'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400&q=80',
+  'https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?w=400&q=80',
+  'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&q=80',
+  'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=400&q=80',
+  'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=400&q=80'
+];
+let photoIndex = {};
+
+function nextPhoto(id){
+  if(!photoIndex[id])photoIndex[id]=0;
+  photoIndex[id]=(photoIndex[id]+1)%photoUrls.length;
+  const img=document.getElementById('photoImg_'+id);
+  const c=document.getElementById('photoCounter_'+id);
+  if(img)img.src=photoUrls[photoIndex[id]];
+  if(c)c.textContent=(photoIndex[id]+1)+' / '+photoUrls.length;
+}
+function prevPhoto(id){
+  if(!photoIndex[id])photoIndex[id]=0;
+  photoIndex[id]=(photoIndex[id]-1+photoUrls.length)%photoUrls.length;
+  const img=document.getElementById('photoImg_'+id);
+  const c=document.getElementById('photoCounter_'+id);
+  if(img)img.src=photoUrls[photoIndex[id]];
+  if(c)c.textContent=(photoIndex[id]+1)+' / '+photoUrls.length;
+}
+
+// ============= PUZZLE GAME =============
+let puzzleState = {};
+function renderPuzzle(id){
+  const nums = [1,2,3,4,5,6,7,8,0];
+  for(let i=nums.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[nums[i],nums[j]]=[nums[j],nums[i]];}
+  puzzleState[id]={nums:[...nums],moves:0};
+  return '<div class="game-container"><div style="font-size:12px;color:rgba(255,255,255,.5);margin-bottom:4px">Соберите пятнашки (15)</div><div class="game-grid" id="puzzleGrid_'+id+'" style="grid-template-columns:repeat(3,60px);grid-template-rows:repeat(3,60px);gap:4px">'+renderPuzzleGrid(id)+'</div><div class="game-score" id="puzzleScore_'+id+'">Ходов: 0</div><button class="game-btn" onclick="shufflePuzzle(\''+id+'\')">Перемешать</button></div>';
+}
+function renderPuzzleGrid(id){
+  const s=puzzleState[id];if(!s)return'';
+  return s.nums.map((n,i)=>{
+    if(n===0)return'<div class="game-cell empty"></div>';
+    return'<div class="game-cell" onclick="movePuzzle('+i+',\''+id+'\')">'+n+'</div>';
+  }).join('');
+}
+function movePuzzle(idx,id){
+  const s=puzzleState[id];if(!s)return;
+  const nums=s.nums,size=3;
+  const row=Math.floor(idx/size),col=idx%size;
+  const zi=nums.indexOf(0);
+  const zr=Math.floor(zi/size),zc=zi%size;
+  if((Math.abs(row-zr)+Math.abs(col-zc))===1){
+    [nums[idx],nums[zi]]=[nums[zi],nums[idx]];
+    s.moves++;
+    document.getElementById('puzzleGrid_'+id).innerHTML=renderPuzzleGrid(id);
+    document.getElementById('puzzleScore_'+id).textContent='Ходов: '+s.moves;
+    const won=JSON.stringify(nums.slice(0,8))===JSON.stringify([1,2,3,4,5,6,7,8]);
+    if(won)showToast('?? Победа! '+s.moves+' ходов!');
+  }
+}
+// ============= VIDEO PLAYER =============
+function toggleVideo(btn,id){
+  const canvas=document.getElementById('videoCanvas_'+id);
+  if(btn.textContent==='?'){
+    btn.textContent='?';
+    const bar=canvas.parentElement.querySelector('.player-progress-fill');
+    let w=0;
+    const iv=setInterval(()=>{w+=0.5;if(w>100){w=100;clearInterval(iv);btn.textContent='?';}if(bar)bar.style.width=w+'%';},200);
+    canvas.dataset.interval=iv;
+  } else {
+    btn.textContent='?';
+    clearInterval(parseInt(canvas.dataset.interval));
+  }
+}
+
+function shufflePuzzle(id){
+  const nums=[1,2,3,4,5,6,7,8,0];
+  for(let i=nums.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[nums[i],nums[j]]=[nums[j],nums[i]];}
+  puzzleState[id]={nums,moves:0};
+  document.getElementById('puzzleGrid_'+id).innerHTML=renderPuzzleGrid(id);
+  document.getElementById('puzzleScore_'+id).textContent='Ходов: 0';
+}
+
+// ============= INIT =============
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){if(state.startOpen)hideStartMenu();hideContextMenu();}
+  if(e.ctrlKey&&e.key==='n'){e.preventDefault();createWindow('notepad');}
+});
+
+setTimeout(()=>{boot();},300);
+
+showNotification('Загрузка Windows 11...');
+</script>
+</body>
+</html>
