@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Хлебников Даниил | Портфолио</title>
+  <meta name="description" content="Портфолио Даниила Хлебникова — веб-разработчик, студент КАИТ20. Python, C#, JavaScript, HTML/CSS, SQL.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
@@ -15,6 +16,9 @@
       --accent: #6366f1;
       --accent-2: #22d3ee;
       --accent-3: #a855f7;
+      --green: #22c55e;
+      --orange: #f59e0b;
+      --pink: #ec4899;
       --text: #e2e8f0;
       --muted: #94a3b8;
       --glass: rgba(255,255,255,0.06);
@@ -36,7 +40,7 @@
     #preloader {
       position: fixed; inset: 0; z-index: 9999;
       background: var(--bg);
-      display: flex; align-items: center; justify-content: center;
+      display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 18px;
       transition: opacity .6s ease, visibility .6s ease;
     }
     #preloader.hide { opacity: 0; visibility: hidden; }
@@ -47,6 +51,7 @@
       border-right-color: var(--accent);
       animation: spin 1s linear infinite;
     }
+    .loader-text { color: var(--muted); font-size: .85rem; letter-spacing: 2px; text-transform: uppercase; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
     /* ===== Animated background ===== */
@@ -77,8 +82,8 @@
     /* ===== Nav ===== */
     nav {
       position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      display: flex; justify-content: center; gap: 32px;
-      padding: 16px 24px;
+      display: flex; justify-content: center; gap: 28px; flex-wrap: wrap;
+      padding: 14px 24px;
       background: rgba(11,16,32,0.6);
       backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--glass-border);
@@ -87,8 +92,8 @@
     }
     @keyframes navin { to { transform: translateY(0); } }
     nav a {
-      font-size: .9rem; font-weight: 500; color: var(--muted);
-      position: relative; transition: color .25s;
+      font-size: .85rem; font-weight: 500; color: var(--muted);
+      position: relative; transition: color .25s; white-space: nowrap;
     }
     nav a::after {
       content:''; position:absolute; left:0; bottom:-6px; height:2px; width:0;
@@ -127,15 +132,22 @@
       opacity:0; animation: fadeUp .8s .9s forwards; }
     .hero-links { display:flex; gap:16px; flex-wrap:wrap;
       opacity:0; animation: fadeUp .8s 1.1s forwards; }
+    .hero-stats { display:flex; gap:32px; margin-top:28px; opacity:0; animation: fadeUp .8s 1.3s forwards; }
+    .hero-stat { text-align:center; }
+    .hero-stat .num { font-family:'Space Grotesk',sans-serif; font-size:1.8rem; font-weight:700;
+      background: linear-gradient(135deg,var(--accent-2),var(--accent)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .hero-stat .label { font-size:.75rem; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-top:2px; }
+
     .btn {
       display:inline-flex; align-items:center; gap:8px; padding:13px 30px; border-radius:14px;
-      font-weight:600; font-size:.95rem; transition: transform .25s, box-shadow .25s;
+      font-weight:600; font-size:.95rem; transition: transform .25s, box-shadow .25s; cursor:pointer;
     }
     .btn-primary { background: linear-gradient(135deg,var(--accent),var(--accent-3)); color:#fff;
-      box-shadow:0 8px 24px rgba(99,102,241,.35); }
+      box-shadow:0 8px 24px rgba(99,102,241,.35); border:none; }
     .btn-primary:hover { transform: translateY(-3px); box-shadow:0 12px 32px rgba(99,102,241,.5); }
-    .btn-outline { border:1px solid var(--glass-border); color:var(--text); }
+    .btn-outline { border:1px solid var(--glass-border); color:var(--text); background:transparent; }
     .btn-outline:hover { background: var(--glass); border-color: var(--accent-2); transform: translateY(-3px); }
+    .btn-sm { padding:10px 22px; font-size:.85rem; border-radius:10px; }
     @keyframes fadeUp { from { opacity:0; transform: translateY(24px);} to { opacity:1; transform: translateY(0);} }
 
     .scroll-ind {
@@ -158,14 +170,24 @@
     .section-subtitle { color: var(--muted); margin-bottom:48px; font-size:1.05rem; }
 
     /* About */
-    .about-grid { display:grid; grid-template-columns:1.4fr 1fr; gap:40px; }
+    .about-grid { display:grid; grid-template-columns:1.4fr 1fr; gap:40px; align-items:start; }
     .about-text p { color:#cbd5e1; margin-bottom:16px; }
+    .about-text p strong { color: var(--accent-2); font-weight:600; }
     .about-details { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
     .detail-item { background: var(--glass); border:1px solid var(--glass-border); border-radius:14px;
       padding:18px 20px; backdrop-filter: blur(10px); transition: transform .25s, border-color .25s; }
     .detail-item:hover { transform: translateY(-4px); border-color: var(--accent); }
     .detail-item .label { font-size:.75rem; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); }
     .detail-item .value { font-weight:600; margin-top:4px; }
+
+    /* Interests */
+    .interests-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:16px; margin-top:32px; }
+    .interest-card { display:flex; align-items:center; gap:14px; padding:16px 20px;
+      background: var(--glass); border:1px solid var(--glass-border); border-radius:14px;
+      backdrop-filter: blur(10px); transition: transform .25s, border-color .25s; }
+    .interest-card:hover { transform:translateY(-3px); border-color:var(--accent-3); }
+    .interest-card i { font-size:1.4rem; color:var(--accent-2); }
+    .interest-card span { font-weight:500; font-size:.9rem; }
 
     /* Skills */
     .skills-grid { display:grid; grid-template-columns: repeat(auto-fill,minmax(160px,1fr)); gap:18px; }
@@ -179,33 +201,113 @@
     .skill-card:hover::before { opacity:1; }
     .skill-card i { font-size:2.2rem; margin-bottom:10px; }
     .skill-card .name { font-weight:600; }
+    .skill-card .level { font-size:.75rem; color:var(--muted); margin-top:4px; }
     .skill-bar { height:6px; border-radius:6px; background: rgba(255,255,255,.1); margin-top:12px; overflow:hidden; }
     .skill-bar span { display:block; height:100%; width:0; border-radius:6px;
       background: linear-gradient(90deg,var(--accent),var(--accent-2)); transition: width 1.2s ease; }
 
+    /* Soft skills */
+    .soft-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:16px; margin-top:40px; }
+    .soft-card { display:flex; align-items:center; gap:14px; padding:18px 22px;
+      background: var(--glass); border:1px solid var(--glass-border); border-radius:14px;
+      backdrop-filter: blur(10px); transition: transform .25s, border-color .25s; }
+    .soft-card:hover { transform:translateY(-3px); border-color:var(--green); }
+    .soft-card .icon { width:42px; height:42px; border-radius:10px; display:flex; align-items:center; justify-content:center;
+      background: rgba(34,197,94,.12); color:var(--green); font-size:1.1rem; flex-shrink:0; }
+    .soft-card .name { font-weight:600; font-size:.9rem; }
+    .soft-card .desc { font-size:.78rem; color:var(--muted); margin-top:2px; }
+
+    /* Timeline */
+    .timeline { position:relative; padding-left:40px; }
+    .timeline::before { content:''; position:absolute; left:14px; top:0; bottom:0; width:2px;
+      background: linear-gradient(to bottom,var(--accent),var(--accent-2),var(--accent-3)); }
+    .tl-item { position:relative; margin-bottom:40px; }
+    .tl-item:last-child { margin-bottom:0; }
+    .tl-dot { position:absolute; left:-33px; top:6px; width:16px; height:16px; border-radius:50%;
+      background: var(--accent); border:3px solid var(--bg); box-shadow: 0 0 0 3px var(--accent); }
+    .tl-item:nth-child(2) .tl-dot { background: var(--accent-2); box-shadow: 0 0 0 3px var(--accent-2); }
+    .tl-item:nth-child(3) .tl-dot { background: var(--accent-3); box-shadow: 0 0 0 3px var(--accent-3); }
+    .tl-item:nth-child(4) .tl-dot { background: var(--green); box-shadow: 0 0 0 3px var(--green); }
+    .tl-date { font-size:.78rem; color:var(--accent-2); font-weight:600; text-transform:uppercase; letter-spacing:.5px; margin-bottom:6px; }
+    .tl-title { font-size:1.1rem; font-weight:700; margin-bottom:4px; }
+    .tl-desc { font-size:.9rem; color:var(--muted); }
+    .tl-tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+    .tl-tags span { background:rgba(255,255,255,.08); padding:3px 10px; border-radius:6px; font-size:.72rem; color:#cbd5e1; }
+
     /* Projects */
     .projects-grid { display:grid; grid-template-columns: repeat(auto-fill,minmax(330px,1fr)); gap:24px; }
     .project-card { background: var(--glass); border:1px solid var(--glass-border); border-radius:18px;
-      overflow:hidden; backdrop-filter: blur(10px); transition: transform .35s, box-shadow .35s, border-color .35s; }
+      overflow:hidden; backdrop-filter: blur(10px); transition: transform .35s, box-shadow .35s, border-color .35s;
+      display:flex; flex-direction:column; }
     .project-card:hover { transform: translateY(-8px); border-color: var(--accent);
       box-shadow:0 24px 50px rgba(99,102,241,.18); }
     .project-preview { height:190px; display:flex; align-items:center; justify-content:center;
-      font-size:3rem; color: rgba(255,255,255,.85); position:relative; overflow:hidden; }
+      font-size:3rem; color: rgba(255,255,255,.85); position:relative; overflow:hidden; flex-shrink:0; }
     .project-preview i { animation: pulse 3s ease-in-out infinite; }
     @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.12)} }
-    .project-preview .overlay { position:absolute; inset:0; background: linear-gradient(to top, rgba(0,0,0,.4), transparent); }
-    .project-body { padding:24px; }
+    .project-preview .overlay { position:absolute; inset:0; background: linear-gradient(to top, rgba(0,0,0,.5), transparent); }
+    .project-preview .badge { position:absolute; top:14px; right:14px; padding:4px 12px; border-radius:8px;
+      font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.5px; }
+    .badge-done { background:rgba(34,197,94,.2); color:var(--green); border:1px solid rgba(34,197,94,.3); }
+    .badge-wip { background:rgba(245,158,11,.2); color:var(--orange); border:1px solid rgba(245,158,11,.3); }
+    .badge-edu { background:rgba(99,102,241,.2); color:var(--accent); border:1px solid rgba(99,102,241,.3); }
+    .project-body { padding:24px; flex:1; display:flex; flex-direction:column; }
     .project-body h3 { font-size:1.2rem; margin-bottom:8px; }
-    .project-body p { font-size:.9rem; color:var(--muted); margin-bottom:16px; }
-    .project-tech { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; }
+    .project-body p { font-size:.88rem; color:var(--muted); margin-bottom:14px; line-height:1.5; }
+    .project-features { margin-bottom:14px; }
+    .project-features li { font-size:.82rem; color:#cbd5e1; margin-bottom:4px; padding-left:16px; position:relative; }
+    .project-features li::before { content:'->'; position:absolute; left:0; color:var(--accent-2); font-weight:700; }
+    .project-tech { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; margin-top:auto; }
     .project-tech span { background: rgba(255,255,255,.08); padding:4px 10px; border-radius:8px;
       font-size:.78rem; color:#cbd5e1; }
+    .project-links { display:flex; gap:12px; }
     .project-link { display:inline-flex; align-items:center; gap:6px; color:var(--accent-2);
-      font-weight:600; font-size:.9rem; transition: gap .2s; }
+      font-weight:600; font-size:.88rem; transition: gap .2s; }
     .project-link:hover { gap:10px; }
+    .project-link.github { color:var(--muted); }
+    .project-link.github:hover { color:#fff; }
+
+    /* Achievements */
+    .achieve-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:20px; }
+    .achieve-card { display:flex; gap:18px; padding:24px;
+      background: var(--glass); border:1px solid var(--glass-border); border-radius:16px;
+      backdrop-filter: blur(10px); transition: transform .25s, border-color .25s; }
+    .achieve-card:hover { transform:translateY(-4px); border-color:var(--accent-2); }
+    .achieve-icon { width:56px; height:56px; border-radius:14px; display:flex; align-items:center; justify-content:center;
+      font-size:1.5rem; flex-shrink:0; }
+    .achieve-card h4 { font-size:1rem; font-weight:700; margin-bottom:4px; }
+    .achieve-card p { font-size:.82rem; color:var(--muted); line-height:1.4; }
+
+    /* Process */
+    .process-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:20px; }
+    .process-step { text-align:center; padding:32px 20px; background:var(--glass); border:1px solid var(--glass-border);
+      border-radius:16px; backdrop-filter:blur(10px); position:relative; transition: transform .3s, border-color .3s; }
+    .process-step:hover { transform:translateY(-6px); border-color:var(--accent); }
+    .process-num { font-family:'Space Grotesk',sans-serif; font-size:2.5rem; font-weight:700;
+      background: linear-gradient(135deg,var(--accent),var(--accent-2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      opacity:.3; margin-bottom:12px; }
+    .process-step h4 { font-size:1rem; margin-bottom:8px; }
+    .process-step p { font-size:.82rem; color:var(--muted); }
+    .process-step .icon { font-size:2rem; color:var(--accent-2); margin-bottom:14px; }
+    .process-arrow { display:none; }
+
+    /* What I'm looking for */
+    .looking-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+    .looking-card { padding:28px; background:var(--glass); border:1px solid var(--glass-border);
+      border-radius:16px; backdrop-filter:blur(10px); transition: transform .25s, border-color .25s; }
+    .looking-card:hover { transform:translateY(-4px); border-color:var(--accent-2); }
+    .looking-card h4 { display:flex; align-items:center; gap:10px; font-size:1.05rem; margin-bottom:12px; }
+    .looking-card h4 i { color:var(--accent-2); }
+    .looking-card p { font-size:.9rem; color:var(--muted); line-height:1.5; }
+    .looking-card ul { list-style:none; margin-top:10px; }
+    .looking-card ul li { font-size:.88rem; color:#cbd5e1; padding:6px 0; border-bottom:1px solid rgba(255,255,255,.06);
+      display:flex; align-items:center; gap:8px; }
+    .looking-card ul li:last-child { border-bottom:none; }
+    .looking-card ul li i { color:var(--green); font-size:.7rem; }
 
     /* Contacts */
-    .contacts-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+    .contacts-wrapper { display:grid; grid-template-columns:1fr 1fr; gap:32px; align-items:start; }
+    .contacts-grid { display:grid; gap:16px; }
     .contact-item { display:flex; align-items:center; gap:16px; padding:22px;
       background: var(--glass); border:1px solid var(--glass-border); border-radius:16px; backdrop-filter: blur(10px);
       transition: transform .25s, border-color .25s; }
@@ -214,40 +316,101 @@
       border-radius:12px; background: rgba(99,102,241,.15); color:var(--accent-2); font-size:1.2rem; flex-shrink:0; }
     .contact-item .label { font-size:.75rem; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); }
     .contact-item .value { font-weight:500; }
+    .contact-form { padding:28px; background:var(--glass); border:1px solid var(--glass-border);
+      border-radius:16px; backdrop-filter:blur(10px); }
+    .contact-form h3 { font-size:1.1rem; margin-bottom:20px; }
+    .form-group { margin-bottom:16px; }
+    .form-group label { display:block; font-size:.8rem; text-transform:uppercase; letter-spacing:.5px;
+      color:var(--muted); margin-bottom:6px; }
+    .form-group input, .form-group textarea { width:100%; padding:12px 16px; border-radius:10px;
+      border:1px solid var(--glass-border); background:rgba(255,255,255,.04); color:var(--text);
+      font-family:'Inter',sans-serif; font-size:.9rem; transition: border-color .25s; outline:none; }
+    .form-group input:focus, .form-group textarea:focus { border-color:var(--accent-2); }
+    .form-group textarea { resize:vertical; min-height:100px; }
+
+    /* GitHub graph placeholder */
+    .github-section { margin-top:40px; }
+    .github-graph { padding:24px; background:var(--glass); border:1px solid var(--glass-border);
+      border-radius:16px; backdrop-filter:blur(10px); text-align:center; }
+    .github-graph h4 { margin-bottom:16px; font-size:1rem; }
+    .graph-placeholder { display:flex; gap:3px; justify-content:center; flex-wrap:wrap; max-width:700px; margin:0 auto; }
+    .graph-cell { width:14px; height:14px; border-radius:3px; background:rgba(255,255,255,.06); }
+    .graph-cell.l1 { background:rgba(99,102,241,.2); }
+    .graph-cell.l2 { background:rgba(99,102,241,.4); }
+    .graph-cell.l3 { background:rgba(99,102,241,.65); }
+    .graph-cell.l4 { background:var(--accent); }
 
     footer { text-align:center; padding:34px 0; color:var(--muted); font-size:.85rem;
       border-top:1px solid var(--glass-border); }
+    footer a { color:var(--accent-2); }
 
     /* Back to top */
     #toTop { position:fixed; bottom:28px; right:28px; width:48px; height:48px; border-radius:50%;
       display:flex; align-items:center; justify-content:center; background: linear-gradient(135deg,var(--accent),var(--accent-3));
       color:#fff; box-shadow:0 8px 24px rgba(99,102,241,.4); cursor:pointer; opacity:0; pointer-events:none;
-      transition: opacity .3s, transform .3s; z-index:90; }
+      transition: opacity .3s, transform .3s; z-index:90; border:none; }
     #toTop.show { opacity:1; pointer-events:auto; }
     #toTop:hover { transform: translateY(-3px); }
 
+    /* Modal */
+    .modal-overlay { position:fixed; inset:0; z-index:200; background:rgba(0,0,0,.7);
+      display:flex; align-items:center; justify-content:center; opacity:0; visibility:hidden;
+      transition: opacity .3s, visibility .3s; padding:24px; }
+    .modal-overlay.show { opacity:1; visibility:visible; }
+    .modal { background:var(--bg-2); border:1px solid var(--glass-border); border-radius:20px;
+      max-width:600px; width:100%; padding:36px; position:relative; max-height:80vh; overflow-y:auto; }
+    .modal-close { position:absolute; top:16px; right:16px; background:none; border:none;
+      color:var(--muted); font-size:1.3rem; cursor:pointer; transition:color .2s; }
+    .modal-close:hover { color:#fff; }
+    .modal h2 { font-family:'Space Grotesk',sans-serif; font-size:1.5rem; margin-bottom:8px; }
+    .modal .modal-badge { display:inline-block; padding:4px 12px; border-radius:8px; font-size:.75rem;
+      font-weight:600; margin-bottom:16px; }
+    .modal p { color:var(--muted); font-size:.9rem; margin-bottom:12px; line-height:1.5; }
+    .modal ul { list-style:none; margin-bottom:16px; }
+    .modal ul li { padding:6px 0; font-size:.88rem; color:#cbd5e1; display:flex; align-items:center; gap:8px; }
+    .modal ul li i { color:var(--green); font-size:.7rem; }
+    .modal .modal-tech { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px; }
+    .modal .modal-tech span { background:rgba(255,255,255,.08); padding:4px 12px; border-radius:8px;
+      font-size:.78rem; color:#cbd5e1; }
+
+    @media (max-width:900px) {
+      .process-grid { grid-template-columns:1fr 1fr; }
+      .looking-grid { grid-template-columns:1fr; }
+      .contacts-wrapper { grid-template-columns:1fr; }
+    }
     @media (max-width:768px) {
       .hero-content { flex-direction:column; text-align:center; }
       .hero-text h1 { font-size:2.2rem; }
       .typed-line { font-size:1.1rem; }
+      .hero-stats { justify-content:center; }
       .about-grid, .contacts-grid { grid-template-columns:1fr; }
-      nav { gap:18px; flex-wrap:wrap; }
+      nav { gap:14px; }
+      nav a { font-size:.78rem; }
+      .process-grid { grid-template-columns:1fr; }
+      .projects-grid { grid-template-columns:1fr; }
+      .achieve-grid { grid-template-columns:1fr; }
     }
   </style>
 </head>
 <body>
 
-  <div id="preloader"><div class="loader-ring"></div></div>
+  <div id="preloader">
+    <div class="loader-ring"></div>
+    <div class="loader-text">Загрузка</div>
+  </div>
   <div class="bg-canvas"></div>
   <div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
 
   <nav>
     <a href="#about">Обо мне</a>
     <a href="#skills">Навыки</a>
+    <a href="#experience">Опыт</a>
     <a href="#projects">Проекты</a>
+    <a href="#achievements">Достижения</a>
     <a href="#contacts">Контакты</a>
   </nav>
 
+  <!-- ===== HERO ===== -->
   <section class="hero">
     <div class="container hero-content">
       <div class="hero-photo">
@@ -256,105 +419,246 @@
       <div class="hero-text">
         <h1>Привет, я <span class="grad">Даниил</span></h1>
         <div class="typed-line"><span id="typed"></span><span class="cursor">&nbsp;</span></div>
-        <p>Студент колледжа КАИТ20 (ИСПо412). Создаю веб-приложения, работаю с базами данных и программирую на Python и C#. Люблю чистый, современный и функциональный код.</p>
+        <p>Студент колледжа КАИТ20, группа ИСПо412. Создаю веб-приложения, работаю с базами данных и пишу на Python и C#. Увлечён чистым, современным кодом и превращением идей в работающие продукты.</p>
         <div class="hero-links">
-          <a href="#projects" class="btn btn-primary"><i class="fas fa-code"></i> Проекты</a>
+          <a href="#projects" class="btn btn-primary"><i class="fas fa-code"></i> Смотреть проекты</a>
           <a href="#contacts" class="btn btn-outline"><i class="fas fa-envelope"></i> Связаться</a>
+          <a href="https://github.com/danya1002" target="_blank" class="btn btn-outline"><i class="fab fa-github"></i> GitHub</a>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat"><div class="num">6+</div><div class="label">Проектов</div></div>
+          <div class="hero-stat"><div class="num">3</div><div class="label">Языка</div></div>
+          <div class="hero-stat"><div class="num">2+</div><div class="label">Года опыта</div></div>
         </div>
       </div>
     </div>
     <div class="scroll-ind"><div class="mouse"></div>Листайте вниз</div>
   </section>
 
+  <!-- ===== ABOUT ===== -->
   <section id="about">
     <div class="container">
       <div class="section-accent reveal"></div>
       <h2 class="section-title reveal">Обо мне</h2>
-      <p class="section-subtitle reveal">Кто я и чем занимаюсь</p>
+      <p class="section-subtitle reveal">Кто я, чем занимаюсь и чего хочу достичь</p>
       <div class="about-grid">
         <div class="about-text reveal">
-          <p>Меня зовут Хлебников Даниил. Я студент колледжа КАИТ20, группа ИСПо412, завершаю обучение по специальности «Информационные системы и программирование».</p>
-          <p>За время учёбы я освоил несколько языков программирования, научился работать с базами данных и создавать веб-интерфейсы. Мои работы включают учебные задания и полноценные проекты — от прототипа банковского приложения до интернет-магазина.</p>
-          <p>Сейчас активно развиваюсь в веб-разработке. Люблю доводить проекты до конца и уделяю внимание деталям.</p>
+          <p>Меня зовут <strong>Хлебников Даниил</strong>. Я студент колледжа КАИТ20, группа ИСПо412, завершаю обучение по специальности «Информационные системы и программирование».</p>
+          <p>За время учёбы я освоил несколько языков программирования, научился работать с базами данных и создавать веб-интерфейсы. Мои проекты включают веб-приложения разной сложности — от страницы фотостудии до интерактивного банковского приложения с визуализацией данных.</p>
+          <p>Сейчас активно развиваюсь в <strong>веб-разработке</strong> и ищу opportunities для стажировки или junior-позиции, где смогу применить свои навыки и расти как специалист. Люблю доводить проекты до конца и уделяю внимание деталям — от архитектуры до UI.</p>
+          <p>Вне программирования интересуюсь музыкой, электроникой и дизайном. Всегда открыт к новому опыту и сотрудничеству.</p>
         </div>
         <div class="about-details reveal">
           <div class="detail-item"><div class="label">Возраст</div><div class="value">19 лет</div></div>
           <div class="detail-item"><div class="label">Город</div><div class="value">Брянск, Россия</div></div>
           <div class="detail-item"><div class="label">Образование</div><div class="value">КАИТ20, ИСПо412</div></div>
-          <div class="detail-item"><div class="label">Специализация</div><div class="value">Специалист по ИР</div></div>
+          <div class="detail-item"><div class="label">Специализация</div><div class="value">Веб-разработка и ИС</div></div>
+          <div class="detail-item"><div class="label">Языки</div><div class="value">Русский, English (B1)</div></div>
+          <div class="detail-item"><div class="label">Статус</div><div class="value" style="color:var(--green)">Открыт к предложениям</div></div>
+        </div>
+      </div>
+      <div class="interests-grid reveal">
+        <div class="interest-card"><i class="fas fa-music"></i><span>Музыка</span></div>
+        <div class="interest-card"><i class="fas fa-microchip"></i><span>Электроника</span></div>
+        <div class="interest-card"><i class="fas fa-palette"></i><span>Дизайн</span></div>
+        <div class="interest-card"><i class="fas fa-gamepad"></i><span>Игры</span></div>
+        <div class="interest-card"><i class="fas fa-book"></i><span>Саморазвитие</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SKILLS ===== -->
+  <section id="skills">
+    <div class="container">
+      <div class="section-accent reveal"></div>
+      <h2 class="section-title reveal">Технические навыки</h2>
+      <p class="section-subtitle reveal">Технологии и инструменты, которыми я владею</p>
+      <div class="skills-grid">
+        <div class="skill-card reveal"><i class="fab fa-html5" style="color:#e34f26"></i><div class="name">HTML5</div><div class="level">Продвинутый</div><div class="skill-bar"><span data-w="92%"></span></div></div>
+        <div class="skill-card reveal"><i class="fab fa-css3-alt" style="color:#1572b6"></i><div class="name">CSS3</div><div class="level">Продвинутый</div><div class="skill-bar"><span data-w="88%"></span></div></div>
+        <div class="skill-card reveal"><i class="fab fa-js" style="color:#f7df1e"></i><div class="name">JavaScript</div><div class="level">Средний+</div><div class="skill-bar"><span data-w="78%"></span></div></div>
+        <div class="skill-card reveal"><i class="fab fa-python" style="color:#3776ab"></i><div class="name">Python</div><div class="level">Средний</div><div class="skill-bar"><span data-w="70%"></span></div></div>
+        <div class="skill-card reveal"><i class="fab fa-microsoft" style="color:#512bd4"></i><div class="name">C#</div><div class="level">Средний</div><div class="skill-bar"><span data-w="65%"></span></div></div>
+        <div class="skill-card reveal"><i class="fas fa-database" style="color:#f29111"></i><div class="name">SQL</div><div class="level">Средний</div><div class="skill-bar"><span data-w="72%"></span></div></div>
+        <div class="skill-card reveal"><i class="fab fa-git-alt" style="color:#f05032"></i><div class="name">Git</div><div class="level">Средний</div><div class="skill-bar"><span data-w="68%"></span></div></div>
+        <div class="skill-card reveal"><i class="fab fa-figma" style="color:#a259ff"></i><div class="name">Figma</div><div class="level">Базовый</div><div class="skill-bar"><span data-w="55%"></span></div></div>
+      </div>
+
+      <h3 style="font-family:'Space Grotesk',sans-serif; font-size:1.3rem; margin-top:48px; margin-bottom:20px;" class="reveal">Мягкие навыки</h3>
+      <div class="soft-grid">
+        <div class="soft-card reveal"><div class="icon"><i class="fas fa-brain"></i></div><div><div class="name">Аналитическое мышление</div><div class="desc">Умение разбивать сложные задачи на простые</div></div></div>
+        <div class="soft-card reveal"><div class="icon"><i class="fas fa-users"></i></div><div><div class="name">Командная работа</div><div class="desc">Опыт совместной разработки в группе</div></div></div>
+        <div class="soft-card reveal"><div class="icon"><i class="fas fa-clock"></i></div><div><div class="name">Тайм-менеджмент</div><div class="desc">Планирование задач и соблюдение дедлайнов</div></div></div>
+        <div class="soft-card reveal"><div class="icon"><i class="fas fa-lightbulb"></i></div><div><div class="name">Самообучаемость</div><div class="desc">Быстрое освоение новых технологий</div></div></div>
+        <div class="soft-card reveal"><div class="icon"><i class="fas fa-comments"></i></div><div><div class="name">Коммуникация</div><div class="desc">Ясно объясняю технические концепции</div></div></div>
+        <div class="soft-card reveal"><div class="icon"><i class="fas fa-check-circle"></i></div><div><div class="name">Внимание к деталям</div><div class="desc">Слежу за качеством и чистотой кода</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== EXPERIENCE ===== -->
+  <section id="experience">
+    <div class="container">
+      <div class="section-accent reveal"></div>
+      <h2 class="section-title reveal">Опыт и образование</h2>
+      <p class="section-subtitle reveal">Мой путь в IT</p>
+      <div class="timeline reveal">
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-date">2023 — 2026</div>
+          <div class="tl-title">КАИТ20 — «Информационные системы и программирование»</div>
+          <div class="tl-desc">Обучение в колледже. Изучение основ программирования, баз данных, веб-разработки и проектирования информационных систем. Группа ИСПо412.</div>
+          <div class="tl-tags"><span>Python</span><span>C#</span><span>SQL</span><span>HTML/CSS</span><span>Базы данных</span></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-date">2025</div>
+          <div class="tl-title">Проект «Сбербанк Онлайн»</div>
+          <div class="tl-desc">Разработка интерактивного веб-приложения — клона мобильного банка с авторизацией, графиками и переводами. Самостоятельная работа от идеи до реализации.</div>
+          <div class="tl-tags"><span>HTML5</span><span>CSS3</span><span>JavaScript</span><span>Chart.js</span></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-date">2024 — 2025</div>
+          <div class="tl-title">Проект «ElectronicClub»</div>
+          <div class="tl-desc">Создание интернет-магазина электроники на платформе Wix. Работа с каталогом, трейлером и системой заказов. Опыт работы с контентом и UX.</div>
+          <div class="tl-tags"><span>Wix</span><span>Веб-дизайн</span><span>UX/UI</span></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-date">2024</div>
+          <div class="tl-title">Проект «Фотостудия»</div>
+          <div class="tl-desc">Вёрстка сайта по макету из Figma. Адаптивный дизайн, галерея, форма обратной связи. Точное воспроизведение макета.</div>
+          <div class="tl-tags"><span>HTML5</span><span>CSS3</span><span>Figma</span></div>
+        </div>
+      </div>
+
+      <h3 style="font-family:'Space Grotesk',sans-serif; font-size:1.3rem; margin-top:56px; margin-bottom:24px;" class="reveal">Как я работаю</h3>
+      <div class="process-grid reveal">
+        <div class="process-step">
+          <div class="icon"><i class="fas fa-search"></i></div>
+          <div class="process-num">01</div>
+          <h4>Анализ</h4>
+          <p>Изучаю задачу, собираю требования, определяю технологический стек</p>
+        </div>
+        <div class="process-step">
+          <div class="icon"><i class="fas fa-pencil-ruler"></i></div>
+          <div class="process-num">02</div>
+          <h4>Проектирование</h4>
+          <p>Создаю структуру, прототипирую интерфейс, продумываю архитектуру</p>
+        </div>
+        <div class="process-step">
+          <div class="icon"><i class="fas fa-code"></i></div>
+          <div class="process-num">03</div>
+          <h4>Разработка</h4>
+          <p>Пишу чистый код, тестирую, рефакторю, коммичу регулярно</p>
+        </div>
+        <div class="process-step">
+          <div class="icon"><i class="fas fa-rocket"></i></div>
+          <div class="process-num">04</div>
+          <h4>Запуск</h4>
+          <p>Деплою проект, документирую, собираю обратную связь</p>
         </div>
       </div>
     </div>
   </section>
 
-  <section id="skills">
-    <div class="container">
-      <div class="section-accent reveal"></div>
-      <h2 class="section-title reveal">Мои навыки</h2>
-      <p class="section-subtitle reveal">Технологии и инструменты, которыми я владею</p>
-      <div class="skills-grid">
-        <div class="skill-card reveal"><i class="fab fa-html5" style="color:#e34f26"></i><div class="name">HTML5</div><div class="skill-bar"><span data-w="92%"></span></div></div>
-        <div class="skill-card reveal"><i class="fab fa-css3-alt" style="color:#1572b6"></i><div class="name">CSS3</div><div class="skill-bar"><span data-w="88%"></span></div></div>
-        <div class="skill-card reveal"><i class="fab fa-js" style="color:#f7df1e"></i><div class="name">JavaScript</div><div class="skill-bar"><span data-w="78%"></span></div></div>
-        <div class="skill-card reveal"><i class="fab fa-python" style="color:#3776ab"></i><div class="name">Python</div><div class="skill-bar"><span data-w="70%"></span></div></div>
-        <div class="skill-card reveal"><i class="fab fa-microsoft" style="color:#512bd4"></i><div class="name">C#</div><div class="skill-bar"><span data-w="65%"></span></div></div>
-        <div class="skill-card reveal"><i class="fas fa-database" style="color:#f29111"></i><div class="name">SQL</div><div class="skill-bar"><span data-w="72%"></span></div></div>
-      </div>
-    </div>
-  </section>
-
+  <!-- ===== PROJECTS ===== -->
   <section id="projects">
     <div class="container">
       <div class="section-accent reveal"></div>
       <h2 class="section-title reveal">Проекты</h2>
-      <p class="section-subtitle reveal">Мои работы</p>
+      <p class="section-subtitle reveal">Избранные работы — от учебных до собственных инициатив</p>
       <div class="projects-grid">
 
+        <!-- Sberbank -->
         <div class="project-card reveal">
           <div class="project-preview" style="background:linear-gradient(135deg,#21A038,#0C7B2D)">
             <i class="fas fa-university"></i><div class="overlay"></div>
+            <span class="badge badge-done">Готово</span>
           </div>
           <div class="project-body">
             <h3>Сбербанк Онлайн</h3>
-            <p>Клон мобильного банка с авторизацией по ПИН-коду, балансом, переводами, историей операций и тёмной темой.</p>
+            <p>Полнофункциональный клон мобильного банка с авторизацией по ПИН-коду, дашбордом баланса, переводами и историей операций.</p>
+            <ul class="project-features">
+              <li>Авторизация по ПИН-коду с валидацией</li>
+              <li>Дашборд с балансом и графиками (Chart.js)</li>
+              <li>Переводы между счетами</li>
+              <li>История операций с фильтрацией</li>
+              <li>Тёмная тема, адаптивный дизайн</li>
+            </ul>
             <div class="project-tech"><span>HTML5</span><span>CSS3</span><span>JavaScript</span><span>Chart.js</span></div>
-            <a href="projects/sberbank/index.html" target="_blank" class="project-link">Открыть <i class="fas fa-external-link-alt"></i></a>
+            <div class="project-links">
+              <a href="projects/sberbank/index.html" target="_blank" class="project-link">Демо <i class="fas fa-external-link-alt"></i></a>
+              <a href="https://github.com/danya1002" target="_blank" class="project-link github"><i class="fab fa-github"></i> Код</a>
+            </div>
           </div>
         </div>
 
+        <!-- Photographer -->
         <div class="project-card reveal">
           <div class="project-preview" style="background:linear-gradient(135deg,#2c3e50,#3498db)">
             <i class="fas fa-camera"></i><div class="overlay"></div>
+            <span class="badge badge-done">Готово</span>
           </div>
           <div class="project-body">
             <h3>Услуги Фотографа</h3>
-            <p>Сайт фотостудии со списком услуг, галереей работ, контактной формой и отзывами. Собран по макету из Figma.</p>
-            <div class="project-tech"><span>HTML5</span><span>CSS3</span><span>Figma</span></div>
-            <a href="projects/photographer/index.html" target="_blank" class="project-link">Открыть <i class="fas fa-external-link-alt"></i></a>
+            <p>Сайт фотостудии, сверстанный по макету из Figma. Адаптивный дизайн, галерея работ, форма обратной связи.</p>
+            <ul class="project-features">
+              <li>Точная вёрстка по макету из Figma</li>
+              <li>Интерактивная галерея с фильтрами</li>
+              <li>Список услуг с описаниями и ценами</li>
+              <li>Форма обратной связи с валидацией</li>
+              <li>Отзывы клиентов</li>
+            </ul>
+            <div class="project-tech"><span>HTML5</span><span>CSS3</span><span>Figma</span><span>Адаптив</span></div>
+            <div class="project-links">
+              <a href="projects/photographer/index.html" target="_blank" class="project-link">Демо <i class="fas fa-external-link-alt"></i></a>
+              <a href="https://github.com/danya1002" target="_blank" class="project-link github"><i class="fab fa-github"></i> Код</a>
+            </div>
           </div>
         </div>
 
+        <!-- ElectronicClub -->
         <div class="project-card reveal">
           <div class="project-preview" style="background:linear-gradient(135deg,#1a1a2e,#16213e)">
             <i class="fas fa-store"></i><div class="overlay"></div>
+            <span class="badge badge-done">Готово</span>
           </div>
           <div class="project-body">
             <h3>ElectronicClub</h3>
-            <p>Интернет-магазин на платформе Wix с каталогом товаров, трейлером и системой заказов.</p>
-            <div class="project-tech"><span>Wix</span><span>Веб-дизайн</span><span>Контент</span></div>
-            <a href="https://hlebnikovdanya2006.wixsite.com/electronicclub" target="_blank" class="project-link">Открыть <i class="fas fa-external-link-alt"></i></a>
+            <p>Интернет-магазин электроники на платформе Wix с каталогом товаров, трейлером и системой оформления заказов.</p>
+            <ul class="project-features">
+              <li>Каталог товаров с категориями</li>
+              <li>Система корзины и оформления заказа</li>
+              <li>Интеграция видео-трейлера</li>
+              <li>Адаптивный дизайн под мобильные</li>
+            </ul>
+            <div class="project-tech"><span>Wix</span><span>Веб-дизайн</span><span>UX/UI</span><span>Контент</span></div>
+            <div class="project-links">
+              <a href="https://hlebnikovdanya2006.wixsite.com/electronicclub" target="_blank" class="project-link">Демо <i class="fas fa-external-link-alt"></i></a>
+            </div>
           </div>
         </div>
 
+        <!-- Mobile Dev -->
         <div class="project-card reveal">
           <div class="project-preview" style="background:linear-gradient(135deg,#6C63FF,#4ECDC4)">
             <i class="fas fa-mobile-alt"></i><div class="overlay"></div>
+            <span class="badge badge-wip">В работе</span>
           </div>
           <div class="project-body">
-            <h3>Мобильная разработка</h3>
-            <p>Сборка кроссплатформенного приложения: изучение инструментов и подходов к мобильной разработке.</p>
-            <div class="project-tech"><span>Кроссплатформа</span><span>UI/UX</span></div>
-            <a href="#" class="project-link" style="opacity:.5;cursor:default;pointer-events:none;">В процессе <i class="fas fa-spinner"></i></a>
+            <h3>Мобильное приложение</h3>
+            <p>Кроссплатформенное мобильное приложение. Изучение инструментов и подходов к мобильной разработке.</p>
+            <ul class="project-features">
+              <li>Исследование кроссплатформенных фреймворков</li>
+              <li>Проектирование UI/UX для мобильных</li>
+              <li>Прототипирование и тестирование</li>
+            </ul>
+            <div class="project-tech"><span>Кроссплатформа</span><span>UI/UX</span><span>Прототип</span></div>
+            <div class="project-links">
+              <a href="#" class="project-link" style="opacity:.5;cursor:default;pointer-events:none;">Скоро <i class="fas fa-spinner"></i></a>
+            </div>
           </div>
         </div>
 
@@ -362,22 +666,125 @@
     </div>
   </section>
 
+  <!-- ===== ACHIEVEMENTS ===== -->
+  <section id="achievements">
+    <div class="container">
+      <div class="section-accent reveal"></div>
+      <h2 class="section-title reveal">Достижения</h2>
+      <p class="section-subtitle reveal">Чем могу гордиться</p>
+      <div class="achieve-grid">
+        <div class="achieve-card reveal">
+          <div class="achieve-icon" style="background:rgba(99,102,241,.15);color:var(--accent)"><i class="fas fa-graduation-cap"></i></div>
+          <div><h4>Обучение в КАИТ20</h4><p>Успешно осваиваю специальность «Информационные системы и программирование», группа ИСпо412</p></div>
+        </div>
+        <div class="achieve-card reveal">
+          <div class="achieve-icon" style="background:rgba(34,211,238,.15);color:var(--accent-2)"><i class="fas fa-project-diagram"></i></div>
+          <div><h4>6+ самостоятельных проектов</h4><p>Создал ряд веб-приложений разной сложности — от лендинга до интерактивного банка с графиками</p></div>
+        </div>
+        <div class="achieve-card reveal">
+          <div class="achieve-icon" style="background:rgba(34,197,94,.15);color:var(--green)"><i class="fas fa-laptop-code"></i></div>
+          <div><h4>Самостоятельное обучение</h4><p>Освоил JavaScript, Chart.js и основы веб-разработки за пределами учебной программы</p></div>
+        </div>
+        <div class="achieve-card reveal">
+          <div class="achieve-icon" style="background:rgba(168,85,247,.15);color:var(--accent-3)"><i class="fas fa-store"></i></div>
+          <div><h4>Запуск ElectronicClub</h4><p>Создал и запустил интернет-магазин на Wix с каталогом и системой заказов</p></div>
+        </div>
+        <div class="achieve-card reveal">
+          <div class="achieve-icon" style="background:rgba(245,158,11,.15);color:var(--orange)"><i class="fab fa-github"></i></div>
+          <div><h4>Активный GitHub-профиль</h4><p>Регулярно публикую код, веду историю коммитов, оформляю репозитории</p></div>
+        </div>
+        <div class="achieve-card reveal">
+          <div class="achieve-icon" style="background:rgba(236,72,153,.15);color:var(--pink)"><i class="fas fa-palette"></i></div>
+          <div><h4>Навыки дизайна</h4><p>Работаю с Figma, воспроизвожу макеты с точным соответствием, понимаю основы UX</p></div>
+        </div>
+      </div>
+
+      <div class="github-section reveal">
+        <div class="github-graph">
+          <h4><i class="fab fa-github" style="margin-right:8px"></i>Активность на GitHub</h4>
+          <p style="font-size:.85rem;color:var(--muted);margin-bottom:16px">Регулярные коммиты — зелёные квадратики моей работы</p>
+          <div class="graph-placeholder" id="graphPlaceholder"></div>
+          <a href="https://github.com/danya1002" target="_blank" class="btn btn-outline btn-sm" style="margin-top:20px">
+            <i class="fab fa-github"></i> Открыть профиль
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== LOOKING FOR ===== -->
+  <section id="looking">
+    <div class="container">
+      <div class="section-accent reveal"></div>
+      <h2 class="section-title reveal">Что я ищу</h2>
+      <p class="section-subtitle reveal">Мои цели и ожидания от работы</p>
+      <div class="looking-grid reveal">
+        <div class="looking-card">
+          <h4><i class="fas fa-bullseye"></i> Карьерные цели</h4>
+          <p>Хочу начать карьеру в веб-разработке или backend-разработке. Готов учиться, брать ответственность и вносить реальный вклад в проекты команды.</p>
+          <ul>
+            <li><i class="fas fa-check"></i> Junior/Frontend разработчик</li>
+            <li><i class="fas fa-check"></i> Стажировка в IT-компании</li>
+            <li><i class="fas fa-check"></i> Удалённая работа / фриланс</li>
+            <li><i class="fas fa-check"></i> Участие в открытых проектах</li>
+          </ul>
+        </div>
+        <div class="looking-card">
+          <h4><i class="fas fa-handshake"></i> Что предлагаю</h4>
+          <p>Мои сильные стороны и то, что я могу привнести в команду:</p>
+          <ul>
+            <li><i class="fas fa-check"></i> Быстро обучаюсь новым технологиям</li>
+            <li><i class="fas fa-check"></i> Внимание к деталям и качеству UI</li>
+            <li><i class="fas fa-check"></i> Умение работать с макетами из Figma</li>
+            <li><i class="fas fa-check"></i> Опыт работы с SQL и базами данных</li>
+            <li><i class="fas fa-check"></i> Регулярные коммиты и чистый код</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CONTACTS ===== -->
   <section id="contacts">
     <div class="container">
       <div class="section-accent reveal"></div>
       <h2 class="section-title reveal">Контакты</h2>
       <p class="section-subtitle reveal">Свяжитесь со мной удобным способом</p>
-      <div class="contacts-grid">
-        <div class="contact-item reveal"><i class="fas fa-envelope"></i><div class="info"><div class="label">Email</div><div class="value">hlebnikovdanya2006@gmail.com</div></div></div>
-        <div class="contact-item reveal"><i class="fas fa-phone"></i><div class="info"><div class="label">Телефон</div><div class="value">8 (906) 697-23-87</div></div></div>
-        <div class="contact-item reveal"><i class="fas fa-map-marker-alt"></i><div class="info"><div class="label">Город</div><div class="value">Брянск, Россия</div></div></div>
-        <div class="contact-item reveal"><i class="fab fa-github"></i><div class="info"><div class="label">GitHub</div><div class="value">@danya1002</div></div></div>
+      <div class="contacts-wrapper">
+        <div class="contacts-grid">
+          <div class="contact-item reveal"><i class="fas fa-envelope"></i><div><div class="label">Email</div><div class="value">hlebnikovdanya2006@gmail.com</div></div></div>
+          <div class="contact-item reveal"><i class="fas fa-phone"></i><div><div class="label">Телефон</div><div class="value">8 (906) 697-23-87</div></div></div>
+          <div class="contact-item reveal"><i class="fas fa-map-marker-alt"></i><div><div class="label">Город</div><div class="value">Брянск, Россия</div></div></div>
+          <div class="contact-item reveal"><i class="fab fa-github"></i><div><div class="label">GitHub</div><div class="value"><a href="https://github.com/danya1002" target="_blank" style="color:var(--accent-2)">@danya1002</a></div></div></div>
+          <div class="contact-item reveal"><i class="fab fa-telegram-plane"></i><div><div class="label">Telegram</div><div class="value"><a href="https://t.me/danya1002" target="_blank" style="color:var(--accent-2)">@danya1002</a></div></div></div>
+        </div>
+        <div class="contact-form reveal">
+          <h3><i class="fas fa-paper-plane" style="color:var(--accent-2);margin-right:8px"></i>Напишите мне</h3>
+          <div class="form-group">
+            <label>Имя</label>
+            <input type="text" placeholder="Ваше имя">
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" placeholder="your@email.com">
+          </div>
+          <div class="form-group">
+            <label>Сообщение</label>
+            <textarea placeholder="Расскажите о вашем предложении..."></textarea>
+          </div>
+          <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="alert('Форма пока в разработке. Напишите мне на email или Telegram!')">
+            <i class="fas fa-paper-plane"></i> Отправить
+          </button>
+        </div>
       </div>
     </div>
   </section>
 
   <footer>
-    <div class="container">&copy; 2026 Хлебников Даниил. Все права защищены.</div>
+    <div class="container">
+      <p>&copy; 2026 <strong>Хлебников Даниил</strong>. Все права защищены.</p>
+      <p style="margin-top:6px">Создано с <i class="fas fa-heart" style="color:var(--pink);font-size:.75rem"></i> и чистым кодом</p>
+    </div>
   </footer>
 
   <div id="toTop"><i class="fas fa-arrow-up"></i></div>
@@ -385,23 +792,23 @@
   <script>
     // Preloader
     window.addEventListener('load', () => {
-      setTimeout(() => document.getElementById('preloader').classList.add('hide'), 400);
+      setTimeout(() => document.getElementById('preloader').classList.add('hide'), 500);
     });
 
     // Typing effect
-    const roles = ['Разработчик', 'Студент КАИТ20', 'Веб-энтузиаст', 'Python & C#'];
+    const roles = ['Веб-разработчик', 'Студент КАИТ20', 'Python & C#', 'Frontend энтузиаст', 'Любитель чистого кода'];
     let ri = 0, ci = 0, deleting = false;
     const typed = document.getElementById('typed');
     function typeLoop() {
       const word = roles[ri];
       if (!deleting) {
         typed.textContent = word.slice(0, ++ci);
-        if (ci === word.length) { deleting = true; setTimeout(typeLoop, 1400); return; }
+        if (ci === word.length) { deleting = true; setTimeout(typeLoop, 1600); return; }
       } else {
         typed.textContent = word.slice(0, --ci);
         if (ci === 0) { deleting = false; ri = (ri + 1) % roles.length; }
       }
-      setTimeout(typeLoop, deleting ? 45 : 90);
+      setTimeout(typeLoop, deleting ? 40 : 85);
     }
     typeLoop();
 
@@ -414,7 +821,7 @@
           io.unobserve(e.target);
         }
       });
-    }, { threshold: 0.15 });
+    }, { threshold: 0.12 });
     document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 
     // Nav active state + smooth scroll
@@ -426,14 +833,23 @@
     const sections = [...document.querySelectorAll('section[id]')];
     window.addEventListener('scroll', () => {
       const y = window.scrollY + 120;
-      sections.forEach(s => {
-        navLinks.forEach(a => a.classList.remove('active'));
-        const active = sections.find(s => s.offsetTop <= y && s.offsetTop + s.offsetHeight > y);
-        if (active) navLinks.forEach(a => a.getAttribute('href') === '#' + active.id && a.classList.add('active'));
-      });
+      navLinks.forEach(a => a.classList.remove('active'));
+      const active = [...sections].reverse().find(s => s.offsetTop <= y);
+      if (active) navLinks.forEach(a => a.getAttribute('href') === '#' + active.id && a.classList.add('active'));
       document.getElementById('toTop').classList.toggle('show', window.scrollY > 500);
     });
     document.getElementById('toTop').addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+    // Generate GitHub-style graph
+    const graph = document.getElementById('graphPlaceholder');
+    const levels = ['', 'l1', 'l2', 'l3', 'l4'];
+    for (let i = 0; i < 120; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'graph-cell';
+      const rand = Math.random();
+      if (rand > 0.4) cell.classList.add(levels[Math.ceil(Math.random() * 4)]);
+      graph.appendChild(cell);
+    }
   </script>
 </body>
 </html>
